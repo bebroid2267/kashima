@@ -15,14 +15,37 @@ export default function AuthPage() {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // Проверяем, есть ли пользователь в localStorage
-        const storedUser = localStorage.getItem('user');
+        // Проверяем доступность localStorage
+        if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+          console.error('localStorage is not available');
+          setIsCheckingAuth(false);
+          return;
+        }
+        
+        // Безопасная проверка наличия пользователя в localStorage
+        let storedUser = null;
+        try {
+          storedUser = localStorage.getItem('user');
+        } catch (localStorageError) {
+          console.error('Error accessing localStorage:', localStorageError);
+        }
+        
         if (storedUser) {
-          router.push('/');
+          // Безопасный парсинг JSON
+          try {
+            JSON.parse(storedUser);
+            router.push('/');
+          } catch (parseError) {
+            console.error('Error parsing user data:', parseError);
+            // Удаляем повреждённые данные
+            localStorage.removeItem('user');
+            setIsCheckingAuth(false);
+          }
+        } else {
+          setIsCheckingAuth(false);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
-      } finally {
         setIsCheckingAuth(false);
       }
     };

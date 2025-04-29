@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import font from '../../public/go.jpg'
 import Footer from './components/Footer';
+import { Workbox } from 'workbox-window';
 
 const fakeCoeffs = [1.25, 3.88, 1.54, 1.28, 1.06];
 
@@ -251,13 +252,33 @@ export default function Home() {
 
   // Check authentication state and update energy
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    // Проверка доступности localStorage
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      console.error('localStorage is not available');
+      return;
+    }
+    
+    // Безопасное получение данных пользователя
+    let storedUser = null;
+    try {
+      const storedUserStr = localStorage.getItem('user');
+      if (storedUserStr) {
+        storedUser = JSON.parse(storedUserStr);
+      }
+    } catch (error) {
+      console.error('Error accessing or parsing localStorage data:', error);
+      localStorage.removeItem('user');
+      router.push('/auth');
+      return;
+    }
+    
     if (!storedUser) {
       setIsCheckingAuth(true);
       router.push('/auth');
       return;
     }
-    const userData = JSON.parse(storedUser);
+    
+    const userData = storedUser;
     setUser(userData);
     setEnergy(userData.energy || 0);
     setMaxEnergy(userData.max_energy || 100);
@@ -783,6 +804,41 @@ export default function Home() {
       setTestDepositLoading(false);
     }
   };
+
+  // Service worker registration
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const wb = new Workbox('/sw.js');
+      
+      wb.addEventListener('installed', event => {
+        console.log('Service Worker installed:', event);
+      });
+      
+      wb.addEventListener('activated', event => {
+        console.log('Service Worker activated:', event);
+      });
+      
+      wb.addEventListener('message', event => {
+        console.log('Message from Service Worker:', event);
+      });
+      
+      wb.addEventListener('waiting', event => {
+        console.log('Service Worker is waiting to be activated:', event);
+        // Можно добавить логику обновления
+      });
+      
+      // Register the service worker
+      wb.register()
+        .then(registration => {
+          console.log('Service Worker registered successfully:', registration);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
+        });
+    } else {
+      console.warn('Service Worker is not supported or disabled');
+    }
+  }, []);
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
