@@ -61,22 +61,43 @@ export default function AuthPage() {
     try {
       console.log('Attempting to login with MB ID:', mbId);
       
+      // Защита от пустого ID
+      if (!mbId.trim()) {
+        throw new Error('Please enter your ID');
+      }
+      
+      // Добавляем таймаут для запроса к базе данных
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout. Please try again.')), 10000)
+      );
+      
       // Проверяем, существует ли пользователь в таблице users
       console.log('Querying users table for mb_id:', mbId);
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('mb_id', mbId)
-        .maybeSingle();
+      
+      // Обрабатываем запрос с таймаутом
+      const { data: userData, error: userError } = await Promise.race([
+        supabase
+          .from('users')
+          .select('*')
+          .eq('mb_id', mbId)
+          .maybeSingle(),
+        timeoutPromise
+      ]) as any;
       
       console.log('Query result:', { userData, userError });
       
       if (userError) {
         console.error('Database error:', userError);
-        if (userError.message.includes('invalid input syntax for type bigint')) {
+        // Проверяем различные типы ошибок
+        if (userError.code === 'PGRST116') {
+          throw new Error('User not found');
+        } else if (userError.message && userError.message.includes('invalid input syntax for type bigint')) {
           throw new Error('Invalid ID format. Please enter numbers only');
+        } else if (userError.message && userError.message.includes('timeout')) {
+          throw new Error('Connection timeout. Please try again');
+        } else {
+          throw new Error(`Database error: ${userError.message || 'Unknown error'}`);
         }
-        throw new Error(`Database error: ${userError.message}`);
       }
       
       if (!userData) {
@@ -85,6 +106,11 @@ export default function AuthPage() {
       }
       
       console.log('User found:', userData);
+
+      // Устанавливаем значения по умолчанию, если данные отсутствуют
+      if (!userData.max_energy) userData.max_energy = 100;
+      if (!userData.chance) userData.chance = 30;
+      if (userData.energy === undefined || userData.energy === null) userData.energy = 1;
 
       // Проверяем, нужно ли инициализировать энергию пользователя
       const today = new Date().toISOString().split('T')[0]; // Формат YYYY-MM-DD

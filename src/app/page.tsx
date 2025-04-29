@@ -214,76 +214,97 @@ export default function Home() {
     } catch (error) {
       console.error('Error accessing or parsing localStorage data:', error);
       localStorage.removeItem('user');
-      router.push('/auth');
+      // Устанавливаем задержку перед переходом для избежания проблем с состоянием
+      setTimeout(() => {
+        router.push('/auth');
+      }, 300);
       return;
     }
     
     if (!storedUser) {
       setIsCheckingAuth(true);
-      router.push('/auth');
+      // Устанавливаем задержку перед переходом для избежания проблем с состоянием
+      setTimeout(() => {
+        router.push('/auth');
+      }, 300);
       return;
     }
     
-    const userData = storedUser;
-    setUser(userData);
-    setEnergy(userData.energy || 0);
-    setMaxEnergy(userData.max_energy || 100);
-    setLastLoginDate(userData.last_login_date || null);
-    setChance(userData.chance || 0);
-    setIsCheckingAuth(false); // Сразу убираем лоадер
+    // Устанавливаем дефолтные значения для критических полей, если они отсутствуют
+    if (!storedUser.energy) storedUser.energy = 0;
+    if (!storedUser.max_energy) storedUser.max_energy = 100;
+    if (!storedUser.chance) storedUser.chance = 30;
+    
+    // Обновляем состояние пользователя
+    setUser(storedUser);
+    setEnergy(storedUser.energy || 0);
+    setMaxEnergy(storedUser.max_energy || 100);
+    setLastLoginDate(storedUser.last_login_date || null);
+    setChance(storedUser.chance || 0);
+    setIsCheckingAuth(false); // Убираем лоадер
 
-    // Фоновая проверка и обновление данных
-    (async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('mb_id', userData.mb_id)
-          .single();
-        if (error) {
-          console.error('Ошибка при получении данных пользователя:', error);
-          // Если ошибка критичная (например, пользователь удалён) — разлогиниваем
-          if (error.code === 'PGRST116') {
-            localStorage.removeItem('user');
-            setUser(null);
-            router.push('/auth');
-          }
-        } else if (data) {
-          // Проверяем last_login_date
-          const today = getTodayMSK();
-          const lastLogin = data.last_login_date || null;
-          
-          // Если last_login_date не сегодня, начисляем +1 энергии
-          if (lastLogin !== today) {
-            const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
-            
-            // Обновляем данные в базе
-            const { error: updateError } = await supabase
-              .from('users')
-              .update({ energy: newEnergy, last_login_date: today })
-              .eq('mb_id', data.mb_id);
-              
-            if (updateError) {
-              console.error('Ошибка при обновлении энергии:', updateError);
-            } else {
-              // Обновляем локальные данные
-              data.energy = newEnergy;
-              data.last_login_date = today;
+    // Фоновая проверка и обновление данных только если есть ID пользователя
+    if (storedUser && storedUser.mb_id) {
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('mb_id', storedUser.mb_id)
+            .single();
+          if (error) {
+            console.error('Ошибка при получении данных пользователя:', error);
+            // Если ошибка критичная (например, пользователь удалён) — разлогиниваем
+            if (error.code === 'PGRST116') {
+              localStorage.removeItem('user');
+              setUser(null);
+              // Устанавливаем задержку перед переходом для избежания проблем с состоянием
+              setTimeout(() => {
+                router.push('/auth');
+              }, 300);
             }
+          } else if (data) {
+            // Проверяем last_login_date
+            const today = getTodayMSK();
+            const lastLogin = data.last_login_date || null;
+            
+            // Если last_login_date не сегодня, начисляем +1 энергии
+            if (lastLogin !== today) {
+              const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
+              
+              // Обновляем данные в базе
+              const { error: updateError } = await supabase
+                .from('users')
+                .update({ energy: newEnergy, last_login_date: today })
+                .eq('mb_id', data.mb_id);
+                
+              if (updateError) {
+                console.error('Ошибка при обновлении энергии:', updateError);
+              } else {
+                // Обновляем локальные данные
+                data.energy = newEnergy;
+                data.last_login_date = today;
+              }
+            }
+            
+            // Устанавливаем дефолтные значения для критических полей, если они отсутствуют
+            if (data.energy === undefined || data.energy === null) data.energy = 0;
+            if (!data.max_energy) data.max_energy = 100;
+            if (!data.chance) data.chance = 30;
+            
+            // Обновляем состояние
+            setUser(data);
+            localStorage.setItem('user', JSON.stringify(data));
+            setEnergy(data.energy || 0);
+            setMaxEnergy(data.max_energy || 100);
+            setLastLoginDate(data.last_login_date);
+            setChance(data.chance || 0);
           }
-          
-          // Обновляем состояние
-          setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
-          setEnergy(data.energy || 0);
-          setMaxEnergy(data.max_energy || 100);
-          setLastLoginDate(data.last_login_date);
-          setChance(data.chance || 0);
+        } catch (error) {
+          console.error('Error checking authentication:', error);
         }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      }
-    })();
+      })();
+    }
   }, [router]);
 
   // Таймер до следующей энергии - восстанавливаем для отсчета до 00:00 МСК

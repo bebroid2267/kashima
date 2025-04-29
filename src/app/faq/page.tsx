@@ -6,6 +6,7 @@ import Image from 'next/image';
 import chance from '@/../public/image.png';
 import round from '@/../public/result.jpg';
 import winner from '@/../public/light.jpg';
+import Head from 'next/head';
 
 interface FAQBlock {
   title: string;
@@ -72,6 +73,9 @@ export default function FAQ() {
 
   return (
     <div className="faq-container">
+      <Head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" />
+      </Head>
       <div className="language-switcher">
         <button 
           className={`lang-btn ${currentLang === 'ru' ? 'active' : ''}`}
