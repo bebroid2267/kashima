@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+const withPWA = require('next-pwa')({
+  dest: 'public', // папка, куда будет помещён service-worker
+  register: true,
+  skipWaiting: true,
+});
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = withPWA({
+  output: 'export',
+  // Твои другие настройки Next.js
+});
