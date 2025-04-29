@@ -2,9 +2,9 @@ const withPWA = require('next-pwa')({
   dest: 'public', // папка, куда будет помещён service-worker
   register: true,
   skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development'
 });
 
 module.exports = withPWA({
-  output: 'export',
   // Твои другие настройки Next.js
 });

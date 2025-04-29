@@ -7,31 +7,59 @@ import Footer from './components/Footer';
 
 const fakeCoeffs = [1.25, 3.88, 1.54, 1.28, 1.06];
 
-// Array of 20+ different prediction messages
-const predictionMessages = [
-  "Market analysis completed",
-  "Growth trend detected",
-  "Success pattern identified",
-  "Probability calculation completed",
-  "Prediction formed",
-  "Algorithm determined optimal path",
-  "Data processed successfully",
-  "Model predicted result",
-  "Analysis completed successfully",
-  "Coefficient calculation completed",
-  "Prediction ready for display",
-  "Algorithm determined perspective",
-  "Calculation completed successfully", 
-  "Data analysis completed",
-  "Prediction formed successfully",
-  "Calculation completed",
-  "Algorithm determined result",
-  "Analysis completed",
-  "Prediction ready",
-  "Coefficient calculation completed",
-  "Analysis completed successfully",
-  "Prediction formed",
-  "Calculation completed successfully"
+// Category-specific prediction messages
+const predictionMessages30to50 = [
+  "ИИ прогнозирует умеренный рост на основе анализа последних 5 раундов.",
+  "Система рекомендует осторожную игру из-за волновой активности графика.",
+  "Вероятен низкий коэффициент из-за малого процента удачных сессий сегодня.",
+  "Аналитическая система определила средний диапазон на основе текущих показателей.",
+  "Прогнозируется небольшой взлёт согласно расчётам на основе последних 10 сессий.",
+  "Ожидается стабильный коэффициент из-за умеренных флуктуаций графика.",
+  "Модель указывает на небольшой рост по результатам анализа текущей сессии.",
+  "Рекомендуется консервативная ставка из-за низкого уровня предсказуемости.",
+  "Система определила рост в пределах нормы благодаря стабильным колебаниям коэффициента.",
+  "ИИ предлагает соблюдать осторожность в связи с нестабильностью текущей сессии.",
+  "Алгоритм фиксирует средний взлёт на основе умеренного сигнала системы.",
+  "Прогнозируется умеренный рост исходя из активности на средней волне.",
+  "ИИ определил умеренный рост в связи с ограниченным потенциалом текущего раунда.",
+  "Система оценивает безопасность полёта как среднюю из-за смешанных сигналов.",
+  "Анализ трендов указывает на небольшой подъём в ближайшем раунде."
+];
+
+const predictionMessages50to70 = [
+  "Технический анализ выявил положительную тенденцию, прогнозируется позитивный рост.",
+  "ИИ рассчитал повышенную вероятность успешной сессии для следующего раунда.",
+  "Статистика последних взлётов показывает стабильный рост в ближайшем раунде.",
+  "Система фиксирует позитивный сигнал, указывающий на успешный раунд.",
+  "ИИ определил благоприятный момент для игры с высокой вероятностью выгодной ставки.",
+  "Аналитика прогнозирует уверенный рост на основе позитивного тренда графика.",
+  "Оптимизированные алгоритмы обеспечивают высокую точность прогноза для текущей сессии.",
+  "Система обнаружила закономерность, указывающую на успешную ставку.",
+  "Совпадение нескольких факторов создаёт оптимальный момент для входа в игру.",
+  "Аналитическая сводка полётов прогнозирует средний подъем графика.",
+  "Расчётная система указывает на благоприятный потенциал взлёта.",
+  "ИИ видит хорошую возможность для тактической игры с высоким шансом выигрыша.",
+  "Система оценивает безопасность полёта как хорошую благодаря стабильной динамике показателей.",
+  "Стабильные показатели активности указывают на прогнозируемый рост.",
+  "Динамика графика отражает потенциал для положительного исхода."
+];
+
+const predictionMessages70to85 = [
+  "Идеальное совпадение параметров обеспечивает максимальную точность прогноза.",
+  "ИИ прогнозирует высокий потенциал роста в предстоящем раунде.",
+  "Аналитическая система в полном согласии, фиксируя оптимальный момент для ставки.",
+  "Сильный сигнал от системы указывает на высоковероятную успешную игру.",
+  "ИИ определил идеальное время для максимизации прибыли через высокую ставку.",
+  "Все показатели системы положительны, рекомендуется активная стратегия.",
+  "Расчёты показывают максимальную вероятность высокого успеха в текущей сессии.",
+  "Совокупность всех факторов указывает на высокий взлёт в ближайшем раунде.",
+  "Модель работает на пике эффективности, обеспечивая исключительную точность прогноза.",
+  "Система обнаружила мощный импульс, предвещающий сильный рост коэффициента.",
+  "Все индикаторы в зелёной зоне, безопасность полёта оценивается как высокая.",
+  "ИИ прогнозирует успешный исход, основываясь на положительных показателях всех индикаторов.",
+  "Оптимальные условия для большой ставки с максимальной потенциальной прибылью.",
+  "Система подтверждает надёжность высокоточного прогноза на текущую сессию.",
+  "ИИ зафиксировал идеальные условия для игры в данный момент."
 ];
 
 // Получить сегодняшнюю дату по МСК (UTC+3)
@@ -106,12 +134,43 @@ function getUniqueCoefficient(chance: number): number {
   return coeff;
 }
 
+function getCoeffColor(coefficient: number, chance: number): string {
+  // Определяем категорию шанса
+  const range = getRangeByChance(chance);
+  
+  if (range === '30-50') {
+    // Для шанса 30-50%
+    if (coefficient <= 1.5) return '#52c41a'; // Зеленый для безопасных (70% случаев)
+    if (coefficient <= 3.0) return '#faad14'; // Желтый для умеренных (20% случаев)
+    return '#ff4d4f'; // Красный для высоких (10% случаев)
+  } 
+  else if (range === '50-70') {
+    // Для шанса 50-70%
+    if (coefficient <= 2.5) return '#52c41a'; // Зеленый для безопасных (80% случаев)
+    if (coefficient <= 4.0) return '#faad14'; // Желтый для умеренных (15% случаев)
+    return '#ff4d4f'; // Красный для высоких (5% случаев)
+  } 
+  else if (range === '70-85') {
+    // Для шанса 70-85%
+    if (coefficient <= 1.8) return '#52c41a'; // Зеленый для безопасных (85% случаев)
+    if (coefficient <= 2.5) return '#faad14'; // Желтый для умеренных (10% случаев)
+    return '#ff4d4f'; // Красный для высоких (5% случаев)
+  }
+  
+  // Для других случаев (default)
+  return '#ffe066'; // Желтый по умолчанию
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<string | null>(null);
   const [coefficient, setCoefficient] = useState<number | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [aviatorUrl, setAviatorUrl] = useState<string>('');
+  const [depositUrl, setDepositUrl] = useState<string>('');
+  const [helpLink, setHelpLink] = useState<string>('');
+  const [testDepositLoading, setTestDepositLoading] = useState(false);
+  const [testDepositResult, setTestDepositResult] = useState<string | null>(null);
   const [user, setUser] = useState<any>(() => {
     // Инициализация user из localStorage (SSR-safe)
     if (typeof window !== 'undefined') {
@@ -223,13 +282,36 @@ export default function Home() {
             router.push('/auth');
           }
         } else if (data) {
+          // Проверяем last_login_date
+          const today = getTodayMSK();
+          const lastLogin = data.last_login_date || null;
+          
+          // Если last_login_date не сегодня, начисляем +1 энергии
+          if (lastLogin !== today) {
+            const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
+            
+            // Обновляем данные в базе
+            const { error: updateError } = await supabase
+              .from('users')
+              .update({ energy: newEnergy, last_login_date: today })
+              .eq('mb_id', data.mb_id);
+              
+            if (updateError) {
+              console.error('Ошибка при обновлении энергии:', updateError);
+            } else {
+              // Обновляем локальные данные
+              data.energy = newEnergy;
+              data.last_login_date = today;
+            }
+          }
+          
+          // Обновляем состояние
           setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
           setEnergy(data.energy || 0);
           setMaxEnergy(data.max_energy || 100);
           setLastLoginDate(data.last_login_date);
           setChance(data.chance || 0);
-          await checkAndUpdateEnergy(data);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
@@ -237,47 +319,67 @@ export default function Home() {
     })();
   }, [router]);
 
-  // Таймер до следующей энергии
+  // Таймер до следующей энергии - восстанавливаем для отсчета до 00:00 МСК
   useEffect(() => {
     if (!lastLoginDate) return;
     let interval: NodeJS.Timeout;
+    
     function getNextEnergyTime() {
       if (!lastLoginDate) return new Date();
-      const last = new Date(lastLoginDate + 'T00:00:00+03:00');
-      const next = new Date(last);
-      next.setDate(last.getDate() + 1);
+      
+      // Получаем текущую дату по МСК
+      const now = getNowMSK();
+      
+      // Создаем дату следующего обновления (00:00 МСК следующего дня)
+      const next = new Date(now);
+      next.setDate(next.getDate() + 1);
       next.setHours(0, 0, 0, 0);
+      
       return next;
     }
+    
     function updateTimer() {
       if (energy >= maxEnergy) {
         setEnergyTimer('');
         return;
       }
+      
       const now = getNowMSK();
       const next = getNextEnergyTime();
       const diff = next.getTime() - now.getTime();
+      
+      // Выводим отладочную информацию
+      console.log('Таймер:', {
+        now: now.toISOString(),
+        next: next.toISOString(),
+        diff: diff,
+        lastLoginDate: lastLoginDate
+      });
+      
       if (diff <= 0) {
-        if (energy < maxEnergy) {
-          const newEnergy = Math.min(energy + 1, maxEnergy);
-          setEnergy(newEnergy);
-          const today = getTodayMSK();
-          setLastLoginDate(today);
-          if (user) {
-            supabase.from('users').update({ energy: newEnergy, last_login_date: today }).eq('mb_id', user.mb_id);
-            const updatedUser = { ...user, energy: newEnergy, last_login_date: today };
-            setUser(updatedUser);
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-          }
+        // Если таймер истек, обновляем lastLoginDate на сегодня
+        const today = getTodayMSK();
+        setLastLoginDate(today);
+        
+        // Обновляем lastLoginDate в базе данных
+        if (user) {
+          supabase.from('users').update({ last_login_date: today }).eq('mb_id', user.mb_id);
+          const updatedUser = { ...user, last_login_date: today };
+          setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
         }
-        setEnergyTimer('');
+        
+        // Перезапускаем таймер для следующего дня
+        setTimeout(updateTimer, 100);
         return;
       }
+      
       const hours = Math.floor(diff / 1000 / 60 / 60).toString().padStart(2, '0');
       const minutes = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
       const seconds = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
       setEnergyTimer(`${hours}:${minutes}:${seconds}`);
     }
+    
     updateTimer();
     interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
@@ -294,7 +396,7 @@ export default function Home() {
     }
   }, [isLoading]);
 
-  // Анимация звёздного гиперпространства
+  // Анимация нейронной сети
   useEffect(() => {
     const canvas = starCanvasRef.current;
     if (!canvas) return;
@@ -304,56 +406,159 @@ export default function Home() {
     let height = canvas.height = canvas.offsetHeight;
     let animationFrame: number;
     let running = true;
-    // Больше звёзд
-    let stars = Array.from({ length: 320 }, () => ({
+
+    // Создаем нейроны
+    const neurons = Array.from({ length: 50 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       z: Math.random() * width,
-      prevX: 0,
-      prevY: 0,
+      connections: [] as number[],
+      speed: Math.random() * 2 + 1,
+      size: Math.random() * 3 + 1,
     }));
+
+    // Создаем связи между нейронами
+    neurons.forEach((neuron, i) => {
+      neuron.connections = Array.from({ length: 3 }, () => 
+        Math.floor(Math.random() * neurons.length)
+      ).filter(j => j !== i);
+    });
+
     function resize() {
       if (!canvas) return;
       width = canvas.width = canvas.offsetWidth;
       height = canvas.height = canvas.offsetHeight;
     }
+
     window.addEventListener('resize', resize);
+
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
-      // Делаем хвосты длиннее и glow сильнее
-      const speed = isLoading ? 28 : 7;
-      const tail = isLoading ? 180 : 90;
-      for (let star of stars) {
-        star.prevX = star.x;
-        star.prevY = star.y;
-        star.z -= speed;
-        if (star.z <= 0) {
-          star.x = Math.random() * width;
-          star.y = Math.random() * height;
-          star.z = width;
-        }
-        const k = tail / star.z;
-        const sx = (star.x - width / 2) * k + width / 2;
-        const sy = (star.y - height / 2) * k + height / 2;
-        ctx.beginPath();
-        ctx.moveTo(star.prevX, star.prevY);
-        ctx.lineTo(sx, sy);
-        ctx.strokeStyle = isLoading ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,220,0.85)';
-        ctx.lineWidth = isLoading ? 3.2 : 1.7;
-        ctx.shadowColor = isLoading ? '#fffbe6' : '#ffe066';
-        ctx.shadowBlur = isLoading ? 32 : 12;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        star.x = sx;
-        star.y = sy;
+
+      // Если не загрузка, просто очищаем canvas и выходим
+      if (!isLoading) {
+        // Анимация для обычного состояния (в 2 раза медленнее)
+        const defaultSpeed = 2.5; // Половина от скорости при клике
+
+        // Обновляем позиции нейронов
+        neurons.forEach(neuron => {
+          neuron.z -= defaultSpeed;
+          if (neuron.z <= 0) {
+            neuron.z = width;
+            neuron.x = Math.random() * width;
+            neuron.y = Math.random() * height;
+          }
+        });
+
+        // Рисуем связи и нейроны
+        neurons.forEach(neuron => {
+          const k = 150 / neuron.z;
+          const x = (neuron.x - width / 2) * k + width / 2;
+          const y = (neuron.y - height / 2) * k + height / 2;
+
+          // Рисуем связи
+          neuron.connections.forEach(connIndex => {
+            const connectedNeuron = neurons[connIndex];
+            const connK = 150 / connectedNeuron.z;
+            const connX = (connectedNeuron.x - width / 2) * connK + width / 2;
+            const connY = (connectedNeuron.y - height / 2) * connK + height / 2;
+
+            // Рисуем линию связи
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(connX, connY);
+            
+            // Градиент для линии
+            const gradient = ctx.createLinearGradient(x, y, connX, connY);
+            gradient.addColorStop(0, 'rgba(56, 224, 255, 0.2)'); // Более прозрачные линии
+            gradient.addColorStop(1, 'rgba(124, 95, 255, 0.2)'); // Более прозрачные линии
+            
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 0.5; // Тоньше линии
+            ctx.shadowColor = '#7c5fff';
+            ctx.shadowBlur = 3; // Меньше свечение
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          });
+
+          // Рисуем нейрон
+          ctx.beginPath();
+          ctx.arc(x, y, neuron.size * k * 0.8, 0, Math.PI * 2); // Меньше размер
+          ctx.fillStyle = '#7c5fff';
+          ctx.shadowColor = '#7c5fff';
+          ctx.shadowBlur = 4; // Меньше свечение
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+
+        if (running) animationFrame = requestAnimationFrame(draw);
+        return;
       }
-      if (isLoading && showFlash) {
-        ctx.fillStyle = 'rgba(255,255,255,0.97)';
+
+      // Скорость движения для состояния при клике
+      const speed = 5; // Медленная скорость для спокойной анимации
+
+      // Обновляем позиции нейронов
+      neurons.forEach(neuron => {
+        neuron.z -= speed;
+        if (neuron.z <= 0) {
+          neuron.z = width;
+          neuron.x = Math.random() * width;
+          neuron.y = Math.random() * height;
+        }
+      });
+
+      // Рисуем связи и нейроны
+      neurons.forEach(neuron => {
+        const k = 150 / neuron.z;
+        const x = (neuron.x - width / 2) * k + width / 2;
+        const y = (neuron.y - height / 2) * k + height / 2;
+
+        // Рисуем связи
+        neuron.connections.forEach(connIndex => {
+          const connectedNeuron = neurons[connIndex];
+          const connK = 150 / connectedNeuron.z;
+          const connX = (connectedNeuron.x - width / 2) * connK + width / 2;
+          const connY = (connectedNeuron.y - height / 2) * connK + height / 2;
+
+          // Рисуем линию связи
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(connX, connY);
+          
+          // Градиент для линии
+          const gradient = ctx.createLinearGradient(x, y, connX, connY);
+          gradient.addColorStop(0, 'rgba(56, 224, 255, 0.4)'); // Более прозрачные линии
+          gradient.addColorStop(1, 'rgba(124, 95, 255, 0.4)'); // Более прозрачные линии
+          
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 1; // Тоньше линии
+          ctx.shadowColor = '#7c5fff'; // Фиолетовое свечение
+          ctx.shadowBlur = 5; // Меньше свечение
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        });
+
+        // Рисуем нейрон
+        ctx.beginPath();
+        ctx.arc(x, y, neuron.size * k, 0, Math.PI * 2);
+        ctx.fillStyle = '#7c5fff'; // Фиолетовые нейроны
+        ctx.shadowColor = '#7c5fff'; // Фиолетовое свечение
+        ctx.shadowBlur = 8; // Меньше свечение
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Добавляем свечение при загрузке
+      if (showFlash) {
+        ctx.fillStyle = 'rgba(124, 95, 255, 0.1)'; // Фиолетовое свечение
         ctx.fillRect(0, 0, width, height);
       }
+
       if (running) animationFrame = requestAnimationFrame(draw);
     }
+
     draw();
     return () => {
       running = false;
@@ -372,7 +577,13 @@ export default function Home() {
         const last = lastLogin ? new Date(lastLogin + 'T00:00:00+03:00') : new Date();
         const now = new Date(getTodayMSK() + 'T00:00:00+03:00');
         const daysPassed = Math.max(1, Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)));
-        let newEnergy = Math.min((userData.energy || 0) + daysPassed, userData.max_energy || 100);
+        
+        // Ограничиваем количество дней, чтобы энергия не заполнялась до максимума сразу
+        const maxDaysToAdd = 3; // Максимум 3 дня энергии за раз
+        const daysToAdd = Math.min(daysPassed, maxDaysToAdd);
+        
+        let newEnergy = Math.min((userData.energy || 0) + daysToAdd, userData.max_energy || 100);
+        
         if (newEnergy > userData.energy) {
           await supabase
             .from('users')
@@ -401,13 +612,24 @@ export default function Home() {
     }
   };
 
-  // Function to get a random prediction message
-  const getRandomPredictionMessage = () => {
-    const randomIndex = Math.floor(Math.random() * predictionMessages.length);
-    return predictionMessages[randomIndex];
+  // Function to get a random prediction message based on chance category
+  const getRandomPredictionMessageByChance = (chance: number): string => {
+    if (chance >= 30 && chance < 50) {
+      const randomIndex = Math.floor(Math.random() * predictionMessages30to50.length);
+      return predictionMessages30to50[randomIndex];
+    } else if (chance >= 50 && chance < 70) {
+      const randomIndex = Math.floor(Math.random() * predictionMessages50to70.length);
+      return predictionMessages50to70[randomIndex];
+    } else if (chance >= 70 && chance <= 85) {
+      const randomIndex = Math.floor(Math.random() * predictionMessages70to85.length);
+      return predictionMessages70to85[randomIndex];
+    } else {
+      // Fallback for any other chance value
+      return "Прогноз сформирован";
+    }
   };
 
-  // Function to handle the AI Vision button click
+  // Modify the handleAIVisionClick function to use the category-specific messages
   const handleAIVisionClick = async () => {
     if (energy <= 0) {
       alert('Недостаточно энергии для использования AI Vision.');
@@ -421,8 +643,10 @@ export default function Home() {
 
     // Уменьшаем энергию на 1
     const newEnergy = energy - 1;
+    
+    // Сначала обновляем локальное состояние
     setEnergy(newEnergy);
-
+    
     // Обновляем только energy в базе данных
     const { error } = await supabase
       .from('users')
@@ -431,49 +655,74 @@ export default function Home() {
 
     if (error) {
       console.error('Ошибка при обновлении энергии:', error);
+      // В случае ошибки восстанавливаем предыдущее значение энергии
+      setEnergy(energy);
+    } else {
+      // Обновляем только energy в localStorage и user-стейте
+      const updatedUser = { ...user, energy: newEnergy };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Выводим в консоль для отладки
+      console.log('Энергия уменьшена:', energy, '->', newEnergy);
     }
-
-    // Обновляем только energy в localStorage и user-стейте
-    const updatedUser = { ...user, energy: newEnergy };
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
 
     // Simulate loading for 3 seconds
     setTimeout(() => {
       setIsLoading(false);
-      setCurrentMessage(getRandomPredictionMessage());
+      setCurrentMessage(getRandomPredictionMessageByChance(chance));
       setCoefficient(getUniqueCoefficient(chance));
     }, 3000);
   };
 
-  // Fetch Aviator URL from Supabase
+  // Fetch URLs from Supabase
   useEffect(() => {
-    const fetchAviatorUrl = async () => {
+    const fetchUrls = async () => {
       try {
-        console.log('Fetching Aviator URL from Supabase...');
+        console.log('Fetching URLs from Supabase...');
         const { data, error } = await supabase
           .from('actual_url')
-          .select('aviator_url')
+          .select('aviator_url, deposit_url, help_link')
           .single();
         
         if (error) {
-          console.error('Error fetching Aviator URL:', error);
+          console.error('Error fetching URLs:', error);
           return;
         }
         
-        
-        if (data && data.aviator_url) {
-          setAviatorUrl(data.aviator_url);
+        if (data) {
+          if (data.aviator_url) setAviatorUrl(data.aviator_url);
+          if (data.deposit_url) setDepositUrl(data.deposit_url);
+          if (data.help_link) setHelpLink(data.help_link);
         } else {
-          console.warn('No Aviator URL found in the data');
+          console.warn('No URLs found in the data');
         }
       } catch (error) {
-        console.error('Error in fetchAviatorUrl:', error);
+        console.error('Error in fetchUrls:', error);
       }
     };
     
-    fetchAviatorUrl();
+    fetchUrls();
   }, []);
+
+  // Function to handle button clicks
+  const handleDepositClick = () => {
+    console.log('Deposit button clicked, current URL:', depositUrl);
+    if (depositUrl) {
+      window.open(depositUrl, '_blank');
+    } else {
+      console.error('Deposit URL not available');
+    }
+  };
+
+  const handleHelpClick = () => {
+    console.log('Help button clicked, current URL:', helpLink);
+    if (helpLink) {
+      window.open(helpLink, '_blank');
+    } else {
+      console.error('Help link not available');
+    }
+  };
 
   // Function to handle Aviator button click
   const handleAviatorClick = () => {
@@ -482,6 +731,56 @@ export default function Home() {
       window.open(aviatorUrl, '_blank');
     } else {
       console.error('Aviator URL not available');
+    }
+  };
+
+  // Function to handle test deposit - make a POST request to /api/deposit
+  const handleTestDeposit = async () => {
+    if (!user) return;
+    
+    try {
+      setTestDepositLoading(true);
+      setTestDepositResult(null);
+      
+      // Create payload for the deposit endpoint
+      const payload = {
+        user_id: user.mb_id,
+        deposit: 50 // Test deposit amount of $50
+      };
+      
+      // Make the POST request
+      const response = await fetch('/api/deposit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        setTestDepositResult('Success! Deposit processed. New chance: ' + result.chance + '%');
+        
+        // Update local user state with new values
+        if (result.chance) {
+          const updatedUser = { 
+            ...user, 
+            deposit_amount: result.deposit_amount,
+            chance: result.chance 
+          };
+          setUser(updatedUser);
+          setChance(result.chance);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+      } else {
+        setTestDepositResult('Error: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error making test deposit:', error);
+      setTestDepositResult('Error making deposit request');
+    } finally {
+      setTestDepositLoading(false);
     }
   };
 
@@ -742,10 +1041,24 @@ export default function Home() {
                     alignItems: 'center',
                     animation: 'fadeIn 0.5s'
                   }}>
-                    <div style={{ fontSize: 28, marginBottom: 50,fontWeight: 700, color: '#ffe066', textShadow: '0 0 8px #ffe06699' }}>
+                    <div style={{ 
+                      fontSize: 28, 
+                      marginBottom: 10, 
+                      fontWeight: 700, 
+                      color: getCoeffColor(coefficient, chance), 
+                      textShadow: `0 0 8px ${getCoeffColor(coefficient, chance)}99`
+                    }}>
                       {coefficient.toFixed(2)}x
                     </div>
-                    <div style={{ fontSize: 16, marginTop: -15, color: '#7ecbff', textShadow: '0 0 8px #7ecbff99' }}>
+                    <div style={{ 
+                      fontSize: 16, 
+                      marginTop: 5, 
+                      color: '#7ecbff', 
+                      textShadow: '0 0 8px #7ecbff99',
+                      textAlign: 'center',
+                      width: '90%',
+                      padding: '0 5px'
+                    }}>
                       {currentMessage}
                     </div>
                   </div>
@@ -758,7 +1071,10 @@ export default function Home() {
                     fontSize: window.innerWidth <= 600 ? 11 : 22,
                     textAlign: 'center',
                     width: '100%',
-                    marginTop: 50
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}>
                     Click AI Vision for prediction
                   </div>
@@ -874,7 +1190,7 @@ export default function Home() {
                   <span>{energy}/{maxEnergy}</span>
                   {energy < maxEnergy && (
                     <span style={{ color: '#7a5c00', fontSize: 13, fontWeight: 400 }}>
-                      +1 in {energyTimer}
+                      {energyTimer}
                     </span>
                   )}
                   {energy >= maxEnergy && (
@@ -976,6 +1292,111 @@ export default function Home() {
                         }}>
                           Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances become!
                         </div>
+                      </div>
+                      {/* Кнопки для депозита и помощи */}
+                      <div style={{
+                        display: 'flex',
+                        gap: 12,
+                        width: '100%',
+                        marginTop: 10,
+                        marginBottom: 10,
+                        justifyContent: 'center',
+                      }}>
+                        <button
+                          onClick={handleDepositClick}
+                          style={{
+                            flex: 1,
+                            padding: '10px 0',
+                            borderRadius: 8,
+                            border: 'none',
+                            background: 'linear-gradient(90deg, #52c41a 0%, #08979c 100%)',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: 16,
+                            boxShadow: '0 0 16px #52c41a99',
+                            letterSpacing: 1.1,
+                            transition: 'background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s',
+                            cursor: 'pointer',
+                            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+                            outline: 'none',
+                            position: 'relative',
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #52c41acc'; }}
+                          onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #52c41a99'; }}
+                        >
+                          Make Deposit
+                        </button>
+                        <button
+                          onClick={handleHelpClick}
+                          style={{
+                            flex: 1,
+                            padding: '10px 0',
+                            borderRadius: 8,
+                            border: 'none',
+                            background: 'linear-gradient(90deg, #faad14 0%, #fa8c16 100%)',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: 16,
+                            boxShadow: '0 0 16px #faad1499',
+                            letterSpacing: 1.1,
+                            transition: 'background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s',
+                            cursor: 'pointer',
+                            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+                            outline: 'none',
+                            position: 'relative',
+                          }}
+                          onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #faad14cc'; }}
+                          onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #faad1499'; }}
+                        >
+                          Help Me
+                        </button>
+                      </div>
+                      
+                      {/* Тестовая кнопка для имитации депозита */}
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                        width: '100%',
+                        marginTop: 5,
+                        marginBottom: 10,
+                      }}>
+                        <button
+                          onClick={handleTestDeposit}
+                          disabled={testDepositLoading}
+                          style={{
+                            padding: '8px 0',
+                            borderRadius: 8,
+                            border: 'none',
+                            background: 'linear-gradient(90deg, #7c5fff 0%, #ff7eb9 100%)',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: 14,
+                            boxShadow: '0 0 16px #7c5fff77',
+                            transition: 'all 0.2s',
+                            cursor: testDepositLoading ? 'wait' : 'pointer',
+                            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+                            outline: 'none',
+                            opacity: testDepositLoading ? 0.7 : 1
+                          }}
+                        >
+                          {testDepositLoading ? 'Processing...' : 'Test Deposit ($50)'}
+                        </button>
+                        
+                        {testDepositResult && (
+                          <div style={{
+                            padding: '6px 10px',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            backgroundColor: testDepositResult.includes('Error') 
+                              ? 'rgba(255, 77, 79, 0.15)' 
+                              : 'rgba(82, 196, 26, 0.15)',
+                            color: testDepositResult.includes('Error') ? '#ff4d4f' : '#52c41a',
+                            textAlign: 'center'
+                          }}>
+                            {testDepositResult}
+                          </div>
+                        )}
                       </div>
                     </>
                   );
