@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import font from '../../public/go.jpg'
 import Footer from './components/Footer';
-import { Workbox } from 'workbox-window';
 
 const fakeCoeffs = [1.25, 3.88, 1.54, 1.28, 1.06];
 
@@ -193,62 +192,9 @@ export default function Home() {
   const [chance, setChance] = useState<number>(0);
   const [energyTimer, setEnergyTimer] = useState<string>('00:00:00');
   const [showFlash, setShowFlash] = useState(false);
-  const [showInstallButton, setShowInstallButton] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const router = useRouter();
   const starCanvasRef = useRef<HTMLCanvasElement>(null);
   const [starAnimActive, setStarAnimActive] = useState(true);
-
-  // PWA installation logic
-  useEffect(() => {
-    // Check if we're in standalone mode (already installed as PWA)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         (window.navigator as any).standalone || 
-                         document.referrer.includes('android-app://');
-    
-    if (isStandalone) {
-      setShowInstallButton(false);
-      return;
-    }
-
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault();
-      // Stash the event so it can be triggered later
-      setDeferredPrompt(e);
-      // Show the install button
-      setShowInstallButton(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Check if the app is already installed
-    window.addEventListener('appinstalled', () => {
-      setShowInstallButton(false);
-    });
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  // Function to handle PWA installation
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    // Clear the deferredPrompt
-    setDeferredPrompt(null);
-    
-    // Hide the install button
-    setShowInstallButton(false);
-  };
 
   // Check authentication state and update energy
   useEffect(() => {
@@ -805,41 +751,6 @@ export default function Home() {
     }
   };
 
-  // Service worker registration
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      const wb = new Workbox('/sw.js');
-      
-      wb.addEventListener('installed', event => {
-        console.log('Service Worker installed:', event);
-      });
-      
-      wb.addEventListener('activated', event => {
-        console.log('Service Worker activated:', event);
-      });
-      
-      wb.addEventListener('message', event => {
-        console.log('Message from Service Worker:', event);
-      });
-      
-      wb.addEventListener('waiting', event => {
-        console.log('Service Worker is waiting to be activated:', event);
-        // Можно добавить логику обновления
-      });
-      
-      // Register the service worker
-      wb.register()
-        .then(registration => {
-          console.log('Service Worker registered successfully:', registration);
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
-        });
-    } else {
-      console.warn('Service Worker is not supported or disabled');
-    }
-  }, []);
-
   // Show loading state while checking authentication
   if (isCheckingAuth) {
     return (
@@ -961,27 +872,6 @@ export default function Home() {
           Kashif AI
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          {showInstallButton && (
-            <button
-              onClick={handleInstallClick}
-              style={{
-                background: 'none',
-                color: '#ffe066',
-                fontWeight: 700,
-                fontSize: 18,
-                borderRadius: 8,
-                padding: '10px 28px',
-                textDecoration: 'none',
-                boxShadow: '0 0 8px #ffe06655',
-                letterSpacing: 1.1,
-                transition: 'background 0.2s, color 0.2s',
-                cursor: 'pointer',
-                fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-              }}
-            >
-              Download
-            </button>
-          )}
           <button
             onClick={handleLogout}
             style={{
