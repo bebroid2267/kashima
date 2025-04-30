@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -31,8 +34,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'EurostileExtendedBlack', Arial, Helvetica, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body, body * {
   font-family: 'EurostileExtendedBlack', Arial, Helvetica, sans-serif !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
