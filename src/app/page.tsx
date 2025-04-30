@@ -1450,53 +1450,6 @@ export default function Home() {
                           Help Me
                         </button>
                       </div>
-                      
-                      {/* Тестовая кнопка для имитации депозита */}
-                      <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 8,
-                        width: '100%',
-                        marginTop: 5,
-                        marginBottom: 10,
-                      }}>
-                        <button
-                          onClick={handleTestDeposit}
-                          disabled={testDepositLoading}
-                          style={{
-                            padding: '8px 0',
-                            borderRadius: 8,
-                            border: 'none',
-                            background: 'linear-gradient(90deg, #7c5fff 0%, #ff7eb9 100%)',
-                            color: '#fff',
-                            fontWeight: 700,
-                            fontSize: 14,
-                            boxShadow: '0 0 16px #7c5fff77',
-                            transition: 'all 0.2s',
-                            cursor: testDepositLoading ? 'wait' : 'pointer',
-                            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-                            outline: 'none',
-                            opacity: testDepositLoading ? 0.7 : 1
-                          }}
-                        >
-                          {testDepositLoading ? 'Processing...' : 'Test Deposit ($50)'}
-                        </button>
-                        
-                        {testDepositResult && (
-                          <div style={{
-                            padding: '6px 10px',
-                            borderRadius: 6,
-                            fontSize: 12,
-                            backgroundColor: testDepositResult.includes('Error') 
-                              ? 'rgba(255, 77, 79, 0.15)' 
-                              : 'rgba(82, 196, 26, 0.15)',
-                            color: testDepositResult.includes('Error') ? '#ff4d4f' : '#52c41a',
-                            textAlign: 'center'
-                          }}>
-                            {testDepositResult}
-                          </div>
-                        )}
-                      </div>
                     </>
                   );
                 })()}

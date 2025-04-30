@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import chance from '@/../public/image.png';
-import round from '@/../public/result.jpg';
-import winner from '@/../public/light.jpg';
+import chance from '@/../public/chance.jpg';
+import round from '@/../public/resultas.jpg';
+import winner from '@/../public/loading.jpg';
 
 interface FAQBlock {
   title: string;
