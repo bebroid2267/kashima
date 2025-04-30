@@ -257,171 +257,176 @@ export default function AuthPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100vw',
-        background: '#07101e',
-        fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+      </head>
       <div
         style={{
-          width: '100%',
-          maxWidth: 400,
-          padding: '32px',
-          background: 'rgba(20, 40, 70, 0.35)',
-          borderRadius: 16,
-          border: '2px solid #193a5e',
-          boxShadow: '0 0 24px #193a5e55',
+          minHeight: '100vh',
+          width: '100vw',
+          background: '#07101e',
+          fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <h1
+        <div
           style={{
-            color: '#38e0ff',
-            fontSize: 32,
-            fontWeight: 700,
-            textAlign: 'center',
-            marginBottom: 28,
-            letterSpacing: 1.2,
-            textShadow: '0 0 8px #38e0ff99',
-            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+            width: '100%',
+            maxWidth: 400,
+            padding: '32px',
+            background: 'rgba(20, 40, 70, 0.35)',
+            borderRadius: 16,
+            border: '2px solid #193a5e',
+            boxShadow: '0 0 24px #193a5e55',
           }}
         >
-          Kashif AI
-        </h1>
-        
-        {supabaseError && (
-          <div
+          <h1
             style={{
-              backgroundColor: 'rgba(255, 70, 70, 0.2)',
-              border: '1px solid #ff4646',
-              borderRadius: 8,
-              padding: 16,
-              marginBottom: 20,
-              color: '#ff9999',
-              fontSize: 14,
-              lineHeight: 1.5,
-            }}
-          >
-            <p><strong>Ошибка соединения:</strong> {supabaseError}</p>
-            <p style={{ marginTop: 8 }}>Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.</p>
-          </div>
-        )}
-        
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <div>
-            <label
-              htmlFor="mbId"
-              style={{
-                display: 'block',
-                color: '#7ecbff',
-                marginBottom: 8,
-                fontSize: 15,
-                fontWeight: 600,
-                letterSpacing: 1.1,
-                fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-              }}
-            >
-              Your ID Number
-            </label>
-            <input
-              id="mbId"
-              type="text"
-              value={mbId}
-              onChange={(e) => setMbId(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '14px 18px',
-                borderRadius: 8,
-                border: '2px solid #38e0ff',
-                background: 'rgba(20, 40, 70, 0.25)',
-                color: '#fff',
-                fontSize: 17,
-                outline: 'none',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-                fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-                boxShadow: '0 0 8px #38e0ff55',
-              }}
-              placeholder="Enter your ID number"
-              required
-              autoFocus
-              onFocus={e => e.currentTarget.style.borderColor = '#ffe066'}
-              onBlur={e => e.currentTarget.style.borderColor = '#38e0ff'}
-            />
-          </div>
-
-          {error && (
-            <div
-              style={{
-                color: '#ff7eb9',
-                fontSize: 15,
-                textAlign: 'center',
-                padding: '10px',
-                background: 'rgba(255, 126, 185, 0.08)',
-                borderRadius: 8,
-                boxShadow: '0 0 8px #ff7eb955',
-                fontWeight: 600,
-                letterSpacing: 1.1,
-              }}
-            >
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '15px 0',
-              borderRadius: 8,
-              background: 'none',
-              border: loading
-                ? '2px solid #a0a0a0'
-                : '2px solid #38e0ff',
-              color: loading ? '#a0a0a0' : '#38e0ff',
+              color: '#38e0ff',
+              fontSize: 32,
               fontWeight: 700,
-              fontSize: 18,
-              boxShadow: loading ? 'none' : '0 0 8px #38e0ff99',
-              letterSpacing: 1.1,
-              transition: 'background 0.2s, color 0.2s, border 0.2s',
-              cursor: loading ? 'not-allowed' : 'pointer',
+              textAlign: 'center',
+              marginBottom: 28,
+              letterSpacing: 1.2,
+              textShadow: '0 0 8px #38e0ff99',
               fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
             }}
           >
-            {loading ? 'Loading...' : 'Login'}
-          </button>
-        </form>
+            Kashif AI
+          </h1>
+          
+          {supabaseError && (
+            <div
+              style={{
+                backgroundColor: 'rgba(255, 70, 70, 0.2)',
+                border: '1px solid #ff4646',
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 20,
+                color: '#ff9999',
+                fontSize: 14,
+                lineHeight: 1.5,
+              }}
+            >
+              <p><strong>Ошибка соединения:</strong> {supabaseError}</p>
+              <p style={{ marginTop: 8 }}>Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.</p>
+            </div>
+          )}
+          
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div>
+              <label
+                htmlFor="mbId"
+                style={{
+                  display: 'block',
+                  color: '#7ecbff',
+                  marginBottom: 8,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  letterSpacing: 1.1,
+                  fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+                }}
+              >
+                Your ID Number
+              </label>
+              <input
+                id="mbId"
+                type="text"
+                value={mbId}
+                onChange={(e) => setMbId(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '14px 18px',
+                  borderRadius: 8,
+                  border: '2px solid #38e0ff',
+                  background: 'rgba(20, 40, 70, 0.25)',
+                  color: '#fff',
+                  fontSize: 17,
+                  outline: 'none',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                  fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+                  boxShadow: '0 0 8px #38e0ff55',
+                }}
+                placeholder="Enter your ID number"
+                required
+                autoFocus
+                onFocus={e => e.currentTarget.style.borderColor = '#ffe066'}
+                onBlur={e => e.currentTarget.style.borderColor = '#38e0ff'}
+              />
+            </div>
+
+            {error && (
+              <div
+                style={{
+                  color: '#ff7eb9',
+                  fontSize: 15,
+                  textAlign: 'center',
+                  padding: '10px',
+                  background: 'rgba(255, 126, 185, 0.08)',
+                  borderRadius: 8,
+                  boxShadow: '0 0 8px #ff7eb955',
+                  fontWeight: 600,
+                  letterSpacing: 1.1,
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '15px 0',
+                borderRadius: 8,
+                background: 'none',
+                border: loading
+                  ? '2px solid #a0a0a0'
+                  : '2px solid #38e0ff',
+                color: loading ? '#a0a0a0' : '#38e0ff',
+                fontWeight: 700,
+                fontSize: 18,
+                boxShadow: loading ? 'none' : '0 0 8px #38e0ff99',
+                letterSpacing: 1.1,
+                transition: 'background 0.2s, color 0.2s, border 0.2s',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+              }}
+            >
+              {loading ? 'Loading...' : 'Login'}
+            </button>
+          </form>
+        </div>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+          @media (max-width: 600px) {
+            div[style*='maxWidth: 400px'] {
+              padding: 12px !important;
+              border-radius: 8px !important;
+            }
+            h1 {
+              font-size: 22px !important;
+              margin-bottom: 14px !important;
+            }
+            input {
+              font-size: 13px !important;
+              padding: 8px 10px !important;
+              border-radius: 5px !important;
+            }
+            button {
+              font-size: 13px !important;
+              padding: 8px 0 !important;
+              border-radius: 5px !important;
+            }
+          }
+        `}</style>
       </div>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
-        @media (max-width: 600px) {
-          div[style*='maxWidth: 400px'] {
-            padding: 12px !important;
-            border-radius: 8px !important;
-          }
-          h1 {
-            font-size: 22px !important;
-            margin-bottom: 14px !important;
-          }
-          input {
-            font-size: 13px !important;
-            padding: 8px 10px !important;
-            border-radius: 5px !important;
-          }
-          button {
-            font-size: 13px !important;
-            padding: 8px 0 !important;
-            border-radius: 5px !important;
-          }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }
 

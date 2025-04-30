@@ -30,12 +30,28 @@
   font-display: swap;
 }
 
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow-x: hidden;
+  width: 100%;
+  position: fixed;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'EurostileExtendedBlack', Arial, Helvetica, sans-serif;
   -webkit-user-select: none;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+  width: 100%;
+  position: fixed;
 }
 
 body, body * {
@@ -45,9 +61,6 @@ body, body * {
 * {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}
-
-html {
-  touch-action: manipulation;
-  -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none;
+  user-select: none;
 }
