@@ -206,18 +206,23 @@ export default function Home() {
 
   // PWA installation logic
   useEffect(() => {
+    console.log('PWA installation effect running');
     // Check if we're in standalone mode (already installed as PWA)
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                          (window.navigator as any).standalone || 
                          document.referrer.includes('android-app://');
     
+    console.log('PWA isStandalone check:', isStandalone);
+    
     if (isStandalone) {
+      console.log('App is running in standalone mode (installed as PWA)');
       setShowInstallButton(false);
       return;
     }
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event triggered');
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       // Stash the event so it can be triggered later
@@ -227,13 +232,16 @@ export default function Home() {
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    console.log('beforeinstallprompt listener added');
 
     // Check if the app is already installed
     window.addEventListener('appinstalled', () => {
+      console.log('App installed event triggered');
       setShowInstallButton(false);
     });
 
     return () => {
+      console.log('Cleaning up PWA installation listeners');
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
@@ -257,45 +265,59 @@ export default function Home() {
 
   // Check authentication state and update energy
   useEffect(() => {
+    console.log('AUTH CHECK: Starting authentication check...');
+    
     // Проверка доступности localStorage
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      console.error('localStorage is not available');
+      console.error('AUTH CHECK: localStorage is not available');
       return;
     }
     
+    console.log('AUTH CHECK: localStorage is available');
+    
     // Check if Supabase is initialized
     if (typeof window !== 'undefined' && window.supabaseInitError) {
-      console.error('Supabase initialization error:', window.supabaseInitError);
+      console.error('AUTH CHECK: Supabase initialization error:', window.supabaseInitError);
       setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
       return;
     }
     
+    console.log('AUTH CHECK: No Supabase init errors found');
+    
     if (!supabaseClient) {
-      console.error('Supabase client is not available');
+      console.error('AUTH CHECK: Supabase client is not available');
       setSupabaseError('База данных недоступна. Проверьте интернет-соединение и попробуйте перезагрузить страницу.');
       return;
     }
     
+    console.log('AUTH CHECK: Supabase client is available');
+    
     // Безопасное получение данных пользователя
     let storedUser = null;
     try {
+      console.log('AUTH CHECK: Trying to get user from localStorage');
       const storedUserStr = localStorage.getItem('user');
+      console.log('AUTH CHECK: localStorage "user" item exists:', !!storedUserStr);
+      
       if (storedUserStr) {
         storedUser = JSON.parse(storedUserStr);
+        console.log('AUTH CHECK: Successfully parsed user data');
       }
     } catch (error) {
-      console.error('Error accessing or parsing localStorage data:', error);
+      console.error('AUTH CHECK: Error accessing or parsing localStorage data:', error);
       localStorage.removeItem('user');
       router.push('/auth');
       return;
     }
     
     if (!storedUser) {
+      console.log('AUTH CHECK: No stored user, redirecting to auth page');
       setIsCheckingAuth(true);
       router.push('/auth');
       return;
     }
     
+    console.log('AUTH CHECK: User found in localStorage, setting up state');
     const userData = storedUser;
     setUser(userData);
     setEnergy(userData.energy || 0);
@@ -303,17 +325,22 @@ export default function Home() {
     setLastLoginDate(userData.last_login_date || null);
     setChance(userData.chance || 0);
     setIsCheckingAuth(false); // Сразу убираем лоадер
+    console.log('AUTH CHECK: Authentication check complete, local user data loaded');
 
     // Фоновая проверка и обновление данных
     (async () => {
       try {
+        console.log('AUTH CHECK: Starting background user data check with Supabase');
         const { data, error } = await supabaseClient
           .from('users')
           .select('*')
           .eq('mb_id', userData.mb_id)
           .single();
+          
+        console.log('AUTH CHECK: Background check result:', { data: !!data, error });
+        
         if (error) {
-          console.error('Ошибка при получении данных пользователя:', error);
+          console.error('AUTH CHECK: Error getting user data:', error);
           // Если ошибка критичная (например, пользователь удалён) — разлогиниваем
           if (error.code === 'PGRST116') {
             localStorage.removeItem('user');
@@ -324,9 +351,11 @@ export default function Home() {
           // Проверяем last_login_date
           const today = getTodayMSK();
           const lastLogin = data.last_login_date || null;
+          console.log('AUTH CHECK: Checking last login date', { today, lastLogin });
           
           // Если last_login_date не сегодня, начисляем +1 энергии
           if (lastLogin !== today) {
+            console.log('AUTH CHECK: Last login date is not today, updating energy');
             const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
             
             // Обновляем данные в базе
@@ -345,6 +374,7 @@ export default function Home() {
           }
           
           // Обновляем состояние
+          console.log('AUTH CHECK: Updating state with fresh data from Supabase');
           setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
           setEnergy(data.energy || 0);
@@ -353,7 +383,7 @@ export default function Home() {
           setChance(data.chance || 0);
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
+        console.error('AUTH CHECK: Error in background check:', error);
       }
     })();
   }, [router]);
@@ -894,6 +924,7 @@ export default function Home() {
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
+    console.log('RENDER: Showing authentication check loading screen');
     return (
       <div
         style={{
@@ -907,8 +938,8 @@ export default function Home() {
           fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'stretch',
-          justifyContent: 'flex-start',
+          alignItems: 'center', // Changed from 'stretch' to 'center' to ensure spinner is visible
+          justifyContent: 'center', // Changed from 'flex-start' to 'center' for better visibility
           overflowX: 'hidden',
           position: 'relative',
         }}
@@ -947,6 +978,21 @@ export default function Home() {
           <div style={{ color: '#7ecbff', fontSize: 18 }}>
             Проверка авторизации...
           </div>
+          <button 
+            onClick={() => router.push('/auth')}
+            style={{
+              marginTop: 16,
+              padding: '8px 16px',
+              borderRadius: 8,
+              background: 'rgba(56, 224, 255, 0.2)',
+              border: '1px solid #38e0ff',
+              color: '#38e0ff',
+              fontSize: 14,
+              cursor: 'pointer',
+            }}
+          >
+            Перейти к авторизации
+          </button>
         </div>
       </div>
     );
@@ -954,6 +1000,7 @@ export default function Home() {
 
   // Show error if Supabase initialization failed
   if (supabaseError) {
+    console.log('RENDER: Showing Supabase error screen');
     return (
       <div
         style={{

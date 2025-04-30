@@ -18,53 +18,79 @@ export default function AuthPage() {
 
   // Check if user is already authenticated
   useEffect(() => {
+    console.log('AUTH PAGE: Starting authentication check');
+    
     const checkUser = async () => {
       try {
         // Проверяем доступность localStorage
         if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-          console.error('localStorage is not available');
+          console.error('AUTH PAGE: localStorage is not available');
           setIsCheckingAuth(false);
           return;
         }
+        
+        console.log('AUTH PAGE: localStorage is available');
 
         // Check if Supabase is initialized
         if (typeof window !== 'undefined' && window.supabaseInitError) {
-          console.error('Supabase initialization error:', window.supabaseInitError);
+          console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
           setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
           setIsCheckingAuth(false);
           return;
         }
         
+        console.log('AUTH PAGE: No Supabase init errors found');
+        
         // Безопасная проверка наличия пользователя в localStorage
         let storedUser = null;
         try {
+          console.log('AUTH PAGE: Checking for user in localStorage');
           storedUser = localStorage.getItem('user');
+          console.log('AUTH PAGE: User exists in localStorage:', !!storedUser);
         } catch (localStorageError) {
-          console.error('Error accessing localStorage:', localStorageError);
+          console.error('AUTH PAGE: Error accessing localStorage:', localStorageError);
         }
         
         if (storedUser) {
           // Безопасный парсинг JSON
           try {
-            JSON.parse(storedUser);
-            router.push('/');
+            console.log('AUTH PAGE: Parsing user data from localStorage');
+            const userData = JSON.parse(storedUser);
+            console.log('AUTH PAGE: Successfully parsed user data, redirecting to home');
+            
+            // Add a small timeout to allow console logging to complete
+            setTimeout(() => {
+              router.push('/');
+            }, 100);
+            
           } catch (parseError) {
-            console.error('Error parsing user data:', parseError);
+            console.error('AUTH PAGE: Error parsing user data:', parseError);
             // Удаляем повреждённые данные
             localStorage.removeItem('user');
             setIsCheckingAuth(false);
           }
         } else {
+          console.log('AUTH PAGE: No stored user, showing login form');
           setIsCheckingAuth(false);
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
+        console.error('AUTH PAGE: Error checking authentication:', error);
         setIsCheckingAuth(false);
       }
     };
     
     checkUser();
-  }, [router]);
+    
+    // Adding a fallback to ensure we don't get stuck in loading state
+    const timeout = setTimeout(() => {
+      if (isCheckingAuth) {
+        console.log('AUTH PAGE: Fallback timeout triggered - forcing auth screen to show');
+        setIsCheckingAuth(false);
+      }
+    }, 5000); // 5 second timeout as failsafe
+    
+    return () => clearTimeout(timeout);
+  }, [router, isCheckingAuth]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,29 +98,32 @@ export default function AuthPage() {
     setError(null);
 
     try {
+      console.log('AUTH PAGE: Login attempt with MB ID:', mbId);
+      
       // Check if Supabase is properly initialized
       if (typeof window !== 'undefined' && window.supabaseInitError) {
+        console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
         throw new Error(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
       }
       
       if (!supabaseClient) {
+        console.error('AUTH PAGE: Supabase client is not available');
         throw new Error('База данных недоступна. Проверьте интернет-соединение и попробуйте снова.');
       }
       
-      console.log('Attempting to login with MB ID:', mbId);
+      console.log('AUTH PAGE: Supabase client is available, querying users table');
       
       // Проверяем, существует ли пользователь в таблице users
-      console.log('Querying users table for mb_id:', mbId);
       const { data: userData, error: userError } = await supabaseClient
         .from('users')
         .select('*')
         .eq('mb_id', mbId)
         .maybeSingle();
       
-      console.log('Query result:', { userData, userError });
+      console.log('AUTH PAGE: Query result:', { userData: !!userData, userError });
       
       if (userError) {
-        console.error('Database error:', userError);
+        console.error('AUTH PAGE: Database error:', userError);
         if (userError.message.includes('invalid input syntax for type bigint')) {
           throw new Error('Invalid ID format. Please enter numbers only');
         }
@@ -102,11 +131,11 @@ export default function AuthPage() {
       }
       
       if (!userData) {
-        console.error('No user found with mb_id:', mbId);
+        console.error('AUTH PAGE: No user found with mb_id:', mbId);
         throw new Error('User not found');
       }
       
-      console.log('User found:', userData);
+      console.log('AUTH PAGE: User found, checking energy/login date');
 
       // Проверяем, нужно ли инициализировать энергию пользователя
       const today = new Date().toISOString().split('T')[0]; // Формат YYYY-MM-DD
@@ -114,7 +143,7 @@ export default function AuthPage() {
       
       // Если у пользователя нет энергии или даты последнего входа, инициализируем их
       if (userData.energy === undefined || userData.energy === null || userData.last_login_date === undefined || userData.last_login_date === null) {
-        console.log('Инициализация энергии пользователя');
+        console.log('AUTH PAGE: Initializing user energy');
         
         // Устанавливаем начальные значения
         const initialEnergy = 1;
@@ -131,8 +160,9 @@ export default function AuthPage() {
           .single();
           
         if (updateError) {
-          console.error('Error initializing energy:', updateError);
+          console.error('AUTH PAGE: Error initializing energy:', updateError);
         } else if (updatedData) {
+          console.log('AUTH PAGE: Energy initialized successfully');
           updatedUserData = updatedData;
         }
       } else {
@@ -141,7 +171,7 @@ export default function AuthPage() {
         
         // Если пользователь не входил сегодня, увеличиваем энергию
         if (lastLogin !== today) {
-          console.log('Увеличиваем энергию пользователя');
+          console.log('AUTH PAGE: Increasing user energy (last login was not today)');
           
           // Ограничиваем максимальное значение энергии
           const newEnergy = Math.min((userData.energy || 0) + 1, 100);
@@ -158,20 +188,27 @@ export default function AuthPage() {
             .single();
             
           if (updateError) {
-            console.error('Error updating energy:', updateError);
+            console.error('AUTH PAGE: Error updating energy:', updateError);
           } else if (updatedData) {
+            console.log('AUTH PAGE: Energy updated successfully');
             updatedUserData = updatedData;
           }
         }
       }
 
       // Сохраняем данные пользователя в localStorage
+      console.log('AUTH PAGE: Saving user data to localStorage');
       localStorage.setItem('user', JSON.stringify(updatedUserData));
       
-      console.log('Login successful, redirecting to home page');
-      router.push('/');
+      console.log('AUTH PAGE: Login successful, redirecting to home page');
+      
+      // Delay to ensure state is updated before navigation
+      setTimeout(() => {
+        router.push('/');
+      }, 100);
+      
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error('AUTH PAGE: Login error:', err);
       setError(err.message || 'An error occurred during login');
     } finally {
       setLoading(false);
