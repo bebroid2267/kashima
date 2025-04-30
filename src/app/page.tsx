@@ -480,162 +480,47 @@ export default function Home() {
     let animationFrame: number;
     let running = true;
 
-    // Создаем нейроны
-    const neurons = Array.from({ length: 50 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      z: Math.random() * width,
-      connections: [] as number[],
-      speed: Math.random() * 2 + 1,
-      size: Math.random() * 3 + 1,
-    }));
-
-    // Создаем связи между нейронами
-    neurons.forEach((neuron, i) => {
-      neuron.connections = Array.from({ length: 3 }, () => 
-        Math.floor(Math.random() * neurons.length)
-      ).filter(j => j !== i);
+    // 8 точек, координаты фиксированные (по кругу)
+    const R = Math.min(width, height) / 2.5;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const points = Array.from({ length: 8 }, (_, i) => {
+      const angle = (2 * Math.PI * i) / 8;
+      return {
+        x: centerX + R * Math.cos(angle),
+        y: centerY + R * Math.sin(angle),
+        size: 5 + Math.random() * 2
+      };
     });
 
-    function resize() {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-    }
-
-    window.addEventListener('resize', resize);
-
+    let t = 0;
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, width, height);
-
+      
       // Если не загрузка, просто очищаем canvas и выходим
       if (!isLoading) {
-        // Анимация для обычного состояния (в 2 раза медленнее)
-        const defaultSpeed = 2.5; // Половина от скорости при клике
-
-        // Обновляем позиции нейронов
-        neurons.forEach(neuron => {
-          neuron.z -= defaultSpeed;
-          if (neuron.z <= 0) {
-            neuron.z = width;
-            neuron.x = Math.random() * width;
-            neuron.y = Math.random() * height;
-          }
-        });
-
-        // Рисуем связи и нейроны
-        neurons.forEach(neuron => {
-          const k = 150 / neuron.z;
-          const x = (neuron.x - width / 2) * k + width / 2;
-          const y = (neuron.y - height / 2) * k + height / 2;
-
-          // Рисуем связи
-          neuron.connections.forEach(connIndex => {
-            const connectedNeuron = neurons[connIndex];
-            const connK = 150 / connectedNeuron.z;
-            const connX = (connectedNeuron.x - width / 2) * connK + width / 2;
-            const connY = (connectedNeuron.y - height / 2) * connK + height / 2;
-
-            // Рисуем линию связи
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(connX, connY);
-            
-            // Градиент для линии
-            const gradient = ctx.createLinearGradient(x, y, connX, connY);
-            gradient.addColorStop(0, 'rgba(56, 224, 255, 0.2)'); // Более прозрачные линии
-            gradient.addColorStop(1, 'rgba(124, 95, 255, 0.2)'); // Более прозрачные линии
-            
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 0.5; // Тоньше линии
-            ctx.shadowColor = '#7c5fff';
-            ctx.shadowBlur = 3; // Меньше свечение
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-          });
-
-          // Рисуем нейрон
-          ctx.beginPath();
-          ctx.arc(x, y, neuron.size * k * 0.8, 0, Math.PI * 2); // Меньше размер
-          ctx.fillStyle = '#7c5fff';
-          ctx.shadowColor = '#7c5fff';
-          ctx.shadowBlur = 4; // Меньше свечение
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        });
-
         if (running) animationFrame = requestAnimationFrame(draw);
         return;
       }
 
-      // Скорость движения для состояния при клике
-      const speed = 5; // Медленная скорость для спокойной анимации
-
-      // Обновляем позиции нейронов
-      neurons.forEach(neuron => {
-        neuron.z -= speed;
-        if (neuron.z <= 0) {
-          neuron.z = width;
-          neuron.x = Math.random() * width;
-          neuron.y = Math.random() * height;
-        }
-      });
-
-      // Рисуем связи и нейроны
-      neurons.forEach(neuron => {
-        const k = 150 / neuron.z;
-        const x = (neuron.x - width / 2) * k + width / 2;
-        const y = (neuron.y - height / 2) * k + height / 2;
-
-        // Рисуем связи
-        neuron.connections.forEach(connIndex => {
-          const connectedNeuron = neurons[connIndex];
-          const connK = 150 / connectedNeuron.z;
-          const connX = (connectedNeuron.x - width / 2) * connK + width / 2;
-          const connY = (connectedNeuron.y - height / 2) * connK + height / 2;
-
-          // Рисуем линию связи
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(connX, connY);
-          
-          // Градиент для линии
-          const gradient = ctx.createLinearGradient(x, y, connX, connY);
-          gradient.addColorStop(0, 'rgba(56, 224, 255, 0.4)'); // Более прозрачные линии
-          gradient.addColorStop(1, 'rgba(124, 95, 255, 0.4)'); // Более прозрачные линии
-          
-          ctx.strokeStyle = gradient;
-          ctx.lineWidth = 1; // Тоньше линии
-          ctx.shadowColor = '#7c5fff'; // Фиолетовое свечение
-          ctx.shadowBlur = 5; // Меньше свечение
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        });
-
-        // Рисуем нейрон
+      t += 0.04;
+      points.forEach((pt, i) => {
+        // Пульсация радиуса
+        const pulse = 0.7 + 0.3 * Math.abs(Math.sin(t + i));
         ctx.beginPath();
-        ctx.arc(x, y, neuron.size * k, 0, Math.PI * 2);
-        ctx.fillStyle = '#7c5fff'; // Фиолетовые нейроны
-        ctx.shadowColor = '#7c5fff'; // Фиолетовое свечение
-        ctx.shadowBlur = 8; // Меньше свечение
+        ctx.arc(pt.x, pt.y, pt.size * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = '#7c5fff';
+        ctx.globalAlpha = 0.5 + 0.5 * pulse;
         ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
       });
-
-      // Добавляем свечение при загрузке
-      if (showFlash) {
-        ctx.fillStyle = 'rgba(124, 95, 255, 0.1)'; // Фиолетовое свечение
-        ctx.fillRect(0, 0, width, height);
-      }
-
       if (running) animationFrame = requestAnimationFrame(draw);
     }
 
     draw();
     return () => {
       running = false;
-      window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrame);
     };
   }, [isLoading, showFlash]);
