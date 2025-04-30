@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
   try {
+    // Check if supabase client is available
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 503 }
+      );
+    }
+
     const data = await request.json();
     
     // Validate required fields
@@ -67,8 +76,7 @@ export async function POST(request: Request) {
       .upsert(userData, { 
         onConflict: 'mb_id',  // Указываем колонку, которая является уникальным идентификатором
         ignoreDuplicates: false // Обновляем существующие записи
-      })
-      .select();
+      });
     
     if (upsertError) {
       console.error('Error upserting user:', upsertError);

@@ -3,12 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+// Ensure we handle null/undefined supabase client
+const supabaseClient = supabase as SupabaseClient | undefined;
 
 export default function AuthPage() {
   const [mbId, setMbId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const router = useRouter();
 
   // Check if user is already authenticated
@@ -18,6 +23,14 @@ export default function AuthPage() {
         // Проверяем доступность localStorage
         if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
           console.error('localStorage is not available');
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        // Check if Supabase is initialized
+        if (typeof window !== 'undefined' && window.supabaseInitError) {
+          console.error('Supabase initialization error:', window.supabaseInitError);
+          setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
           setIsCheckingAuth(false);
           return;
         }
@@ -59,11 +72,20 @@ export default function AuthPage() {
     setError(null);
 
     try {
+      // Check if Supabase is properly initialized
+      if (typeof window !== 'undefined' && window.supabaseInitError) {
+        throw new Error(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
+      }
+      
+      if (!supabaseClient) {
+        throw new Error('База данных недоступна. Проверьте интернет-соединение и попробуйте снова.');
+      }
+      
       console.log('Attempting to login with MB ID:', mbId);
       
       // Проверяем, существует ли пользователь в таблице users
       console.log('Querying users table for mb_id:', mbId);
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await supabaseClient
         .from('users')
         .select('*')
         .eq('mb_id', mbId)
@@ -98,7 +120,7 @@ export default function AuthPage() {
         const initialEnergy = 1;
         
         // Обновляем данные в базе
-        const { data: updatedData, error: updateError } = await supabase
+        const { data: updatedData, error: updateError } = await supabaseClient
           .from('users')
           .update({ 
             energy: initialEnergy,
@@ -125,7 +147,7 @@ export default function AuthPage() {
           const newEnergy = Math.min((userData.energy || 0) + 1, 100);
           
           // Обновляем данные в базе
-          const { data: updatedData, error: updateError } = await supabase
+          const { data: updatedData, error: updateError } = await supabaseClient
             .from('users')
             .update({ 
               energy: newEnergy,
@@ -234,6 +256,24 @@ export default function AuthPage() {
         >
           Kashif AI
         </h1>
+        
+        {supabaseError && (
+          <div
+            style={{
+              backgroundColor: 'rgba(255, 70, 70, 0.2)',
+              border: '1px solid #ff4646',
+              borderRadius: 8,
+              padding: 16,
+              marginBottom: 20,
+              color: '#ff9999',
+              fontSize: 14,
+              lineHeight: 1.5,
+            }}
+          >
+            <p><strong>Ошибка соединения:</strong> {supabaseError}</p>
+            <p style={{ marginTop: 8 }}>Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.</p>
+          </div>
+        )}
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>

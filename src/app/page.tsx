@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import font from '../../public/go.jpg'
 import Footer from './components/Footer';
 import { Workbox } from 'workbox-window';
@@ -162,6 +163,9 @@ function getCoeffColor(coefficient: number, chance: number): string {
   return '#ffe066'; // Желтый по умолчанию
 }
 
+// Ensure we handle null/undefined supabase client
+const supabaseClient = supabase as SupabaseClient | undefined;
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [prediction, setPrediction] = useState<string | null>(null);
@@ -198,6 +202,7 @@ export default function Home() {
   const router = useRouter();
   const starCanvasRef = useRef<HTMLCanvasElement>(null);
   const [starAnimActive, setStarAnimActive] = useState(true);
+  const [supabaseError, setSupabaseError] = useState<string | null>(null);
 
   // PWA installation logic
   useEffect(() => {
@@ -258,6 +263,19 @@ export default function Home() {
       return;
     }
     
+    // Check if Supabase is initialized
+    if (typeof window !== 'undefined' && window.supabaseInitError) {
+      console.error('Supabase initialization error:', window.supabaseInitError);
+      setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
+      return;
+    }
+    
+    if (!supabaseClient) {
+      console.error('Supabase client is not available');
+      setSupabaseError('База данных недоступна. Проверьте интернет-соединение и попробуйте перезагрузить страницу.');
+      return;
+    }
+    
     // Безопасное получение данных пользователя
     let storedUser = null;
     try {
@@ -289,7 +307,7 @@ export default function Home() {
     // Фоновая проверка и обновление данных
     (async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('users')
           .select('*')
           .eq('mb_id', userData.mb_id)
@@ -312,18 +330,18 @@ export default function Home() {
             const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
             
             // Обновляем данные в базе
-            const { error: updateError } = await supabase
-              .from('users')
-              .update({ energy: newEnergy, last_login_date: today })
-              .eq('mb_id', data.mb_id);
-              
-            if (updateError) {
-              console.error('Ошибка при обновлении энергии:', updateError);
+            if (supabaseClient) {
+              await supabaseClient
+                .from('users')
+                .update({ energy: newEnergy, last_login_date: today })
+                .eq('mb_id', data.mb_id);
             } else {
-              // Обновляем локальные данные
-              data.energy = newEnergy;
-              data.last_login_date = today;
+              console.error('Supabase client is not available, cannot update energy');
             }
+            
+            // Обновляем локальные данные
+            data.energy = newEnergy;
+            data.last_login_date = today;
           }
           
           // Обновляем состояние
@@ -384,7 +402,11 @@ export default function Home() {
         
         // Обновляем lastLoginDate в базе данных
         if (user) {
-          supabase.from('users').update({ last_login_date: today }).eq('mb_id', user.mb_id);
+          if (supabaseClient) {
+            supabaseClient.from('users').update({ last_login_date: today }).eq('mb_id', user.mb_id);
+          } else {
+            console.error('Supabase client is not available, cannot update last_login_date');
+          }
           const updatedUser = { ...user, last_login_date: today };
           setUser(updatedUser);
           localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -606,10 +628,14 @@ export default function Home() {
         let newEnergy = Math.min((userData.energy || 0) + daysToAdd, userData.max_energy || 100);
         
         if (newEnergy > userData.energy) {
-          await supabase
-            .from('users')
-            .update({ energy: newEnergy, last_login_date: today })
-            .eq('mb_id', userData.mb_id);
+          if (supabaseClient) {
+            await supabaseClient
+              .from('users')
+              .update({ energy: newEnergy, last_login_date: today })
+              .eq('mb_id', userData.mb_id);
+          } else {
+            console.error('Supabase client is not available, cannot update energy');
+          }
           setEnergy(newEnergy);
           setLastLoginDate(today);
           const updatedUser = { ...userData, energy: newEnergy, last_login_date: today };
@@ -652,48 +678,67 @@ export default function Home() {
 
   // Modify the handleAIVisionClick function to use the category-specific messages
   const handleAIVisionClick = async () => {
-    if (energy <= 0) {
-      alert('Недостаточно энергии для использования AI Vision.');
+    if (energy < 1) {
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 1000);
       return;
     }
 
-    setIsLoading(true);
-    setPrediction(null);
-    setCoefficient(null);
-    setCurrentMessage("ИИ печатает предсказание");
-
-    // Уменьшаем энергию на 1
-    const newEnergy = energy - 1;
-    
-    // Сначала обновляем локальное состояние
-    setEnergy(newEnergy);
-    
-    // Обновляем только energy в базе данных
-    const { error } = await supabase
-      .from('users')
-      .update({ energy: newEnergy })
-      .eq('mb_id', user.mb_id);
-
-    if (error) {
-      console.error('Ошибка при обновлении энергии:', error);
-      // В случае ошибки восстанавливаем предыдущее значение энергии
-      setEnergy(energy);
-    } else {
-      // Обновляем только energy в localStorage и user-стейте
-      const updatedUser = { ...user, energy: newEnergy };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      // Выводим в консоль для отладки
-      console.log('Энергия уменьшена:', energy, '->', newEnergy);
+    if (!user) {
+      router.push('/auth');
+      return;
     }
+    
+    try {
+      setIsLoading(true);
+      
+      // Check if Supabase client is available
+      if (!supabaseClient) {
+        throw new Error('База данных недоступна. Попробуйте перезагрузить страницу.');
+      }
+      
+      // Уменьшаем энергию на 1
+      const newEnergy = energy - 1;
+      
+      // Сначала обновляем локальное состояние
+      setEnergy(newEnergy);
+      
+      // Обновляем только energy в базе данных
+      if (!supabaseClient) {
+        console.error('Supabase client is not available, cannot update energy');
+        throw new Error('База данных недоступна. Попробуйте перезагрузить страницу.');
+      }
+      
+      const { error } = await supabaseClient
+        .from('users')
+        .update({ energy: newEnergy })
+        .eq('mb_id', user.mb_id);
 
-    // Simulate loading for 3 seconds
-    setTimeout(() => {
+      if (error) {
+        console.error('Ошибка при обновлении энергии:', error);
+        // В случае ошибки восстанавливаем предыдущее значение энергии
+        setEnergy(energy);
+      } else {
+        // Обновляем только energy в localStorage и user-стейте
+        const updatedUser = { ...user, energy: newEnergy };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        // Выводим в консоль для отладки
+        console.log('Энергия уменьшена:', energy, '->', newEnergy);
+      }
+
+      // Simulate loading for 3 seconds
+      setTimeout(() => {
+        setIsLoading(false);
+        setCurrentMessage(getRandomPredictionMessageByChance(chance));
+        setCoefficient(getUniqueCoefficient(chance));
+      }, 3000);
+    } catch (err: any) {
+      console.error('Error in AI Vision:', err);
+      setSupabaseError(err.message || 'An error occurred');
       setIsLoading(false);
-      setCurrentMessage(getRandomPredictionMessageByChance(chance));
-      setCoefficient(getUniqueCoefficient(chance));
-    }, 3000);
+    }
   };
 
   // Fetch URLs from Supabase
@@ -701,7 +746,14 @@ export default function Home() {
     const fetchUrls = async () => {
       try {
         console.log('Fetching URLs from Supabase...');
-        const { data, error } = await supabase
+        
+        // Check if Supabase client is available
+        if (!supabaseClient) {
+          console.error('Supabase client is not available');
+          return;
+        }
+        
+        const { data, error } = await supabaseClient
           .from('actual_url')
           .select('aviator_url, deposit_url, help_link')
           .single();
@@ -895,6 +947,65 @@ export default function Home() {
           <div style={{ color: '#7ecbff', fontSize: 18 }}>
             Проверка авторизации...
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if Supabase initialization failed
+  if (supabaseError) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          width: '100vw',
+          background: 'radial-gradient(circle at 50% 30%, #0a1a2f 60%, #07101e 100%)',
+          fontFamily: 'Segoe UI, Arial, sans-serif',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '500px',
+            backgroundColor: 'rgba(255, 70, 70, 0.2)',
+            border: '1px solid #ff4646',
+            borderRadius: 12,
+            padding: 24,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 16,
+          }}
+        >
+          <h2 style={{ color: '#ff9999', fontSize: 22, textAlign: 'center' }}>
+            Ошибка подключения
+          </h2>
+          <p style={{ color: '#ff9999', fontSize: 16, textAlign: 'center', lineHeight: 1.5 }}>
+            {supabaseError}
+          </p>
+          <p style={{ color: '#7ecbff', fontSize: 14, textAlign: 'center', marginTop: 8 }}>
+            Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: 8,
+              backgroundColor: '#1a3b5a',
+              color: '#38e0ff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontSize: 16,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            Перезагрузить
+          </button>
         </div>
       </div>
     );

@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export default function DebugPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -18,6 +19,13 @@ export default function DebugPage() {
         console.log('Проверка подключения к Supabase...');
         console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
         console.log('Ключ:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Установлен' : 'Отсутствует');
+        
+        if (!supabase) {
+          console.error('Supabase client not available');
+          setConnectionStatus('Ошибка: Supabase client не инициализирован');
+          setError('База данных недоступна. Проверьте переменные окружения и соединение.');
+          return;
+        }
         
         // Проверяем подключение, запрашивая информацию о таблице
         const { data, error } = await supabase
@@ -45,6 +53,10 @@ export default function DebugPage() {
 
   const fetchUsers = async () => {
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+      
       console.log('Запрос всех пользователей...');
       const { data, error } = await supabase
         .from('users')
@@ -75,6 +87,10 @@ export default function DebugPage() {
     }
     
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+      
       setSearchLoading(true);
       setSearchError(null);
       
