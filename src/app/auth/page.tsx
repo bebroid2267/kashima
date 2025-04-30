@@ -18,7 +18,10 @@ export default function AuthPage() {
 
   // Check if user is already authenticated
   useEffect(() => {
-    console.log('AUTH PAGE: Starting authentication check');
+    console.log('AUTH PAGE: useEffect start');
+    console.log('window:', typeof window !== 'undefined');
+    console.log('localStorage:', typeof localStorage !== 'undefined');
+    console.log('supabaseClient:', !!supabaseClient);
     
     const checkUser = async () => {
       try {
@@ -57,12 +60,10 @@ export default function AuthPage() {
             console.log('AUTH PAGE: Parsing user data from localStorage');
             const userData = JSON.parse(storedUser);
             console.log('AUTH PAGE: Successfully parsed user data, redirecting to home');
-            
-            // Add a small timeout to allow console logging to complete
             setTimeout(() => {
+              console.log('AUTH PAGE: router.push(/)');
               router.push('/');
             }, 100);
-            
           } catch (parseError) {
             console.error('AUTH PAGE: Error parsing user data:', parseError);
             // Удаляем повреждённые данные
@@ -96,7 +97,7 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+    console.log('AUTH PAGE: handleLogin called');
     try {
       console.log('AUTH PAGE: Login attempt with MB ID:', mbId);
       
@@ -201,9 +202,8 @@ export default function AuthPage() {
       localStorage.setItem('user', JSON.stringify(updatedUserData));
       
       console.log('AUTH PAGE: Login successful, redirecting to home page');
-      
-      // Delay to ensure state is updated before navigation
       setTimeout(() => {
+        console.log('AUTH PAGE: router.push(/) after login');
         router.push('/');
       }, 100);
       
@@ -217,6 +217,7 @@ export default function AuthPage() {
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
+    console.log('AUTH PAGE: RENDER: Showing authentication check loading screen');
     return (
       <div
         style={{
