@@ -39,6 +39,8 @@ export default function RootLayout({
           html {
             height: 100%;
             overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
           }
           
           body {
@@ -46,6 +48,8 @@ export default function RootLayout({
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             position: relative;
           }
           
@@ -53,6 +57,8 @@ export default function RootLayout({
             min-height: 100%;
             width: 100%;
             position: relative;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
           }
 
           * {
@@ -60,7 +66,6 @@ export default function RootLayout({
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-            touch-action: manipulation;
           }
 
           input, textarea {
@@ -70,7 +75,7 @@ export default function RootLayout({
 
           /* Prevent zoom on double tap for iOS */
           * {
-            touch-action: manipulation;
+            touch-action: pan-y pinch-zoom;
           }
         `}</style>
       </head>      
