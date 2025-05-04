@@ -38,44 +38,16 @@ export default function RootLayout({
         <style>{`
           html {
             height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
           }
           
           body {
             min-height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-          }
-          
-          #__next {
-            min-height: 100%;
-            width: 100%;
-            position: relative;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
           }
 
           * {
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-          }
-
-          input, textarea {
-            -webkit-user-select: text;
-            user-select: text;
-          }
-
-          /* Prevent zoom on double tap for iOS */
-          * {
-            touch-action: pan-y pinch-zoom;
           }
         `}</style>
       </head>      
