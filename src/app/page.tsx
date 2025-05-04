@@ -990,6 +990,7 @@ export default function Home() {
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 2,
+          marginTop: 8
         }}
       >
         <div
@@ -1170,7 +1171,7 @@ export default function Home() {
                     </div>
                     <div style={{ 
                       fontSize: 16, 
-                      marginTop: 5, 
+                      marginTop: 15, 
                       color: '#7ecbff', 
                       textShadow: '0 0 8px #7ecbff99',
                       textAlign: 'center',
@@ -1529,11 +1530,12 @@ export default function Home() {
             width: 100vw !important;
           }
           header {
-            padding: 12px 4vw !important;
+            padding: 18px 4vw 12px 4vw !important;
             gap: 12px !important;
             flex-direction: row !important;
             align-items: center !important;
             justify-content: space-between !important;
+            margin-top: 20px !important;
           }
           header > div:first-child {
             font-size: 20px !important;

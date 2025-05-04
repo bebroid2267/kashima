@@ -22,8 +22,9 @@ export default function Footer() {
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
-        height: 64,
+        height: 95,
         borderTop: '2px solid #193a5e',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
       {/* Home Button */}
@@ -42,10 +43,21 @@ export default function Footer() {
           fontWeight: pathname === '/' ? 700 : 500,
           transition: 'all 0.2s',
           height: '100%',
+          position: 'relative',
         }}
       >
-        <span style={{ fontSize: 28, marginBottom: 2, filter: pathname === '/' ? 'drop-shadow(0 0 8px #38e0ff)' : 'none' }}>▶️</span>
-        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HOME</span>
+        <div style={{ 
+          position: 'absolute', 
+          top: '-1px', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          height: 'calc(100% - 15px)',
+          paddingBottom: '5px',
+        }}>
+          <span style={{ fontSize: 28, marginBottom: 4, filter: pathname === '/' ? 'drop-shadow(0 0 8px #38e0ff)' : 'none' }}>▶️</span>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HOME</span>
+        </div>
       </Link>
       {/* Help Button */}
       <Link
@@ -63,11 +75,35 @@ export default function Footer() {
           fontWeight: pathname.startsWith('/faq') ? 700 : 500,
           transition: 'all 0.2s',
           height: '100%',
+          position: 'relative',
         }}
       >
-        <span style={{ fontSize: 28, marginBottom: 2, filter: pathname.startsWith('/faq') ? 'drop-shadow(0 0 8px #ffe066)' : 'none' }}>❓</span>
-        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HELP</span>
+        <div style={{ 
+          position: 'absolute', 
+          top: '-1px', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center',
+          height: 'calc(100% - 15px)',
+          paddingBottom: '5px',
+        }}>
+          <span style={{ fontSize: 28, marginBottom: 4, filter: pathname.startsWith('/faq') ? 'drop-shadow(0 0 8px #ffe066)' : 'none' }}>❓</span>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HELP</span>
+        </div>
       </Link>
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          footer {
+            height: 95px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          footer {
+            height: 95px !important;
+            padding-bottom: env(safe-area-inset-bottom, 10px) !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 } 
