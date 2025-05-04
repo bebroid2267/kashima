@@ -38,7 +38,6 @@ html {
   user-select: none;
   overflow-x: hidden;
   width: 100%;
-  position: fixed;
 }
 
 body {
@@ -51,7 +50,6 @@ body {
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
   width: 100%;
-  position: fixed;
 }
 
 body, body * {
