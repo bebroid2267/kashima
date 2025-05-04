@@ -1074,7 +1074,7 @@ export default function Home() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'flex-start',
-          padding: '0 5vw 32px 5vw',
+          padding: '0 5vw 120px 5vw',
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 2,
@@ -1550,7 +1550,7 @@ export default function Home() {
             border-radius: 6px !important;
           }
           main {
-            padding: 0 4vw 30px 4vw !important;
+            padding: 0 4vw 100px 4vw !important;
           }
           main > div {
             gap: 16px !important;

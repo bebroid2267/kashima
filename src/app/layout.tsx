@@ -27,7 +27,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="format-detection" content="telephone=no" />
@@ -38,22 +38,39 @@ export default function RootLayout({
         <style>{`
           html {
             height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
           }
+          
           body {
             min-height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
             position: relative;
           }
+          
           #__next {
             min-height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            position: relative;
           }
+
           * {
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+          }
+
+          input, textarea {
+            -webkit-user-select: text;
+            user-select: text;
+          }
+
+          /* Prevent zoom on double tap for iOS */
+          * {
+            touch-action: manipulation;
           }
         `}</style>
       </head>      
