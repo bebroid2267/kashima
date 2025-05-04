@@ -1163,9 +1163,9 @@ export default function Home() {
                     <div style={{ 
                       fontSize: 28, 
                       marginBottom: 10, 
-                      fontWeight: 700, 
+                      fontWeight: 500, 
                       color: getCoeffColor(coefficient, chance), 
-                      textShadow: `0 0 8px ${getCoeffColor(coefficient, chance)}99`
+                      textShadow: `0 0 3px ${getCoeffColor(coefficient, chance)}66`
                     }}>
                       {coefficient.toFixed(2)}x
                     </div>
@@ -1173,7 +1173,7 @@ export default function Home() {
                       fontSize: 16, 
                       marginTop: 15, 
                       color: '#7ecbff', 
-                      textShadow: '0 0 8px #7ecbff99',
+                      textShadow: '0 0 4px #7ecbff66',
                       textAlign: 'center',
                       width: '90%',
                       padding: '0 5px'
@@ -1387,9 +1387,9 @@ export default function Home() {
                         </div>
                         <div style={{
                           fontSize: 36,
-                          fontWeight: 800,
+                          fontWeight: 500,
                           color: chanceColor,
-                          textShadow: `0 0 16px ${chanceColor}99`,
+                          textShadow: `0 0 6px ${chanceColor}55`,
                           marginBottom: 8,
                         }}>
                           {chance.toFixed(2)}%
