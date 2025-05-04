@@ -1569,7 +1569,7 @@ export default function Home() {
           /* Кнопки */
           main > div > div > div > div[style*='display: flex'][style*='gap: 12px'] {
             padding: 0 !important;
-            margin: 12px 0 !important;
+            margin: 4px 0 !important;
           }
           main > div > div > div > div[style*='display: flex'][style*='gap: 12px'] button {
             font-size: 13px !important;
@@ -1578,22 +1578,31 @@ export default function Home() {
           }
           /* Энергия */
           main > div > div > div > div[style*='position: relative'][style*='width: 100%'] {
-            margin: 8px 0 !important;
+            margin: 2px 0 !important;
           }
           /* Шанс и инфо-блок */
           main > div > div > div > div[style*='textAlign: center'] {
-            margin: 8px 0 !important;
-            padding: 14px !important;
+            margin: 2px 0 !important;
+            padding: 6px !important;
+            border-width: 1px !important;
           }
           main > div > div > div > div[style*='textAlign: center'] div {
-            font-size: 12px !important;
+            font-size: 10px !important;
+            margin-bottom: 2px !important;
           }
           main > div > div > div > div[style*='textAlign: center'] div + div {
-            font-size: 18px !important;
+            font-size: 14px !important;
+            margin-bottom: 2px !important;
           }
-          /* Информативный блок */
+          main > div > div > div > div[style*='textAlign: center'] div + div + div {
+            height: 4px !important;
+            border-radius: 2px !important;
+          }
+          main > div > div > div > div[style*='textAlign: center'] div + div + div div {
+            border-radius: 2px !important;
+          }
           main > div > div > div > div:last-child {
-            margin: 4px 0 8px 0 !important;
+            margin: 1px 0 2px 0 !important;
             padding: 12px !important;
           }
           .ai-prediction-hint {

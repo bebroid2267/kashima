@@ -35,10 +35,29 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/192.jpg" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png" />
+        <style>{`
+          html {
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          body {
+            min-height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+          }
+          #__next {
+            min-height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+          * {
+            -webkit-tap-highlight-color: transparent;
+          }
+        `}</style>
       </head>      
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
