@@ -203,6 +203,7 @@ export default function Home() {
   const starCanvasRef = useRef<HTMLCanvasElement>(null);
   const [starAnimActive, setStarAnimActive] = useState(true);
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
+  const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
 
   // PWA installation logic
   useEffect(() => {
@@ -993,17 +994,17 @@ export default function Home() {
       >
         <div
           style={{
-            color: '#38e0ff',
+            color: '#fff',
             fontSize: 32,
             fontWeight: 700,
             letterSpacing: 1.2,
             textShadow: '0 0 8px #38e0ff99',
-            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+            fontFamily: "'montserrat', Arial, Helvetica, sans-serif",
           }}
         >
           Kashif AI
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {showInstallButton && (
             <button
               onClick={handleInstallClick}
@@ -1025,25 +1026,43 @@ export default function Home() {
               Download
             </button>
           )}
-          <button
-            onClick={handleLogout}
-            style={{
-              background: 'none',
-              color: '#ff7eb9',
-              fontWeight: 700,
-              fontSize: 18,
-              borderRadius: 8,
-              padding: '10px 28px',
-              textDecoration: 'none',
-              boxShadow: '0 0 8px #ff7eb955',
-              letterSpacing: 1.1,
-              transition: 'background 0.2s, color 0.2s',
-              cursor: 'pointer',
-              fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-            }}
-          >
-            Exit
-          </button>
+          {/* Language Switcher */}
+          <div style={{ display: 'flex', gap: 6, marginLeft: 8 }}>
+            <button
+              onClick={() => setSelectedLang('fr')}
+              style={{
+                background: selectedLang === 'fr' ? '#38e0ff' : 'none',
+                color: selectedLang === 'fr' ? '#07101e' : '#38e0ff',
+                border: '1px solid #38e0ff',
+                borderRadius: 8,
+                padding: '6px 16px',
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: 'pointer',
+                fontFamily: 'Montserrat, sans-serif',
+                transition: 'all 0.2s',
+              }}
+            >
+              FR
+            </button>
+            <button
+              onClick={() => setSelectedLang('ar')}
+              style={{
+                background: selectedLang === 'ar' ? '#38e0ff' : 'none',
+                color: selectedLang === 'ar' ? '#07101e' : '#38e0ff',
+                border: '1px solid #38e0ff',
+                borderRadius: 8,
+                padding: '6px 16px',
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: 'pointer',
+                fontFamily: 'Montserrat, sans-serif',
+                transition: 'all 0.2s',
+              }}
+            >
+              AR
+            </button>
+          </div>
         </div>
       </header>
       {/* MAIN CONTENT */}
@@ -1098,7 +1117,7 @@ export default function Home() {
               <div
                 style={{
                   width: '100%',
-                  minHeight: 120,
+                  minHeight: 240,
                   border: isLoading ? '2.5px solid #ffe066' : '2.5px solid #38e0ff',
                   borderRadius: 12,
                   background: 'linear-gradient(135deg, #0a1931 0%, #1e295c 100%)',
@@ -1113,8 +1132,8 @@ export default function Home() {
                   position: 'relative',
                   overflow: 'hidden',
                   boxShadow: '0 0 16px #193a5e55',
-                  marginBottom: 16,
                   transition: 'background 0.3s, box-shadow 0.3s, border 0.3s',
+                  marginBottom: 0,
                 }}
               >
                 {/* Canvas звёзд */}
@@ -1163,18 +1182,20 @@ export default function Home() {
                   </div>
                 )}
                 {!isLoading && !coefficient && (
-                  <div style={{ 
-                    opacity: 0.7, 
-                    color: '#7ecbff', 
-                    textShadow: '0 0 8px #7ecbff99',
-                    fontSize: window.innerWidth <= 600 ? 11 : 22,
-                    textAlign: 'center',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
+                  <div 
+                    className="ai-prediction-hint"
+                    style={{ 
+                      opacity: 0.7, 
+                      color: '#fff', 
+                      textShadow: '0 0 8px #7ecbff99',
+                      fontSize: 22,
+                      textAlign: 'center',
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
                     Click AI Vision for prediction
                   </div>
                 )}
@@ -1185,7 +1206,8 @@ export default function Home() {
                   display: 'flex',
                   gap: 12,
                   width: '100%',
-                  marginTop: 4,
+                  marginTop: 0,
+                  marginBottom: 0,
                   justifyContent: 'center',
                 }}
               >
@@ -1227,11 +1249,11 @@ export default function Home() {
                     padding: '14px 0',
                     borderRadius: 8,
                     border: 'none',
-                    background: 'linear-gradient(90deg, #38e0ff 0%, #7c5fff 100%)',
+                    background: 'linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%)',
                     color: '#fff',
                     fontWeight: 700,
                     fontSize: 18,
-                    boxShadow: '0 0 16px #38e0ff99',
+                    boxShadow: '0 0 16px #ff4d4f99',
                     letterSpacing: 1.1,
                     transition: 'background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s',
                     cursor: 'pointer',
@@ -1239,8 +1261,8 @@ export default function Home() {
                     outline: 'none',
                     position: 'relative',
                   }}
-                  onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #7c5fffcc'; }}
-                  onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #38e0ff99'; }}
+                  onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #ff7875cc'; }}
+                  onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #ff4d4f99'; }}
                 >
                   Aviator
                 </button>
@@ -1249,53 +1271,79 @@ export default function Home() {
               <div style={{
                 position: 'relative',
                 width: '100%',
-                height: 44,
-                borderRadius: 12,
-                border: '2px solid #ffe066',
-                boxShadow: '0 0 12px #ffe06655',
-                marginBottom: 18,
+                height: 38,
+                borderRadius: 16,
+                boxShadow: '0 0 8px #ffe06655',
+                border: '2px solid #38e0ff',
+                margin: '4px auto 8px auto',
                 overflow: 'hidden',
-                background: '#fffbe600',
+                background: 'rgba(30,40,60,0.85)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
+                padding: '0 18px',
+                gap: 10,
               }}>
-                {/* Прогресс-бар-заливка */}
+                {/* Количество энергии */}
                 <div style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  height: '100%',
-                  width: `${(energy / maxEnergy) * 100}%`,
-                  background: 'linear-gradient(90deg, #ffe066cc 0%, #ffb300cc 100%)',
-                  zIndex: 1,
-                  transition: 'width 0.3s',
-                }} />
-                {/* Контент поверх */}
-                <div style={{
-                  position: 'relative',
-                  zIndex: 2,
-                  width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0 18px',
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: '#7a5c00',
-                  height: '100%',
+                  fontWeight: 800,
+                  fontSize: 18,
+                  color: '#fff',
+                  letterSpacing: 0.5,
+                  minWidth: 80,
+                  justifyContent: 'flex-start',
                 }}>
-                  <span style={{ fontSize: 22, color: '#ffb300' }}>⚡</span>
-                  <span>{energy}/{maxEnergy}</span>
+                  <span style={{ fontSize: 22, marginRight: 6 }}>⚡</span>
+                  {energy}/{maxEnergy}
+                </div>
+                {/* Прогресс-бар */}
+                <div style={{
+                  flex: 1,
+                  height: 12,
+                  background: '#232b3a',
+                  borderRadius: 6,
+                  margin: '0 8px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 0 6px #ffe06633',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    height: '100%',
+                    width: `${(energy / maxEnergy) * 100}%`,
+                    background: 'linear-gradient(90deg, #ff4d4f 0%, #ffe066 50%, #52c41a 100%)',
+                    borderRadius: 6,
+                    transition: 'width 0.3s',
+                  }} />
+                </div>
+                {/* Таймер или Full energy */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: '#fff',
+                  minWidth: 80,
+                  justifyContent: 'flex-end',
+                  gap: 5,
+                }}>
                   {energy < maxEnergy && (
-                    <span style={{ color: '#7a5c00', fontSize: 13, fontWeight: 400 }}>
-                      {energyTimer}
-                    </span>
+                    <>
+                      <span>{energyTimer}</span>
+                      <span style={{ color: '#ffe066', fontSize: 18 }}>⏰</span>
+                    </>
                   )}
                   {energy >= maxEnergy && (
-                    <span style={{ color: '#7a5c00', fontSize: 13, fontWeight: 400 }}>
-                      Full energy
-                    </span>
+                    <>
+                      <span>Full</span>
+                      <span style={{ color: '#ffe066', fontSize: 18 }}>⚡</span>
+                    </>
                   )}
                 </div>
               </div>
@@ -1305,7 +1353,7 @@ export default function Home() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'stretch',
-                gap: 8,
+                gap: 4,
               }}>
                 {(() => {
                   const chanceColor =
@@ -1320,14 +1368,14 @@ export default function Home() {
                         border: `2px solid ${chanceColor}`,
                         boxShadow: `0 0 12px ${chanceColor}33`,
                         padding: '18px 16px',
-                        marginTop: 18,
-                        marginBottom: 8,
+                        marginTop: 4,
+                        marginBottom: 4,
                         textAlign: 'center',
                         position: 'relative',
                         width: '100%',
                       }}>
                         <div style={{
-                          color: '#7ecbff',
+                          color: '#fff',
                           fontWeight: 600,
                           fontSize: 18,
                           marginBottom: 6,
@@ -1369,12 +1417,12 @@ export default function Home() {
                         border: '2px solid #38e0ff',
                         boxShadow: '0 0 12px #38e0ff33',
                         padding: '14px',
-                        marginTop: 4,
-                        marginBottom: 8,
+                        marginTop: 2,
+                        marginBottom: 4,
                         width: '100%',
                       }}>
                         <div style={{
-                          color: '#ffe066',
+                          color: '#fff',
                           fontSize: 14,
                           fontWeight: 600,
                           marginBottom: 8,
@@ -1397,8 +1445,8 @@ export default function Home() {
                         display: 'flex',
                         gap: 12,
                         width: '100%',
-                        marginTop: 10,
-                        marginBottom: 10,
+                        marginTop: 4,
+                        marginBottom: 4,
                         justifyContent: 'center',
                       }}>
                         <button
@@ -1408,11 +1456,11 @@ export default function Home() {
                             padding: '10px 0',
                             borderRadius: 8,
                             border: 'none',
-                            background: 'linear-gradient(90deg, #52c41a 0%, #08979c 100%)',
+                            background: 'linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%)',
                             color: '#fff',
                             fontWeight: 700,
                             fontSize: 16,
-                            boxShadow: '0 0 16px #52c41a99',
+                            boxShadow: '0 0 16px #ff4d4f99',
                             letterSpacing: 1.1,
                             transition: 'background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s',
                             cursor: 'pointer',
@@ -1420,8 +1468,8 @@ export default function Home() {
                             outline: 'none',
                             position: 'relative',
                           }}
-                          onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #52c41acc'; }}
-                          onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #52c41a99'; }}
+                          onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #ff7875cc'; }}
+                          onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #ff4d4f99'; }}
                         >
                           Make Deposit
                         </button>
@@ -1470,6 +1518,9 @@ export default function Home() {
           main > div > div {
             max-width: 100% !important;
             min-width: 0 !important;
+          }
+          main > div > div > div[style*='flex-direction: column'] {
+            gap: 4px !important;
           }
         }
         @media (max-width: 600px) {
@@ -1544,6 +1595,9 @@ export default function Home() {
           main > div > div > div > div:last-child {
             margin: 4px 0 8px 0 !important;
             padding: 12px !important;
+          }
+          .ai-prediction-hint {
+            font-size: 18px !important;
           }
         }
         @keyframes spin {

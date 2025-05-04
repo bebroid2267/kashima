@@ -23,8 +23,8 @@
 }
 
 @font-face {
-  font-family: 'EurostileExtendedBlack';
-  src: url('/fonts/EurostileExtendedBlack.ttf') format('truetype');
+  font-family: 'montserrat';
+  src: url('/fonts/montserrat.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -44,7 +44,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'EurostileExtendedBlack', Arial, Helvetica, sans-serif;
+  font-family: 'montserrat', Arial, Helvetica, sans-serif;
   -webkit-user-select: none;
   user-select: none;
   touch-action: manipulation;
@@ -55,7 +55,7 @@ body {
 }
 
 body, body * {
-  font-family: 'EurostileExtendedBlack', Arial, Helvetica, sans-serif !important;
+  font-family: 'montserrat', Arial, Helvetica, sans-serif !important;
 }
 
 * {

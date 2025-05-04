@@ -70,11 +70,20 @@ export default function FAQ() {
   const [currentLang, setCurrentLang] = useState<'ru' | 'ar'>('ru');
   const content = FAQ_CONTENT[currentLang];
 
+  // Функция выхода
+  const handleExit = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      window.location.href = '/auth';
+    }
+  };
+
   return (
     <>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-      </head>
+      {/* HEADER */}
+      <div className="faq-header">
+        <button className="faq-exit-btn" onClick={handleExit}>Exit</button>
+      </div>
       <div className="faq-container">
         <div className="language-switcher">
           <button 
@@ -126,6 +135,9 @@ export default function FAQ() {
         <Footer />
 
         <style jsx global>{`
+          html, body {
+            background: #07101e !important;
+          }
           .faq-container {
             min-height: 100vh;
             width: 100%;
@@ -325,6 +337,48 @@ export default function FAQ() {
             .lang-btn {
               padding: 6px 12px;
               font-size: 14px;
+            }
+          }
+
+          .faq-header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 24px 5vw 12px 5vw;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 20;
+            background: none !important;
+            box-shadow: none !important;
+            border: none !important;
+            color: inherit !important;
+          }
+          .faq-exit-btn {
+            background: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            border-radius: 8px;
+            padding: 10px 28px;
+            text-decoration: none;
+            box-shadow: 0 0 8px #ff7eb955;
+            letter-spacing: 1.1px;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+            font-family: 'Orbitron', Segoe UI, Arial, sans-serif;
+            border: none;
+            outline: none;
+            margin-left: 12px;
+          }
+          @media (max-width: 600px) {
+            .faq-header {
+              padding: 12px 4vw 8px 4vw;
+            }
+            .faq-exit-btn {
+              font-size: 14px;
+              padding: 6px 16px;
+              border-radius: 6px;
             }
           }
         `}</style>
