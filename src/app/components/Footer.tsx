@@ -3,7 +3,23 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export default function Footer() {
+interface TranslationsType {
+  fr: {
+    homeFooter: string;
+    faqFooter: string;
+  };
+  ar: {
+    homeFooter: string;
+    faqFooter: string;
+  };
+}
+
+interface FooterProps {
+  selectedLang?: 'fr' | 'ar';
+  translations?: TranslationsType;
+}
+
+export default function Footer({ selectedLang, translations }: FooterProps) {
   const pathname = usePathname();
   return (
     <footer
@@ -56,7 +72,11 @@ export default function Footer() {
           paddingBottom: '5px',
         }}>
           <span style={{ fontSize: 28, marginBottom: 4, filter: pathname === '/' ? 'drop-shadow(0 0 8px #38e0ff)' : 'none' }}>▶️</span>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HOME</span>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
+            {selectedLang === 'fr' && translations ? translations.fr.homeFooter :
+             selectedLang === 'ar' && translations ? translations.ar.homeFooter :
+             "HOME"}
+          </span>
         </div>
       </Link>
       {/* Help Button */}
@@ -88,7 +108,11 @@ export default function Footer() {
           paddingBottom: '5px',
         }}>
           <span style={{ fontSize: 28, marginBottom: 4, filter: pathname.startsWith('/faq') ? 'drop-shadow(0 0 8px #ffe066)' : 'none' }}>❓</span>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>HELP</span>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
+            {selectedLang === 'fr' && translations ? translations.fr.faqFooter :
+             selectedLang === 'ar' && translations ? translations.ar.faqFooter :
+             "FAQ"}
+          </span>
         </div>
       </Link>
       <style jsx global>{`
