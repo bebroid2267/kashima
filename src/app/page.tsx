@@ -1655,11 +1655,15 @@ export default function Home() {
                     display: 'flex', 
                     flexDirection: 'column', 
                     alignItems: 'center',
+                    justifyContent: 'center',
                     animation: 'fadeIn 0.5s',
-                    direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                    direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+                    width: '90%',
+                    height: '100%',
+                    zIndex: 2
                   }}>
                     <div style={{ 
-                      fontSize: 28, 
+                      fontSize: 32, 
                       marginBottom: 10, 
                       fontWeight: 500, 
                       color: getCoeffColor(coefficient, chance), 
@@ -1669,11 +1673,11 @@ export default function Home() {
                     </div>
                     <div style={{ 
                       fontSize: 16, 
-                      marginTop: 15, 
                       color: '#7ecbff', 
                       textShadow: '0 0 4px #7ecbff66',
-                      textAlign: selectedLang === 'ar' ? 'right' : 'center',
-                      width: '90%',
+                      textAlign: 'center',
+                      width: '100%',
+                      maxWidth: '280px',
                       padding: '0 5px'
                     }}>
                       {currentMessage}
@@ -1694,11 +1698,12 @@ export default function Home() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                      direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+                      zIndex: 2
                     }}>
                     {selectedLang === 'fr' ? translations.fr.clickForPrediction : 
-                     selectedLang === 'ar' ? translations.ar.clickForPrediction : 
-                     "Click AI Vision for prediction"}
+                      selectedLang === 'ar' ? translations.ar.clickForPrediction : 
+                      "Click AI Vision for prediction"}
                   </div>
                 )}
               </div>
@@ -2304,6 +2309,19 @@ export default function Home() {
             border-width: 1px !important;
           }
           
+          /* Коэффициент и фраза */
+          main > div > div > div > div[style*="minHeight"] > div[style*="display: flex"] {
+            padding: 5px 0 !important;
+          }
+          main > div > div > div > div[style*="minHeight"] > div > div:first-child {
+            font-size: 26px !important;
+            margin-bottom: 5px !important;
+          }
+          main > div > div > div > div[style*="minHeight"] > div > div:last-child {
+            font-size: 12px !important;
+            line-height: 1.2 !important;
+          }
+          
           /* Кнопки под блоком предсказания */
           main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
             margin: 0 !important;
@@ -2391,6 +2409,14 @@ export default function Home() {
           main > div > div > div > div:last-child button {
             font-size: 10px !important;
             padding: 3px 0 !important;
+          }
+        }
+        /* Для мобильных устройств с высотой больше 700px - увеличиваем кнопки внизу */
+        @media (max-width: 600px) and (min-height: 700px) {
+          main > div > div > div > div:last-child button {
+            font-size: 12px !important;
+            padding: 8px 0 !important;
+            height: 36px !important;
           }
         }
         /* Дополнительная настройка для очень маленьких экранов по высоте */
