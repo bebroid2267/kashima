@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     // Получаем всех пользователей
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('mb_id, energy, max_energy');
+      .select('mb_id, energy');
     
     if (usersError) {
       console.error('Error fetching users:', usersError);
@@ -78,8 +78,7 @@ export async function POST(request: Request) {
     // Создаем записи обновлений для каждого пользователя
     const updates = users.map(user => {
       const currentEnergy = user.energy || 0;
-      const maxEnergy = user.max_energy || 100;
-      const newEnergy = Math.min(currentEnergy + 1, maxEnergy);
+      const newEnergy = Math.min(currentEnergy + 1, 100);
       
       return {
         mb_id: user.mb_id,

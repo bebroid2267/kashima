@@ -510,7 +510,48 @@ export default function Home() {
     setShowInstallButton(false);
   };
 
-  // Check authentication state and update energy
+  // Функция для проверки и обновления энергии за текущий цикл
+  const checkAndProcessEnergyCycle = async () => {
+    if (!supabaseClient || !user) return;
+    
+    try {
+      const currentCycleId = getTodayMSK();
+      console.log('Проверка цикла начисления энергии:', currentCycleId);
+      console.log('Текущее значение энергии в состоянии:', energy);
+      console.log('Текущее значение энергии у пользователя:', user.energy);
+      
+      // Проверяем, был ли этот цикл уже обработан
+      const { data: existingCycle, error: cycleCheckError } = await supabaseClient
+        .from('energy_update_cycles')
+        .select('*')
+        .eq('cycle_id', currentCycleId)
+        .single();
+      
+      if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
+        console.error('Ошибка при проверке цикла:', cycleCheckError);
+        return;
+      }
+      
+      // Если цикл уже обработан, запоминаем это в состоянии
+      if (existingCycle) {
+        console.log('Цикл начисления энергии уже был выполнен:', existingCycle);
+        setLastEnergyAwardCycle(currentCycleId);
+        return;
+      }
+      
+      // ВАЖНО: При обычной загрузке страницы не начисляем энергию автоматически
+      // Только запоминаем состояние цикла для будущих проверок
+      console.log('Цикл начисления энергии не найден, но не выполняем автоматическое начисление при загрузке');
+      
+      // Начисление энергии всем будет происходить только при истечении таймера
+      // или при явном вызове updateAllUsersEnergy()
+      
+    } catch (error) {
+      console.error('Ошибка при проверке цикла начисления энергии:', error);
+    }
+  };
+
+  // Проверка авторизации и обновление энергии при загрузке компонента
   useEffect(() => {
     console.log('AUTH CHECK: Starting authentication check...');
     
@@ -585,6 +626,13 @@ export default function Home() {
           .single();
           
         console.log('AUTH CHECK: Background check result:', { data: !!data, error });
+        if (data) {
+          console.log('AUTH CHECK: User data from DB:', { 
+            energy: data.energy, 
+            max_energy: data.max_energy,
+            last_login_date: data.last_login_date
+          });
+        }
         
         if (error) {
           console.error('AUTH CHECK: Error getting user data:', error);
@@ -600,34 +648,47 @@ export default function Home() {
           const lastLogin = data.last_login_date || null;
           console.log('AUTH CHECK: Checking last login date', { today, lastLogin });
           
-          // Если last_login_date не сегодня, начисляем +1 энергии
+          let needEnergyUpdate = false;
+          let newEnergy = data.energy || 0;
+          
+          // Если last_login_date не сегодня, начисляем +1 энергии за вход
           if (lastLogin !== today) {
             console.log('AUTH CHECK: Last login date is not today, updating energy');
-            const newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
+            console.log('AUTH CHECK: Current energy before update:', data.energy);
+            newEnergy = Math.min((data.energy || 0) + 1, data.max_energy || 100);
+            console.log('AUTH CHECK: New energy after update:', newEnergy);
+            needEnergyUpdate = true;
+          }
+          
+          // Обновляем данные в базе только если требуется
+          if (needEnergyUpdate && supabaseClient) {
+            const { error: updateError } = await supabaseClient
+              .from('users')
+              .update({ energy: newEnergy, last_login_date: today })
+              .eq('mb_id', data.mb_id);
             
-            // Обновляем данные в базе
-            if (supabaseClient) {
-              await supabaseClient
-                .from('users')
-                .update({ energy: newEnergy, last_login_date: today })
-                .eq('mb_id', data.mb_id);
+            if (updateError) {
+              console.error('AUTH CHECK: Error updating energy:', updateError);
             } else {
-              console.error('Supabase client is not available, cannot update energy');
+              // Обновляем локальные данные
+              data.energy = newEnergy;
+              data.last_login_date = today;
+              console.log('AUTH CHECK: Energy updated successfully in DB');
             }
-            
-            // Обновляем локальные данные
-            data.energy = newEnergy;
-            data.last_login_date = today;
           }
           
           // Обновляем состояние
           console.log('AUTH CHECK: Updating state with fresh data from Supabase');
+          console.log('AUTH CHECK: Energy being set to:', data.energy);
           setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
           setEnergy(data.energy || 0);
           setMaxEnergy(data.max_energy || 100);
           setLastLoginDate(data.last_login_date);
           setChance(data.chance || 0);
+          
+          // Проверяем и обрабатываем цикл начисления энергии
+          checkAndProcessEnergyCycle();
         }
       } catch (error) {
         console.error('AUTH CHECK: Error in background check:', error);
@@ -690,7 +751,39 @@ export default function Home() {
         }
         
         // При истечении таймера начисляем энергию всем пользователям
-        updateAllUsersEnergy();
+        // если это ещё не было сделано
+        const currentCycleId = getTodayMSK();
+        if (lastEnergyAwardCycle !== currentCycleId) {
+          console.log('Таймер истек, проверяем необходимость начисления энергии');
+          
+          // Проверяем еще раз в базе данных
+          (async () => {
+            if (!supabaseClient) return;
+            
+            const { data: existingCycle, error: cycleCheckError } = await supabaseClient
+              .from('energy_update_cycles')
+              .select('*')
+              .eq('cycle_id', currentCycleId)
+              .single();
+            
+            if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
+              console.error('Ошибка при проверке цикла:', cycleCheckError);
+              return;
+            }
+            
+            if (existingCycle) {
+              console.log('Цикл начисления энергии уже был выполнен ранее:', existingCycle);
+              setLastEnergyAwardCycle(currentCycleId);
+              return;
+            }
+            
+            // Если цикл не был обработан, начисляем энергию
+            console.log('Цикл начисления энергии не найден, выполняем начисление');
+            updateAllUsersEnergy();
+          })();
+        } else {
+          console.log('Таймер истек, но энергия уже была начислена сегодня');
+        }
         
         // Перезапускаем таймер для следующего дня
         setTimeout(updateTimer, 100);
@@ -1145,6 +1238,7 @@ export default function Home() {
       }
       
       console.log('Начисление энергии всем пользователям...');
+      console.log('Текущее значение энергии перед начислением:', energy);
       
       // Запрос к API для обновления энергии всех пользователей
       const response = await fetch('/api/update-all-energy', {
@@ -1162,13 +1256,39 @@ export default function Home() {
         
         // Обновляем состояние для текущего пользователя
         if (user) {
+          console.log('Обновление энергии для текущего пользователя');
+          console.log('Текущее значение энергии:', energy, 'max:', maxEnergy);
           const newEnergy = Math.min((energy || 0) + 1, maxEnergy || 100);
-          setEnergy(newEnergy);
+          console.log('Новое значение энергии:', newEnergy);
           
-          // Обновляем локальные данные пользователя
-          const updatedUser = { ...user, energy: newEnergy };
-          setUser(updatedUser);
-          localStorage.setItem('user', JSON.stringify(updatedUser));
+          // Запрашиваем свежее значение энергии из базы
+          const { data: freshUserData, error: userError } = await supabaseClient!
+            .from('users')
+            .select('energy')
+            .eq('mb_id', user.mb_id)
+            .single();
+            
+          if (userError) {
+            console.error('Ошибка получения свежих данных пользователя:', userError);
+          } else if (freshUserData) {
+            console.log('Свежее значение энергии из БД:', freshUserData.energy);
+            setEnergy(freshUserData.energy || 0);
+            
+            // Обновляем локальные данные пользователя
+            const updatedUser = { ...user, energy: freshUserData.energy };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            console.log('Состояние пользователя обновлено с учетом свежих данных');
+          } else {
+            // Если не удалось получить свежие данные, используем локальный расчет
+            setEnergy(newEnergy);
+            
+            // Обновляем локальные данные пользователя
+            const updatedUser = { ...user, energy: newEnergy };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            console.log('Состояние пользователя обновлено на основе локального расчета');
+          }
         }
         
         // Запоминаем, что энергия начислена в этом цикле
