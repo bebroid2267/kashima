@@ -446,7 +446,11 @@ export default function Home() {
   const [starAnimActive, setStarAnimActive] = useState(true);
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
-
+  // Состояние для отслеживания последнего цикла таймера, когда была начислена энергия
+  const [lastEnergyAwardCycle, setLastEnergyAwardCycle] = useState<string | null>(null);
+  // Состояние для отслеживания, выполняется ли в данный момент обновление всех пользователей
+  const [isUpdatingAllUsers, setIsUpdatingAllUsers] = useState(false);
+  
   // PWA installation logic
   useEffect(() => {
     console.log('PWA installation effect running');
@@ -685,6 +689,9 @@ export default function Home() {
           localStorage.setItem('user', JSON.stringify(updatedUser));
         }
         
+        // При истечении таймера начисляем энергию всем пользователям
+        updateAllUsersEnergy();
+        
         // Перезапускаем таймер для следующего дня
         setTimeout(updateTimer, 100);
         return;
@@ -699,7 +706,7 @@ export default function Home() {
     updateTimer();
     interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [lastLoginDate, energy, maxEnergy, user]);
+  }, [lastLoginDate, energy, maxEnergy, user, lastEnergyAwardCycle]);
 
   // Flash появляется только после задержки, когда трещины нарисованы
   useEffect(() => {
@@ -1119,6 +1126,62 @@ export default function Home() {
       console.warn('Service Worker is not supported or disabled');
     }
   }, []);
+
+  // Функция для обновления энергии всех пользователей
+  const updateAllUsersEnergy = async () => {
+    if (isUpdatingAllUsers) return; // Предотвращаем параллельное выполнение
+    
+    try {
+      setIsUpdatingAllUsers(true);
+      
+      // Генерируем ID текущего цикла из даты
+      const currentCycleId = getTodayMSK();
+      
+      // Проверяем, не была ли уже начислена энергия в этом цикле
+      if (lastEnergyAwardCycle === currentCycleId) {
+        console.log('Энергия уже была начислена всем пользователям в текущем цикле:', currentCycleId);
+        setIsUpdatingAllUsers(false);
+        return;
+      }
+      
+      console.log('Начисление энергии всем пользователям...');
+      
+      // Запрос к API для обновления энергии всех пользователей
+      const response = await fetch('/api/update-all-energy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cycleId: currentCycleId })
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        console.log('Энергия успешно начислена всем пользователям:', result);
+        
+        // Обновляем состояние для текущего пользователя
+        if (user) {
+          const newEnergy = Math.min((energy || 0) + 1, maxEnergy || 100);
+          setEnergy(newEnergy);
+          
+          // Обновляем локальные данные пользователя
+          const updatedUser = { ...user, energy: newEnergy };
+          setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+        
+        // Запоминаем, что энергия начислена в этом цикле
+        setLastEnergyAwardCycle(currentCycleId);
+      } else {
+        console.error('Ошибка при обновлении энергии всех пользователей:', result.error);
+      }
+    } catch (error) {
+      console.error('Ошибка при обновлении энергии всех пользователей:', error);
+    } finally {
+      setIsUpdatingAllUsers(false);
+    }
+  };
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
@@ -1694,7 +1757,7 @@ export default function Home() {
                         borderRadius: 12,
                         border: `2px solid ${chanceColor}`,
                         boxShadow: `0 0 12px ${chanceColor}33`,
-                        padding: '18px 16px',
+                        padding: '9px 16px',
                         marginTop: 4,
                         marginBottom: 4,
                         textAlign: 'center',
@@ -1704,8 +1767,8 @@ export default function Home() {
                         <div style={{
                           color: '#fff',
                           fontWeight: 600,
-                          fontSize: 18,
-                          marginBottom: 6,
+                          fontSize: 15,
+                          marginBottom: 0,
                           textShadow: '0 0 8px #7ecbff99',
                           fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                         }}>
@@ -1714,17 +1777,17 @@ export default function Home() {
                            "Chance of winning"}
                         </div>
                         <div style={{
-                          fontSize: 36,
+                          fontSize: 27,
                           fontWeight: 500,
                           color: chanceColor,
                           textShadow: `0 0 6px ${chanceColor}55`,
-                          marginBottom: 8,
+                          marginBottom: 2,
                         }}>
                           {chance.toFixed(2)}%
                         </div>
                         <div style={{
                           width: '100%',
-                          height: 10,
+                          height: 7,
                           background: '#193a5e',
                           borderRadius: 5,
                           overflow: 'hidden',
@@ -1752,7 +1815,7 @@ export default function Home() {
                       }}>
                         <div style={{
                           color: '#fff',
-                          fontSize: 14,
+                          fontSize: 12,
                           fontWeight: 600,
                           marginBottom: 8,
                           textAlign: 'center',
@@ -1764,7 +1827,7 @@ export default function Home() {
                         </div>
                         <div style={{
                           color: '#7ecbff',
-                          fontSize: 13,
+                          fontSize: 10,
                           lineHeight: '1.5',
                           textAlign: 'center',
                           direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
@@ -1869,15 +1932,15 @@ export default function Home() {
             width: 100vw !important;
           }
           header {
-            padding: 18px 4vw 12px 4vw !important;
-            gap: 12px !important;
+            padding: 10px 4vw 6px 4vw !important;
+            gap: 8px !important;
             flex-direction: row !important;
             align-items: center !important;
             justify-content: space-between !important;
-            margin-top: 20px !important;
+            margin-top: 10px !important;
           }
           header > div:first-child {
-            font-size: 20px !important;
+            font-size: 18px !important;
             letter-spacing: 0.8px !important;
             margin-bottom: 0 !important;
           }
@@ -1886,15 +1949,15 @@ export default function Home() {
             justify-content: flex-end !important;
           }
           header button {
-            font-size: 14px !important;
-            padding: 6px 16px !important;
+            font-size: 12px !important;
+            padding: 4px 12px !important;
             border-radius: 6px !important;
           }
           main {
-            padding: 0 4vw 100px 4vw !important;
+            padding: 0 4vw 70px 4vw !important;
           }
           main > div {
-            gap: 16px !important;
+            gap: 8px !important;
           }
           main > div > div {
             min-width: 0 !important;
@@ -1902,52 +1965,91 @@ export default function Home() {
             padding: 0 !important;
           }
           /* Предсказание */
-          main > div > div > div > div[style*='minHeight'] {
-            min-height: 60px !important;
+          main > div > div > div > div[style*="minHeight"] {
+            min-height: 170px !important;
             font-size: 13px !important;
             margin: 0 !important;
+            border-width: 1.5px !important;
           }
           /* Кнопки */
-          main > div > div > div > div[style*='display: flex'][style*='gap: 12px'] {
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
             padding: 0 !important;
-            margin: 4px 0 !important;
+            margin: 2px 0 !important;
+            gap: 8px !important;
           }
-          main > div > div > div > div[style*='display: flex'][style*='gap: 12px'] button {
-            font-size: 13px !important;
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] button {
+            font-size: 12px !important;
             padding: 8px 0 !important;
             border-radius: 5px !important;
           }
           /* Энергия */
-          main > div > div > div > div[style*='position: relative'][style*='width: 100%'] {
-            margin: 2px 0 !important;
-          }
-          /* Шанс и инфо-блок */
-          main > div > div > div > div[style*='textAlign: center'] {
-            margin: 2px 0 !important;
-            padding: 6px !important;
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
+            height: 32px !important;
+            margin: 0 0 2px 0 !important;
+            padding: 0 12px !important;
             border-width: 1px !important;
           }
-          main > div > div > div > div[style*='textAlign: center'] div {
-            font-size: 10px !important;
-            margin-bottom: 2px !important;
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:first-child {
+            font-size: 14px !important;
+            min-width: 60px !important;
           }
-          main > div > div > div > div[style*='textAlign: center'] div + div {
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:first-child span {
+            font-size: 16px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:last-child {
+            font-size: 12px !important;
+            min-width: 70px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:nth-child(2) {
+            height: 8px !important;
+          }
+          /* Шанс */
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
+            padding: 10px 6px !important;
+            border-width: 1px !important;
+            margin: 0 0 2px 0 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
             font-size: 14px !important;
             margin-bottom: 2px !important;
           }
-          main > div > div > div > div[style*='textAlign: center'] div + div + div {
-            height: 4px !important;
-            border-radius: 2px !important;
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:nth-child(2) {
+            font-size: 24px !important;
+            margin-bottom: 2px !important;
           }
-          main > div > div > div > div[style*='textAlign: center'] div + div + div div {
-            border-radius: 2px !important;
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:last-child {
+            height: 6px !important;
           }
-          main > div > div > div > div:last-child {
-            margin: 1px 0 2px 0 !important;
-            padding: 12px !important;
+          /* Информационный блок - делаем ещё меньше */
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] {
+            margin: 0 !important;
+            padding: 4px 8px !important;
+            border-width: 1px !important;
+            max-height: 40px !important;
+            overflow: hidden !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:first-child {
+            font-size: 9px !important;
+            margin-bottom: 1px !important;
+            letter-spacing: -0.2px !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:last-child {
+            font-size: 8px !important;
+            line-height: 1.2 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          /* Кнопки внизу */
+          main > div > div > div > div:last-child button {
+            font-size: 12px !important;
+            padding: 6px 0 !important;
+            border-radius: 5px !important;
           }
           .ai-prediction-hint {
-            font-size: 18px !important;
+            font-size: 16px !important;
           }
         }
         @keyframes spin {
@@ -2001,6 +2103,236 @@ export default function Home() {
           60% { opacity: 0.1; }
           80% { opacity: 0.7; }
           100% { opacity: 1; }
+        }
+        /* Специальная настройка для очень маленьких экранов по высоте */
+        @media (max-height: 700px) and (max-width: 600px) {
+          /* Уменьшаем блок предсказания */
+          main > div > div > div > div[style*="minHeight"] {
+            min-height: 130px !important;
+          }
+          
+          /* Кнопки под блоком предсказания */
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
+            margin: 0 !important;
+          }
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] button {
+            padding: 6px 0 !important;
+          }
+          
+          /* Энергия */
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
+            height: 28px !important;
+            margin: 0 !important;
+          }
+          
+          /* Шанс - сильно уменьшаем */
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
+            padding: 4px 6px !important;
+            margin: 0 !important;
+            max-height: 60px !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
+            font-size: 10px !important;
+            margin-bottom: 0 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:nth-child(2) {
+            font-size: 20px !important;
+            margin-bottom: 0 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:last-child {
+            height: 4px !important;
+          }
+          
+          /* Информационный блок - предельно минимизируем */
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] {
+            padding: 2px 4px !important;
+            max-height: 25px !important;
+            border-width: 0.5px !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:first-child {
+            font-size: 7px !important;
+            margin-bottom: 0 !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:last-child {
+            font-size: 6px !important;
+            line-height: 1.1 !important;
+            -webkit-line-clamp: 1 !important;
+          }
+          
+          /* Кнопки внизу */
+          main > div > div > div > div:last-child {
+            margin: 0 !important;
+          }
+          main > div > div > div > div:last-child button {
+            padding: 4px 0 !important;
+            font-size: 11px !important;
+          }
+        }
+        /* Кардинально уменьшаем все блоки на мобильной версии */
+        @media (max-width: 600px) {
+          /* Общие настройки */
+          main {
+            padding: 0 4vw 30px 4vw !important;
+          }
+          main > div {
+            gap: 4px !important;
+          }
+          
+          /* Уменьшаем блок предсказания */
+          main > div > div > div > div[style*="minHeight"] {
+            min-height: 120px !important;
+            border-width: 1px !important;
+          }
+          
+          /* Кнопки под блоком предсказания */
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
+            margin: 0 !important;
+            gap: 4px !important;
+          }
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] button {
+            padding: 5px 0 !important;
+            font-size: 11px !important;
+          }
+          
+          /* Энергия */
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
+            height: 24px !important;
+            margin: 0 !important;
+            border-width: 0.5px !important;
+            padding: 0 6px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:first-child {
+            font-size: 10px !important;
+            min-width: 40px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:first-child span {
+            font-size: 12px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:last-child {
+            font-size: 9px !important;
+            min-width: 50px !important;
+          }
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:nth-child(2) {
+            height: 4px !important;
+          }
+          
+          /* Шанс - сильно уменьшаем */
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
+            padding: 2px 4px !important;
+            border-width: 0.5px !important;
+            margin: 0 !important;
+            max-height: 45px !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
+            font-size: 9px !important;
+            margin-bottom: 0 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:nth-child(2) {
+            font-size: 16px !important;
+            margin-bottom: 0 !important;
+            line-height: 1 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:last-child {
+            height: 3px !important;
+          }
+          
+          /* Информационный блок - делаем экстремально маленьким */
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] {
+            padding: 2px 3px !important;
+            border-width: 0.5px !important;
+            margin: 0 !important;
+            max-height: 26px !important;
+            overflow: hidden !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:first-child {
+            font-size: 6px !important;
+            margin: 0 !important;
+            line-height: 1.1 !important;
+            letter-spacing: -0.2px !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:last-child {
+            font-size: 6px !important;
+            line-height: 1.1 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 1 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            height: 8px !important;
+          }
+          
+          /* Кнопки внизу */
+          main > div > div > div > div:last-child {
+            margin: 0 !important;
+          }
+          main > div > div > div > div:last-child button {
+            font-size: 10px !important;
+            padding: 3px 0 !important;
+          }
+        }
+        /* Дополнительная настройка для очень маленьких экранов по высоте */
+        @media (max-height: 700px) and (max-width: 600px) {
+          main {
+            padding: 0 4vw 15px 4vw !important;
+          }
+          
+          /* Уменьшаем блок предсказания еще сильнее */
+          main > div > div > div > div[style*="minHeight"] {
+            min-height: 100px !important;
+            max-height: 100px !important;
+            overflow: hidden !important;
+          }
+          
+          /* Шанс - предельно минимизируем */
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
+            padding: 1px 3px !important;
+            max-height: 28px !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
+            font-size: 7px !important;
+            width: auto !important;
+            line-height: 1 !important;
+            margin-right: 3px !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:nth-child(2) {
+            font-size: 12px !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+          }
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:last-child {
+            display: none !important;
+          }
+          
+          /* Информационный блок - микроскопический */
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] {
+            max-height: 14px !important;
+            padding: 1px 2px !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:first-child {
+            font-size: 5px !important;
+            height: 5px !important;
+            overflow: hidden !important;
+          }
+          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:last-child {
+            font-size: 4px !important;
+            height: 4px !important;
+            white-space: nowrap !important;
+          }
+          
+          /* Кнопки внизу */
+          main > div > div > div > div:last-child button {
+            padding: 2px 0 !important;
+            height: 20px !important;
+            line-height: 1 !important;
+          }
         }
       `}</style>
     </div>
