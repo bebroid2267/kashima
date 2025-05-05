@@ -1558,7 +1558,7 @@ export default function Home() {
                 transition: 'all 0.2s',
               }}
             >
-              AR
+              عربي
             </button>
           </div>
         </div>
@@ -1784,7 +1784,7 @@ export default function Home() {
               <div style={{
                 position: 'relative',
                 width: '100%',
-                height: 38,
+                height: 44,
                 borderRadius: 16,
                 boxShadow: '0 0 8px #ffe06655',
                 border: '2px solid #38e0ff',
@@ -2062,7 +2062,7 @@ export default function Home() {
             flex-direction: row !important;
             align-items: center !important;
             justify-content: space-between !important;
-            margin-top: 10px !important;
+            margin-top: 24px !important;
           }
           header > div:first-child {
             font-size: 18px !important;
@@ -2109,10 +2109,10 @@ export default function Home() {
           }
           /* Энергия */
           main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
-            height: 32px !important;
-            margin: 0 0 2px 0 !important;
-            padding: 0 12px !important;
-            border-width: 1px !important;
+            height: 30px !important;
+            margin: 0 0 10px 0 !important;
+            border-width: 0.5px !important;
+            padding: 0 6px !important;
           }
           main > div > div > div > div[style*="position: relative"][style*="width: 100%"] > div:first-child {
             font-size: 14px !important;
@@ -2130,9 +2130,10 @@ export default function Home() {
           }
           /* Шанс */
           main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
-            padding: 10px 6px !important;
-            border-width: 1px !important;
-            margin: 0 0 2px 0 !important;
+            padding: 2px 4px !important;
+            border-width: 0.5px !important;
+            margin: 10px 0 0 0 !important;
+            max-height: 45px !important;
           }
           main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
             font-size: 14px !important;
@@ -2307,35 +2308,24 @@ export default function Home() {
           main > div > div > div > div[style*="minHeight"] {
             min-height: 120px !important;
             border-width: 1px !important;
-          }
-          
-          /* Коэффициент и фраза */
-          main > div > div > div > div[style*="minHeight"] > div[style*="display: flex"] {
-            padding: 5px 0 !important;
-          }
-          main > div > div > div > div[style*="minHeight"] > div > div:first-child {
-            font-size: 26px !important;
-            margin-bottom: 5px !important;
-          }
-          main > div > div > div > div[style*="minHeight"] > div > div:last-child {
-            font-size: 12px !important;
-            line-height: 1.2 !important;
+            margin-bottom: 12px !important;
           }
           
           /* Кнопки под блоком предсказания */
           main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
-            margin: 0 !important;
+            margin: 0 0 8px 0 !important;
             gap: 4px !important;
           }
           main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] button {
-            padding: 5px 0 !important;
-            font-size: 11px !important;
+            font-size: 12px !important;
+            padding: 8px 0 !important;
+            border-radius: 5px !important;
           }
           
           /* Энергия */
           main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
             height: 24px !important;
-            margin: 0 !important;
+            margin: 0 0 10px 0 !important;
             border-width: 0.5px !important;
             padding: 0 6px !important;
           }
@@ -2358,7 +2348,7 @@ export default function Home() {
           main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
             padding: 2px 4px !important;
             border-width: 0.5px !important;
-            margin: 0 !important;
+            margin: 10px 0 0 0 !important;
             max-height: 45px !important;
           }
           main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
@@ -2413,6 +2403,29 @@ export default function Home() {
         }
         /* Для мобильных устройств с высотой больше 700px - увеличиваем кнопки внизу */
         @media (max-width: 600px) and (min-height: 700px) {
+          /* Хедер */
+          header {
+            margin-top: 30px !important;
+          }
+          
+          main > div > div > div > div[style*="minHeight"] {
+            margin-bottom: 15px !important;
+          }
+          
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
+            margin: 0 0 12px 0 !important;
+          }
+          
+          /* Увеличиваем отступы между блоками */
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
+            height: 34px !important;
+            margin: 0 0 15px 0 !important;
+          }
+          
+          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
+            margin: 15px 0 0 0 !important;
+          }
+          
           main > div > div > div > div:last-child button {
             font-size: 12px !important;
             padding: 8px 0 !important;
@@ -2425,59 +2438,38 @@ export default function Home() {
             padding: 0 4vw 15px 4vw !important;
           }
           
+          /* Хедер */
+          header {
+            margin-top: 16px !important;
+          }
+          
           /* Уменьшаем блок предсказания еще сильнее */
           main > div > div > div > div[style*="minHeight"] {
             min-height: 100px !important;
             max-height: 100px !important;
             overflow: hidden !important;
+            margin-bottom: 8px !important;
           }
           
-          /* Шанс - предельно минимизируем */
+          /* Кнопки под блоком предсказания */
+          main > div > div > div > div[style*="display: flex"][style*="gap: 12px"] {
+            margin: 0 0 6px 0 !important;
+          }
+          
+          /* Энергия - добавляем отступ снизу */
+          main > div > div > div > div[style*="position: relative"][style*="width: 100%"] {
+            height: 28px !important;
+            margin: 0 0 8px 0 !important;
+          }
+          
+          /* Шанс - добавляем отступ сверху */
           main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] {
-            padding: 1px 3px !important;
-            max-height: 28px !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-          }
-          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:first-child {
-            font-size: 7px !important;
-            width: auto !important;
-            line-height: 1 !important;
-            margin-right: 3px !important;
-          }
-          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:nth-child(2) {
-            font-size: 12px !important;
-            line-height: 1 !important;
-            margin: 0 !important;
-          }
-          main > div > div > div > div[style*="border-radius: 12px"][style*="border: 2px solid"] > div:last-child {
-            display: none !important;
+            margin: 8px 0 0 0 !important;
           }
           
-          /* Информационный блок - микроскопический */
-          main > div > div > div > div[style*="border: 2px solid #38e0ff"] {
-            max-height: 14px !important;
-            padding: 1px 2px !important;
-          }
-          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:first-child {
-            font-size: 5px !important;
-            height: 5px !important;
-            overflow: hidden !important;
-          }
-          main > div > div > div > div[style*="border: 2px solid #38e0ff"] > div:last-child {
-            font-size: 4px !important;
-            height: 4px !important;
-            white-space: nowrap !important;
-          }
-          
-          /* Кнопки внизу */
           main > div > div > div > div:last-child button {
-            padding: 2px 0 !important;
-            height: 20px !important;
-            line-height: 1 !important;
+            padding: 4px 0 !important;
+            font-size: 11px !important;
           }
         }
       `}</style>
