@@ -30,13 +30,12 @@ export function middleware(request: NextRequest) {
   const hasPwaCookie = request.cookies.has('isPwa');
   const hasPwaParam = url.searchParams.has('pwa');
   
-  // Определяем окончательный статус PWA
-  // Для строгой безопасности, учитываем вторичные индикаторы только если хотя бы одно из условий ниже:
-  // 1. Это страница download (где мы хотим, чтобы PWA пользователи могли перейти в auth)
-  // 2. Уже есть основной индикатор PWA
-  const shouldConsiderSecondaryIndicators = pathname === '/download' || isRealPWA;
-  
-  const isPWA = isRealPWA || (shouldConsiderSecondaryIndicators && (hasPwaCookie || hasPwaParam));
+  // ВАЖНО: Делаем определение PWA более гибким
+  // Считаем PWA если есть любой из следующих признаков:
+  // 1. Реальный PWA (индикаторы браузера)
+  // 2. Есть кука isPwa (установленная ранее)
+  // 3. Есть параметр URL pwa=true (используется при редиректе)
+  const isPWA = isRealPWA || hasPwaCookie || hasPwaParam;
   
   // Логируем информацию о проверке PWA статуса
   console.log(`[Middleware] Path: ${pathname}, isPWA: ${isPWA}, isRealPWA: ${isRealPWA}`);
@@ -44,21 +43,32 @@ export function middleware(request: NextRequest) {
     displayMode: request.headers.get('display-mode'),
     appPlatform: request.headers.has('app-platform'),
     hasPwaCookie,
-    hasPwaParam
+    hasPwaParam,
+    userAgent: request.headers.get('user-agent')
   });
 
   // ПРАВИЛО 1: Если пользователь в PWA и пытается зайти на страницу download
   if (isPWA && pathname === '/download') {
-    // Перенаправляем на страницу auth
+    // Перенаправляем на страницу auth с флагом pwa=true
     console.log('[Middleware] PWA пользователь перенаправлен с download на auth');
-    return NextResponse.redirect(new URL('/auth', request.url));
+    url.pathname = '/auth';
+    url.searchParams.set('pwa', 'true');
+    return NextResponse.redirect(url);
   }
   
   // ПРАВИЛО 2: Если пользователь НЕ в PWA и пытается зайти на любую страницу, кроме download
   if (!isPWA && pathname !== '/download') {
     // Перенаправляем на страницу download
     console.log(`[Middleware] НЕ-PWA пользователь перенаправлен на download с: ${pathname}`);
-    return NextResponse.redirect(new URL('/download', request.url));
+    url.pathname = '/download';
+    return NextResponse.redirect(url);
+  }
+  
+  // Если пользователь в PWA, добавляем параметр pwa=true к URL
+  if (isPWA && !url.searchParams.has('pwa')) {
+    url.searchParams.set('pwa', 'true');
+    // Возвращаем переписанный URL с параметром pwa
+    return NextResponse.rewrite(url);
   }
   
   // Для всех остальных случаев разрешаем доступ

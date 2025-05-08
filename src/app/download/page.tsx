@@ -66,14 +66,19 @@ export default function DownloadPage() {
       const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
                               sessionStorage.getItem('isPwa') === 'true';
       
-      // Final PWA determination
-      const isPWA = isPwaMode || storedPwaStatus;
+      // URL параметр - важный индикатор, так как устанавливается middleware
+      const hasUrlPwaParam = window.location.href.includes('pwa=true');
+      
+      // ВАЖНОЕ ИЗМЕНЕНИЕ: Для совместимости с middleware, считаем PWA 
+      // если хотя бы один из индикаторов положительный
+      const isPWA = isPwaMode || storedPwaStatus || hasUrlPwaParam;
       setIsPwa(isPWA);
       
       console.log('PWA detection details:', {
         displayMode: mode,
         isPwaMode,
         storedPwaStatus,
+        hasUrlPwaParam,
         navigatorStandalone: (window.navigator as any).standalone,
         matchMedia: window.matchMedia('(display-mode: standalone)').matches,
         referrer: document.referrer,
