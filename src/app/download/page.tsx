@@ -80,17 +80,9 @@ export default function DownloadPage() {
           sessionStorage.setItem('isPwa', 'true');
           document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
           
-          // Add a flag to the URL for re-detection if needed
-          if (!window.location.href.includes('pwa=true')) {
-            // Store the fact we're redirecting to prevent loops
-            sessionStorage.setItem('redirecting', 'true');
-            
-            // Check if we're already redirecting to prevent infinite loops
-            if (sessionStorage.getItem('redirecting') !== 'true') {
-              console.log('PWA mode detected, redirecting to auth page');
-              setTimeout(() => router.push('/auth'), 300);
-            }
-          }
+          // Force redirect to auth page in most cases
+          console.log('PWA mode detected, redirecting to auth page');
+          setTimeout(() => router.push('/auth?pwa=true'), 300);
         } catch (e) {
           console.error('Error storing PWA state:', e);
         }
@@ -101,14 +93,27 @@ export default function DownloadPage() {
     detectPWAAndRedirect();
     const fallbackCheck = setTimeout(detectPWAAndRedirect, 1000);
     
-    // Clear the redirecting flag after a while to prevent getting stuck
-    const clearRedirectingFlag = setTimeout(() => {
-      sessionStorage.removeItem('redirecting');
-    }, 5000);
+    // Also add a link click handler for additional protection against bugs
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a');
+      if (link && !link.getAttribute('href')?.startsWith('/auth')) {
+        // Always set PWA flag on any navigation
+        try {
+          localStorage.setItem('isPwa', 'true');
+          sessionStorage.setItem('isPwa', 'true');
+          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+        } catch (e) {
+          console.error('Error setting PWA status on link click:', e);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleLinkClick);
     
     return () => {
       clearTimeout(fallbackCheck);
-      clearTimeout(clearRedirectingFlag);
+      document.removeEventListener('click', handleLinkClick);
     };
   }, [router]);
 
@@ -134,6 +139,16 @@ export default function DownloadPage() {
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Try to trigger the prompt manually for Safari
+    if (/iP(ad|hone|od)/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallButton(true);
+    }
+
+    // Also show install button on Android if not in standalone mode
+    if (/Android/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallButton(true);
+    }
 
     // Check if the app is already installed
     window.addEventListener('appinstalled', () => {
@@ -162,33 +177,59 @@ export default function DownloadPage() {
 
   // Function to handle PWA installation
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      console.log('No installation prompt available');
-      // Fallback for when prompt is not available
-      window.dispatchEvent(new Event('beforeinstallprompt'));
+    console.log('Install button clicked');
+    
+    // For iOS Safari
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
+      alert('Для установки на iOS:\n1. Нажмите кнопку "Поделиться" (Share) внизу экрана\n2. Прокрутите вниз и выберите "На экран «Домой»" (Add to Home Screen)');
+      return;
+    }
+    
+    // For Android browsers without install API
+    if (/Android/.test(navigator.userAgent) && !deferredPrompt) {
+      alert('Для установки на Android:\n1. Нажмите на три точки (⋮) в правом верхнем углу\n2. Выберите "Установить приложение" или "Добавить на главный экран"');
       return;
     }
 
-    // Show the install prompt
-    deferredPrompt.prompt();
+    if (!deferredPrompt) {
+      console.log('No installation prompt available');
+      // Показать специальное сообщение пользователю
+      alert('Для установки приложения: \n1. Нажмите на кнопку меню в вашем браузере (⋮ или ···) \n2. Выберите "Установить приложение" или "Добавить на главный экран"');
+      
+      // Попробуем явно вызвать событие для мобильных устройств, где это может сработать
+      try {
+        window.dispatchEvent(new Event('beforeinstallprompt'));
+      } catch (e) {
+        console.error('Error dispatching beforeinstallprompt event:', e);
+      }
+      return;
+    }
 
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the installation prompt: ${outcome}`);
-    
-    // Clear the deferredPrompt
-    setDeferredPrompt(null);
-    
-    // Hide the install button
-    setShowInstallButton(false);
-    
-    if (outcome === 'accepted') {
-      setIsRedirecting(true);
-      setTimeout(() => {
-        localStorage.setItem('isPwa', 'true');
-        sessionStorage.setItem('isPwa', 'true');
-        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-      }, 500);
+    try {
+      // Show the install prompt
+      deferredPrompt.prompt();
+
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the installation prompt: ${outcome}`);
+      
+      // Clear the deferredPrompt
+      setDeferredPrompt(null);
+      
+      // Hide the install button
+      setShowInstallButton(false);
+      
+      if (outcome === 'accepted') {
+        setIsRedirecting(true);
+        setTimeout(() => {
+          localStorage.setItem('isPwa', 'true');
+          sessionStorage.setItem('isPwa', 'true');
+          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error during PWA installation:', error);
+      alert('Для установки: нажмите на кнопку меню в браузере (⋮) и выберите "Установить приложение"');
     }
   };
   
@@ -303,6 +344,31 @@ export default function DownloadPage() {
         }}
       />
       
+      {/* Маленькая кнопка для перехода в приложение для тех, кто уже установил PWA */}
+      <button
+        onClick={() => {
+          localStorage.setItem('isPwa', 'true');
+          sessionStorage.setItem('isPwa', 'true');
+          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+          router.push('/auth?pwa=true');
+        }}
+        style={{
+          position: 'absolute',
+          top: 15,
+          right: 15,
+          background: 'none',
+          border: 'none',
+          color: 'rgba(255,255,255,0.3)',
+          fontSize: 20,
+          cursor: 'pointer',
+          padding: 5,
+          zIndex: 10
+        }}
+        aria-label="Уже установлено"
+      >
+        ⟳
+      </button>
+      
       {/* HEADER */}
       <header
         style={{
@@ -394,48 +460,7 @@ export default function DownloadPage() {
         >
           {selectedLang === 'fr' ? translations.fr.downloadApp : translations.ar.downloadApp}
         </button>
-        
-        {/* Debug button to manually trigger PWA check */}
-        <button
-          onClick={() => {
-            // First set all flags
-            localStorage.setItem('isPwa', 'true');
-            sessionStorage.setItem('isPwa', 'true');
-            document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-            
-            // Force redirection
-            setIsRedirecting(true);
-            setTimeout(() => router.push('/auth?pwa=true'), 500);
-          }}
-          style={{
-            marginTop: 10,
-            padding: '8px 20px',
-            borderRadius: 6,
-            border: '1px dashed #38e0ff',
-            background: 'rgba(56, 224, 255, 0.1)',
-            color: '#38e0ff',
-            fontSize: 14,
-            cursor: 'pointer',
-          }}
-        >
-          Already installed? Click here
-        </button>
       </header>
-
-      {/* Display mode indicator for debugging */}
-      <div style={{
-        position: 'fixed',
-        top: 10,
-        right: 10,
-        background: 'rgba(10, 26, 47, 0.8)',
-        color: '#38e0ff',
-        padding: '5px 10px',
-        borderRadius: 4,
-        fontSize: 12,
-        zIndex: 999
-      }}>
-        Mode: {displayMode}
-      </div>
 
       {/* MAIN CONTENT */}
       <main
@@ -647,6 +672,30 @@ export default function DownloadPage() {
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* Маленькая скрытая ссылка для мануального перехода в случае проблем */}
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <a 
+            href="/auth?pwa=true" 
+            style={{ 
+              color: 'rgba(255,255,255,0.2)', 
+              fontSize: 10, 
+              textDecoration: 'none',
+              cursor: 'default'
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              // Установить все флаги PWA
+              localStorage.setItem('isPwa', 'true');
+              sessionStorage.setItem('isPwa', 'true');
+              document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+              // Перенаправить на страницу auth
+              router.push('/auth?pwa=true');
+            }}
+          >
+            v1.0.0
+          </a>
         </div>
       </main>
 
