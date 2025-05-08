@@ -463,6 +463,10 @@ export default function Home() {
     
     if (isStandalone) {
       console.log('App is running in standalone mode (installed as PWA)');
+      // Set PWA flags for consistent detection
+      localStorage.setItem('isPwa', 'true');
+      sessionStorage.setItem('isPwa', 'true');
+      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
       setShowInstallButton(false);
       return;
     }
@@ -484,6 +488,10 @@ export default function Home() {
     // Check if the app is already installed
     window.addEventListener('appinstalled', () => {
       console.log('App installed event triggered');
+      // Set PWA flags for consistent detection
+      localStorage.setItem('isPwa', 'true');
+      sessionStorage.setItem('isPwa', 'true');
+      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
       setShowInstallButton(false);
     });
 
@@ -502,6 +510,13 @@ export default function Home() {
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      // Set PWA flags for consistent detection
+      localStorage.setItem('isPwa', 'true');
+      sessionStorage.setItem('isPwa', 'true');
+      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+    }
     
     // Clear the deferredPrompt
     setDeferredPrompt(null);

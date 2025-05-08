@@ -3,10 +3,6 @@ import type { NextRequest } from 'next/server';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  // Check if the user is accessing from a standalone PWA app
-  const isStandalone = request.headers.get('display-mode') === 'standalone' || 
-                       request.headers.has('app-platform'); // Custom header some browsers may set
-  
   // Get current URL path
   const url = request.nextUrl.clone();
   const { pathname } = url;
@@ -23,16 +19,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
+  // Check if the user is accessing from a standalone PWA app using multiple methods
+  const isStandalone = 
+    request.headers.get('display-mode') === 'standalone' || 
+    request.headers.has('app-platform') ||  // Custom header some browsers may set
+    request.cookies.has('isPwa');  // Use cookie for more persistent detection
+  
   // If user is not in standalone mode and trying to access any route other than download
   if (!isStandalone && pathname !== '/download') {
     // Redirect to download page
+    console.log('Middleware: Non-PWA user redirected to download page from:', pathname);
     url.pathname = '/download';
     return NextResponse.redirect(url);
   }
   
   // If user is in standalone PWA mode and trying to access the download page
   if (isStandalone && pathname === '/download') {
-    // Redirect to auth page or home
+    // Redirect to auth page
+    console.log('Middleware: PWA user redirected from download page to auth');
     url.pathname = '/auth';
     return NextResponse.redirect(url);
   }

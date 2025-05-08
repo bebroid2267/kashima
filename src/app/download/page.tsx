@@ -8,6 +8,7 @@ export default function DownloadPage() {
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPwa, setIsPwa] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   
   // UI text translations
@@ -17,48 +18,78 @@ export default function DownloadPage() {
       aviatorPredictor: "Prédicteur Aviator",
       aiPowered: "Propulsé par l'intelligence artificielle",
       downloadApp: "Télécharger",
+      redirecting: "Redirection..."
     },
     ar: {
       title: "كاشف AI",
       aviatorPredictor: "متنبئ أفياتور",
       aiPowered: "مدعوم بالذكاء الاصطناعي",
       downloadApp: "تحميل",
+      redirecting: "جارٍ إعادة التوجيه..."
     }
   };
 
-  // Check if running in PWA mode and redirect if needed
+  // Immediate check for PWA mode on component mount
   useEffect(() => {
-    const checkIfPwa = () => {
-      // Multiple ways to check for standalone mode
+    const checkIfPwaAndRedirect = () => {
+      // Check all possible standalone indicators
       const isStandalone = 
         window.matchMedia('(display-mode: standalone)').matches || 
         (window.navigator as any).standalone === true || // iOS
         document.referrer.includes('android-app://') ||
-        window.location.href.includes('mode=standalone');
+        window.location.href.includes('mode=standalone') ||
+        localStorage.getItem('isPwa') === 'true' ||
+        sessionStorage.getItem('isPwa') === 'true';
 
-      setIsPwa(isStandalone);
-      
-      // Store standalone mode in sessionStorage for middleware to check
+      // Debug output
+      console.log('PWA CHECK on download page:', {
+        matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+        navigatorStandalone: (window.navigator as any).standalone,
+        referrer: document.referrer.includes('android-app://'),
+        urlMode: window.location.href.includes('mode=standalone'),
+        localStorage: localStorage.getItem('isPwa'),
+        sessionStorage: sessionStorage.getItem('isPwa'),
+        overall: isStandalone
+      });
+
       if (isStandalone) {
+        setIsPwa(true);
+        setIsRedirecting(true);
         try {
-          sessionStorage.setItem('isPwa', 'true');
+          // Ensure storage is set
           localStorage.setItem('isPwa', 'true');
+          sessionStorage.setItem('isPwa', 'true');
           
-          // If in PWA mode, redirect to the auth page
-          router.push('/auth');
+          // Also set a cookie for the middleware
+          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+          
+          // Redirect to auth page
+          console.log('PWA detected, redirecting to auth page');
+          setTimeout(() => {
+            router.push('/auth');
+          }, 500);
         } catch (e) {
           console.error('Error storing PWA state:', e);
         }
       }
     };
     
-    checkIfPwa();
+    // Run immediately on component mount
+    checkIfPwaAndRedirect();
     
-    // Listen for display mode changes
+    // Fallback check after a short delay to ensure everything is loaded
+    const fallbackCheck = setTimeout(checkIfPwaAndRedirect, 1000);
+    return () => clearTimeout(fallbackCheck);
+  }, [router]);
+
+  // Listen for display mode changes
+  useEffect(() => {
     const mediaQueryList = window.matchMedia('(display-mode: standalone)');
     const handleChange = (e: MediaQueryListEvent) => {
+      console.log('Display mode changed to standalone:', e.matches);
       setIsPwa(e.matches);
       if (e.matches) {
+        setIsRedirecting(true);
         sessionStorage.setItem('isPwa', 'true');
         localStorage.setItem('isPwa', 'true');
         router.push('/auth');
@@ -107,10 +138,14 @@ export default function DownloadPage() {
     window.addEventListener('appinstalled', () => {
       console.log('App installed event triggered');
       setShowInstallButton(false);
+      setIsRedirecting(true);
       
       // Set PWA status after installation
       sessionStorage.setItem('isPwa', 'true');
       localStorage.setItem('isPwa', 'true');
+      
+      // Also set a cookie for server-side detection
+      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
       
       // Add a small delay before redirecting to ensure everything is set
       setTimeout(() => {
@@ -144,7 +179,90 @@ export default function DownloadPage() {
     
     // Hide the install button
     setShowInstallButton(false);
+    
+    if (outcome === 'accepted') {
+      setIsRedirecting(true);
+      setTimeout(() => {
+        localStorage.setItem('isPwa', 'true');
+        sessionStorage.setItem('isPwa', 'true');
+        
+        // Set a cookie for server-side detection
+        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      }, 500);
+    }
   };
+  
+  // If we're redirecting, show a loading screen
+  if (isRedirecting) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          width: '100vw',
+          background: '#07101e',
+          backgroundImage: `url(${font.src})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflowX: 'hidden',
+          position: 'relative',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(7, 16, 30, 0.85)',
+            zIndex: 1,
+          }}
+        />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 20,
+            position: 'relative',
+            zIndex: 2,
+          }}
+        >
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              border: '3px solid #38e0ff',
+              borderTop: '3px solid transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          ></div>
+          <div style={{ 
+            color: '#38e0ff', 
+            fontSize: 18,
+            fontWeight: 600,
+            textAlign: 'center'
+          }}>
+            {selectedLang === 'fr' ? translations.fr.redirecting : translations.ar.redirecting}
+          </div>
+        </div>
+        
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div
