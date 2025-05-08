@@ -455,19 +455,6 @@ export default function Home() {
   useEffect(() => {
     // Функция для проверки PWA режима
     const checkPWAStatus = () => {
-      // Проверка DEV режима - если есть параметр dev=true, пропускаем все проверки
-      const isDevMode = window.location.href.includes('dev=true');
-      if (isDevMode) {
-        console.log('MAIN PAGE: DEV MODE активирован, пропускаем проверки PWA');
-        
-        // В dev режиме сразу устанавливаем все необходимые флаги
-        localStorage.setItem('isPwa', 'true');
-        sessionStorage.setItem('isPwa', 'true');
-        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-        document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
-        
-        return true; // Пропускаем все проверки и не делаем редирект
-      }
       
       // Используем ту же функцию обнаружения PWA
       const getPWADisplayMode = () => {
