@@ -21,20 +21,30 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // Проверка PWA статуса по нескольким признакам
-  const isPWA = 
+  // Доверенные индикаторы PWA режима (заголовки браузера)
+  const isRealPWA = 
     request.headers.get('display-mode') === 'standalone' || 
-    request.headers.has('app-platform') ||  // Некоторые браузеры могут устанавливать этот заголовок
-    request.cookies.has('isPwa') ||  // Проверка cookie
-    url.searchParams.has('pwa');  // URL параметр как запасной вариант
+    request.headers.has('app-platform');
+  
+  // Вторичные индикаторы (могут быть подделаны)
+  const hasPwaCookie = request.cookies.has('isPwa');
+  const hasPwaParam = url.searchParams.has('pwa');
+  
+  // Определяем окончательный статус PWA
+  // Для строгой безопасности, учитываем вторичные индикаторы только если хотя бы одно из условий ниже:
+  // 1. Это страница download (где мы хотим, чтобы PWA пользователи могли перейти в auth)
+  // 2. Уже есть основной индикатор PWA
+  const shouldConsiderSecondaryIndicators = pathname === '/download' || isRealPWA;
+  
+  const isPWA = isRealPWA || (shouldConsiderSecondaryIndicators && (hasPwaCookie || hasPwaParam));
   
   // Логируем информацию о проверке PWA статуса
-  console.log(`[Middleware] Path: ${pathname}, isPWA: ${isPWA}`);
+  console.log(`[Middleware] Path: ${pathname}, isPWA: ${isPWA}, isRealPWA: ${isRealPWA}`);
   console.log(`[Middleware] Headers:`, {
     displayMode: request.headers.get('display-mode'),
     appPlatform: request.headers.has('app-platform'),
-    hasPwaCookie: request.cookies.has('isPwa'),
-    hasPwaParam: url.searchParams.has('pwa')
+    hasPwaCookie,
+    hasPwaParam
   });
 
   // ПРАВИЛО 1: Если пользователь в PWA и пытается зайти на страницу download

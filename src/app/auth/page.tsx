@@ -33,11 +33,34 @@ export default function AuthPage() {
       };
       
       const displayMode = getPWADisplayMode();
-      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
-                            sessionStorage.getItem('isPwa') === 'true';
       
-      const isPWA = displayMode !== 'browser' || storedPwaStatus;
-      console.log('AUTH PAGE: PWA check on auth page:', { displayMode, storedPwaStatus, isPWA });
+      // Прежде всего проверяем настоящие признаки PWA
+      const isRealPWA = displayMode !== 'browser';
+      
+      // Вторичные индикаторы, которые могут быть подделаны
+      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
+                              sessionStorage.getItem('isPwa') === 'true';
+      
+      // Если это реальное PWA, тогда можно доверять вторичным индикаторам
+      // Если это не реальное PWA, тогда в этом случае мы даем шанс только URL параметру pwa=true
+      // который устанавливается middleware при переадресации
+      const hasUrlPwaParam = window.location.href.includes('pwa=true');
+      
+      // Окончательное решение о PWA статусе
+      const isPWA = isRealPWA || (storedPwaStatus && hasUrlPwaParam);
+      
+      // Расширенное логирование
+      console.log('AUTH PAGE: PWA check details:', { 
+        displayMode, 
+        isRealPWA,
+        storedPwaStatus, 
+        hasUrlPwaParam,
+        isPWA,
+        userAgent: navigator.userAgent,
+        referrer: document.referrer,
+        standalone: (window.navigator as any).standalone,
+        matchMedia: window.matchMedia('(display-mode: standalone)').matches
+      });
       
       // Если не PWA, перенаправляем на страницу download
       if (!isPWA) {
@@ -46,8 +69,8 @@ export default function AuthPage() {
         return false;
       }
       
-      // Устанавливаем PWA-флаги если обнаружен PWA режим
-      if (isPWA) {
+      // Устанавливаем PWA-флаги только если это реальный PWA (для более надежной защиты)
+      if (isRealPWA) {
         localStorage.setItem('isPwa', 'true');
         sessionStorage.setItem('isPwa', 'true');
         document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
@@ -56,7 +79,11 @@ export default function AuthPage() {
       return isPWA;
     };
     
+    // Проверяем PWA статус при загрузке и после небольшой задержки
     checkPWAStatus();
+    const fallbackCheck = setTimeout(checkPWAStatus, 1000);
+    
+    return () => clearTimeout(fallbackCheck);
   }, [router]);
 
   // Check if user is already authenticated

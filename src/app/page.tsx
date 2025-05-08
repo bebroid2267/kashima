@@ -469,11 +469,30 @@ export default function Home() {
       };
       
       const displayMode = getPWADisplayMode();
-      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
-                            sessionStorage.getItem('isPwa') === 'true';
       
-      const isPWA = displayMode !== 'browser' || storedPwaStatus;
-      console.log('PWA check on main page:', { displayMode, storedPwaStatus, isPWA });
+      // Прежде всего проверяем настоящие признаки PWA
+      const isRealPWA = displayMode !== 'browser';
+      
+      // Вторичные индикаторы, которые могут быть подделаны
+      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
+                              sessionStorage.getItem('isPwa') === 'true';
+      
+      // Если это реальное PWA, тогда можно доверять вторичным индикаторам
+      // Если это не реальное PWA, тогда доверяем только при наличии URL параметра
+      const hasUrlPwaParam = window.location.href.includes('pwa=true');
+      
+      // Окончательное решение о PWA статусе - на главной странице делаем более строгую проверку
+      // Если не реальное PWA, требуем оба условия - флаги в хранилище и URL параметр
+      const isPWA = isRealPWA || (storedPwaStatus && hasUrlPwaParam);
+      
+      console.log('PWA check on main page:', { 
+        displayMode, 
+        isRealPWA,
+        storedPwaStatus, 
+        hasUrlPwaParam,
+        isPWA,
+        userAgent: navigator.userAgent 
+      });
       
       // Если не PWA, перенаправляем на страницу download
       if (!isPWA) {
@@ -482,8 +501,8 @@ export default function Home() {
         return false;
       }
       
-      // Устанавливаем PWA-флаги если обнаружен PWA режим
-      if (isPWA) {
+      // Устанавливаем PWA-флаги только если это реально PWA режим
+      if (isRealPWA) {
         localStorage.setItem('isPwa', 'true');
         sessionStorage.setItem('isPwa', 'true');
         document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';

@@ -16,6 +16,12 @@ function getPWADisplayMode() {
   return 'browser';
 }
 
+// Добавим функцию для проверки реального PWA режима (без учета localStorage/sessionStorage)
+function isReallyPWA() {
+  const mode = getPWADisplayMode();
+  return mode === 'standalone' || mode === 'twa';
+}
+
 export default function DownloadPage() {
   const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
   const [showInstallButton, setShowInstallButton] = useState(false);
@@ -351,13 +357,12 @@ export default function DownloadPage() {
         }}
       />
       
-      {/* Маленькая кнопка для перехода в приложение для тех, кто уже установил PWA */}
+      {/* Маленькая кнопка для перезагрузки страницы */}
       <button
         onClick={() => {
-          localStorage.setItem('isPwa', 'true');
-          sessionStorage.setItem('isPwa', 'true');
-          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-          router.push('/auth?pwa=true');
+          // Вместо прямой установки PWA-флагов и перехода на auth, 
+          // просто перезагружаем текущую страницу
+          window.location.reload();
         }}
         style={{
           position: 'absolute',
@@ -371,7 +376,7 @@ export default function DownloadPage() {
           padding: 5,
           zIndex: 10
         }}
-        aria-label="Уже установлено"
+        aria-label="Обновить страницу"
       >
         ⟳
       </button>
@@ -681,10 +686,10 @@ export default function DownloadPage() {
           </div>
         </div>
         
-        {/* Маленькая скрытая ссылка для мануального перехода в случае проблем */}
+        {/* Маленькая скрытая ссылка - изменим для безопасности */}
         <div style={{ marginTop: 40, textAlign: 'center' }}>
           <a 
-            href="/auth?pwa=true" 
+            href="#" 
             style={{ 
               color: 'rgba(255,255,255,0.2)', 
               fontSize: 10, 
@@ -693,12 +698,18 @@ export default function DownloadPage() {
             }}
             onClick={(e) => {
               e.preventDefault();
-              // Установить все флаги PWA
-              localStorage.setItem('isPwa', 'true');
-              sessionStorage.setItem('isPwa', 'true');
-              document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-              // Перенаправить на страницу auth
-              router.push('/auth?pwa=true');
+              
+              // Проверяем, действительно ли это PWA, а не подделка через localStorage
+              if (isReallyPWA()) {
+                // Только для реальных PWA устанавливаем флаги и перенаправляем
+                localStorage.setItem('isPwa', 'true');
+                sessionStorage.setItem('isPwa', 'true');
+                document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+                router.push('/auth?pwa=true');
+              } else {
+                // Для обычных браузеров просто показываем подсказку по установке
+                handleInstallClick();
+              }
             }}
           >
             v1.0.0
