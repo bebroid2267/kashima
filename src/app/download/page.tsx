@@ -55,11 +55,14 @@ export default function DownloadPage() {
       
       // Consider the app to be a PWA if it's in standalone or TWA mode
       const isPwaMode = mode === 'standalone' || mode === 'twa';
-      setIsPwa(isPwaMode);
       
       // Additional fallback checks for PWA mode
       const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
                               sessionStorage.getItem('isPwa') === 'true';
+      
+      // Final PWA determination
+      const isPWA = isPwaMode || storedPwaStatus;
+      setIsPwa(isPWA);
       
       console.log('PWA detection details:', {
         displayMode: mode,
@@ -67,24 +70,28 @@ export default function DownloadPage() {
         storedPwaStatus,
         navigatorStandalone: (window.navigator as any).standalone,
         matchMedia: window.matchMedia('(display-mode: standalone)').matches,
-        referrer: document.referrer
+        referrer: document.referrer,
+        isPWA
       });
       
-      // If it's a PWA or we previously determined it's a PWA
-      if (isPwaMode || storedPwaStatus) {
+      // ВАЖНО: Если это PWA, то всегда перенаправляем на auth страницу,
+      // Эта страница должна быть доступна только для браузерных пользователей
+      if (isPWA) {
         setIsRedirecting(true);
         
-        // Store the PWA state in multiple places
+        // Store the PWA state
         try {
           localStorage.setItem('isPwa', 'true');
           sessionStorage.setItem('isPwa', 'true');
           document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
           
-          // Force redirect to auth page in most cases
+          // Force redirect to auth page in all cases
           console.log('PWA mode detected, redirecting to auth page');
           setTimeout(() => router.push('/auth?pwa=true'), 300);
         } catch (e) {
           console.error('Error storing PWA state:', e);
+          // Try direct location change as backup
+          window.location.href = '/auth?pwa=true';
         }
       }
     };

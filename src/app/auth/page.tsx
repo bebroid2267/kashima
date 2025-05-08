@@ -16,6 +16,49 @@ export default function AuthPage() {
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const router = useRouter();
 
+  // Проверяем, что пользователь находится в PWA режиме
+  useEffect(() => {
+    const checkPWAStatus = () => {
+      if (typeof window === 'undefined') return;
+      
+      // Функция для определения PWA режима
+      const getPWADisplayMode = () => {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (document.referrer.startsWith('android-app://')) {
+          return 'twa';
+        } else if ((window.navigator as any).standalone || isStandalone) {
+          return 'standalone';
+        }
+        return 'browser';
+      };
+      
+      const displayMode = getPWADisplayMode();
+      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
+                            sessionStorage.getItem('isPwa') === 'true';
+      
+      const isPWA = displayMode !== 'browser' || storedPwaStatus;
+      console.log('AUTH PAGE: PWA check on auth page:', { displayMode, storedPwaStatus, isPWA });
+      
+      // Если не PWA, перенаправляем на страницу download
+      if (!isPWA) {
+        console.log('AUTH PAGE: Not in PWA mode, redirecting to download page');
+        router.push('/download');
+        return false;
+      }
+      
+      // Устанавливаем PWA-флаги если обнаружен PWA режим
+      if (isPWA) {
+        localStorage.setItem('isPwa', 'true');
+        sessionStorage.setItem('isPwa', 'true');
+        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      }
+      
+      return isPWA;
+    };
+    
+    checkPWAStatus();
+  }, [router]);
+
   // Check if user is already authenticated
   useEffect(() => {
     console.log('AUTH PAGE: useEffect start');

@@ -7,51 +7,52 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const { pathname } = url;
   
-  // Always allow direct access to the download page
-  // This way PWA detection can happen on the client side
-  if (pathname === '/download') {
-    return NextResponse.next();
-  }
-  
-  // Allow access to assets and API routes regardless of PWA status
+  // Разрешить доступ к ресурсам и API независимо от статуса PWA
   if (
     pathname.startsWith('/_next') || 
     pathname.startsWith('/api') || 
     pathname.includes('.') || 
     pathname === '/sw.js' || 
-    pathname.startsWith('/workbox-')
+    pathname.startsWith('/workbox-') ||
+    pathname === '/manifest.json' || 
+    pathname.startsWith('/icons/') ||
+    pathname.startsWith('/screenshots/')
   ) {
     return NextResponse.next();
   }
   
-  // Check if PWA mode is indicated by any of:
-  // 1. Headers
-  // 2. Cookies
-  // 3. URL parameters
-  const isStandalone = 
+  // Проверка PWA статуса по нескольким признакам
+  const isPWA = 
     request.headers.get('display-mode') === 'standalone' || 
-    request.headers.has('app-platform') ||  // Custom header some browsers may set
-    request.cookies.has('isPwa') ||  // Cookie-based detection
-    url.searchParams.has('pwa');  // URL parameter fallback
+    request.headers.has('app-platform') ||  // Некоторые браузеры могут устанавливать этот заголовок
+    request.cookies.has('isPwa') ||  // Проверка cookie
+    url.searchParams.has('pwa');  // URL параметр как запасной вариант
   
-  // Debug information in headers for troubleshooting
-  const response = isStandalone 
-    ? NextResponse.next()
-    : NextResponse.redirect(new URL('/download', request.url));
-    
-  // Add debug info to response headers (visible in Network tab)
-  response.headers.set('X-PWA-Check', String(isStandalone));
-  response.headers.set('X-PWA-Cookies', String(request.cookies.has('isPwa')));
-  response.headers.set('X-PWA-Headers', String(request.headers.get('display-mode') === 'standalone'));
-  
-  // If not in PWA mode and trying to access any route other than download,
-  // redirect to download page
-  if (!isStandalone && pathname !== '/download') {
-    console.log('Middleware: Non-PWA user redirected to download page from:', pathname);
-    return response;
+  // Логируем информацию о проверке PWA статуса
+  console.log(`[Middleware] Path: ${pathname}, isPWA: ${isPWA}`);
+  console.log(`[Middleware] Headers:`, {
+    displayMode: request.headers.get('display-mode'),
+    appPlatform: request.headers.has('app-platform'),
+    hasPwaCookie: request.cookies.has('isPwa'),
+    hasPwaParam: url.searchParams.has('pwa')
+  });
+
+  // ПРАВИЛО 1: Если пользователь в PWA и пытается зайти на страницу download
+  if (isPWA && pathname === '/download') {
+    // Перенаправляем на страницу auth
+    console.log('[Middleware] PWA пользователь перенаправлен с download на auth');
+    return NextResponse.redirect(new URL('/auth', request.url));
   }
   
-  return response;
+  // ПРАВИЛО 2: Если пользователь НЕ в PWA и пытается зайти на любую страницу, кроме download
+  if (!isPWA && pathname !== '/download') {
+    // Перенаправляем на страницу download
+    console.log(`[Middleware] НЕ-PWA пользователь перенаправлен на download с: ${pathname}`);
+    return NextResponse.redirect(new URL('/download', request.url));
+  }
+  
+  // Для всех остальных случаев разрешаем доступ
+  return NextResponse.next();
 }
 
 export const config = {

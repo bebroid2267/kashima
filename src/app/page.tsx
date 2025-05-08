@@ -451,6 +451,58 @@ export default function Home() {
   // Состояние для отслеживания, выполняется ли в данный момент обновление всех пользователей
   const [isUpdatingAllUsers, setIsUpdatingAllUsers] = useState(false);
   
+  // Добавляем проверку PWA режима при загрузке страницы
+  useEffect(() => {
+    // Функция для проверки PWA режима
+    const checkPWAStatus = () => {
+      // Используем ту же функцию обнаружения PWA
+      const getPWADisplayMode = () => {
+        if (typeof window === 'undefined') return 'browser';
+        
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (document.referrer.startsWith('android-app://')) {
+          return 'twa';
+        } else if ((window.navigator as any).standalone || isStandalone) {
+          return 'standalone';
+        }
+        return 'browser';
+      };
+      
+      const displayMode = getPWADisplayMode();
+      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
+                            sessionStorage.getItem('isPwa') === 'true';
+      
+      const isPWA = displayMode !== 'browser' || storedPwaStatus;
+      console.log('PWA check on main page:', { displayMode, storedPwaStatus, isPWA });
+      
+      // Если не PWA, перенаправляем на страницу download
+      if (!isPWA) {
+        console.log('Not in PWA mode, redirecting to download page');
+        router.push('/download');
+        return false;
+      }
+      
+      // Устанавливаем PWA-флаги если обнаружен PWA режим
+      if (isPWA) {
+        localStorage.setItem('isPwa', 'true');
+        sessionStorage.setItem('isPwa', 'true');
+        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      }
+      
+      return isPWA;
+    };
+    
+    // Выполняем проверку сразу и через короткую задержку
+    const isPWA = checkPWAStatus();
+    
+    // Добавляем повторную проверку через короткое время
+    const fallbackCheck = setTimeout(() => {
+      checkPWAStatus();
+    }, 1000);
+    
+    return () => clearTimeout(fallbackCheck);
+  }, [router]);
+
   // PWA installation logic
   useEffect(() => {
     console.log('PWA installation effect running');
