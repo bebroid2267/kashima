@@ -28,14 +28,27 @@ export function middleware(request: NextRequest) {
   
   // Вторичные индикаторы (могут быть подделаны)
   const hasPwaCookie = request.cookies.has('isPwa');
+  const hasRealerPwaCookie = request.cookies.has('realer-pwa');
   const hasPwaParam = url.searchParams.has('pwa');
   
-  // ВАЖНО: Делаем определение PWA более гибким
-  // Считаем PWA если есть любой из следующих признаков:
-  // 1. Реальный PWA (индикаторы браузера)
-  // 2. Есть кука isPwa (установленная ранее)
-  // 3. Есть параметр URL pwa=true (используется при редиректе)
-  const isPWA = isRealPWA || hasPwaCookie || hasPwaParam;
+  // ВАЖНО: Определение PWA более гибкое
+  // Если это РЕАЛЬНОЕ PWA (через заголовки), то устанавливаем особую куку
+  let response = NextResponse.next();
+  
+  if (isRealPWA) {
+    // Устанавливаем cookie, которая будет доступна только в настоящем PWA
+    response.cookies.set('realer-pwa', 'true', { 
+      path: '/',
+      maxAge: 31536000,
+      sameSite: 'strict'
+    });
+  }
+  
+  // Считаем PWA если:
+  // 1. Реальный PWA (индикаторы браузера) 
+  // ИЛИ
+  // 2. Есть наша специальная кука realer-pwa или обычная isPwa И параметр pwa=true
+  const isPWA = isRealPWA || hasRealerPwaCookie || (hasPwaCookie && hasPwaParam);
   
   // Логируем информацию о проверке PWA статуса
   console.log(`[Middleware] Path: ${pathname}, isPWA: ${isPWA}, isRealPWA: ${isRealPWA}`);
@@ -43,6 +56,7 @@ export function middleware(request: NextRequest) {
     displayMode: request.headers.get('display-mode'),
     appPlatform: request.headers.has('app-platform'),
     hasPwaCookie,
+    hasRealerPwaCookie,
     hasPwaParam,
     userAgent: request.headers.get('user-agent')
   });
@@ -53,7 +67,18 @@ export function middleware(request: NextRequest) {
     console.log('[Middleware] PWA пользователь перенаправлен с download на auth');
     url.pathname = '/auth';
     url.searchParams.set('pwa', 'true');
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    
+    // Копируем куку realer-pwa в ответ редиректа, если она была
+    if (isRealPWA || hasRealerPwaCookie) {
+      redirectResponse.cookies.set('realer-pwa', 'true', { 
+        path: '/',
+        maxAge: 31536000,
+        sameSite: 'strict'
+      });
+    }
+    
+    return redirectResponse;
   }
   
   // ПРАВИЛО 2: Если пользователь НЕ в PWA и пытается зайти на любую страницу, кроме download
@@ -68,11 +93,20 @@ export function middleware(request: NextRequest) {
   if (isPWA && !url.searchParams.has('pwa')) {
     url.searchParams.set('pwa', 'true');
     // Возвращаем переписанный URL с параметром pwa
-    return NextResponse.rewrite(url);
+    response = NextResponse.rewrite(url);
+    
+    // Копируем куку realer-pwa в ответ редиректа, если она была
+    if (isRealPWA || hasRealerPwaCookie) {
+      response.cookies.set('realer-pwa', 'true', { 
+        path: '/',
+        maxAge: 31536000,
+        sameSite: 'strict'
+      });
+    }
   }
   
-  // Для всех остальных случаев разрешаем доступ
-  return NextResponse.next();
+  // Возвращаем ответ
+  return response;
 }
 
 export const config = {

@@ -62,6 +62,18 @@ export default function DownloadPage() {
       // Consider the app to be a PWA if it's in standalone or TWA mode
       const isPwaMode = mode === 'standalone' || mode === 'twa';
       
+      // Проверяем специальную куку, устанавливаемую только в реальном PWA
+      function getCookie(name: string): string | null {
+        if (typeof document === 'undefined') return null;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+        return null;
+      }
+      
+      // Проверка специальной куки realer-pwa
+      const hasRealerPwaCookie = getCookie('realer-pwa') === 'true';
+      
       // Additional fallback checks for PWA mode
       const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
                               sessionStorage.getItem('isPwa') === 'true';
@@ -69,14 +81,17 @@ export default function DownloadPage() {
       // URL параметр - важный индикатор, так как устанавливается middleware
       const hasUrlPwaParam = window.location.href.includes('pwa=true');
       
-      // ВАЖНОЕ ИЗМЕНЕНИЕ: Для совместимости с middleware, считаем PWA 
-      // если хотя бы один из индикаторов положительный
-      const isPWA = isPwaMode || storedPwaStatus || hasUrlPwaParam;
+      // Обновленное определение PWA статуса:
+      // 1. Реальный PWA через API браузера
+      // 2. Наличие специальной куки realer-pwa
+      // 3. Комбинация обычной куки/localStorage И URL параметра
+      const isPWA = isPwaMode || hasRealerPwaCookie || (storedPwaStatus && hasUrlPwaParam);
       setIsPwa(isPWA);
       
       console.log('PWA detection details:', {
         displayMode: mode,
         isPwaMode,
+        hasRealerPwaCookie,
         storedPwaStatus,
         hasUrlPwaParam,
         navigatorStandalone: (window.navigator as any).standalone,
@@ -90,11 +105,18 @@ export default function DownloadPage() {
       if (isPWA) {
         setIsRedirecting(true);
         
-        // Store the PWA state
+        // Store the PWA state только если это реальное PWA или есть специальная кука
         try {
-          localStorage.setItem('isPwa', 'true');
-          sessionStorage.setItem('isPwa', 'true');
-          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+          if (isPwaMode || hasRealerPwaCookie) {
+            localStorage.setItem('isPwa', 'true');
+            sessionStorage.setItem('isPwa', 'true');
+            document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+            
+            // Если это реальное PWA, устанавливаем нашу специальную куку
+            if (isPwaMode) {
+              document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
+            }
+          }
           
           // Force redirect to auth page in all cases
           console.log('PWA mode detected, redirecting to auth page');
@@ -172,20 +194,13 @@ export default function DownloadPage() {
     window.addEventListener('appinstalled', () => {
       console.log('App installed event triggered');
       setShowInstallButton(false);
-      setIsRedirecting(true);
       
-      // Set PWA status after installation
-      localStorage.setItem('isPwa', 'true');
-      sessionStorage.setItem('isPwa', 'true');
-      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      // ВАЖНО: Не выполняем редирект и не устанавливаем флаги PWA в браузере
+      // Вместо этого показываем сообщение, чтобы пользователь открыл установленное приложение
+      alert('Приложение успешно установлено! Пожалуйста, закройте браузер и откройте приложение Kashif AI на главном экране вашего устройства.');
       
-      // Set display mode to standalone after installation
-      setDisplayMode('standalone');
-      
-      // Add a small delay before redirecting to ensure everything is set
-      setTimeout(() => {
-        router.push('/auth');
-      }, 1000);
+      // Обновляем только состояние UI без редиректа
+      setDisplayMode('installed_pending');
     });
 
     return () => {
@@ -704,12 +719,15 @@ export default function DownloadPage() {
             onClick={(e) => {
               e.preventDefault();
               
-              // Проверяем, действительно ли это PWA, а не подделка через localStorage
-              if (isReallyPWA()) {
-                // Только для реальных PWA устанавливаем флаги и перенаправляем
+              // Строгая проверка на реальный PWA статус
+              const isPwaMode = getPWADisplayMode() !== 'browser';
+              
+              // Для реальных PWA устанавливаем флаги и перенаправляем
+              if (isPwaMode) {
                 localStorage.setItem('isPwa', 'true');
                 sessionStorage.setItem('isPwa', 'true');
                 document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+                document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
                 router.push('/auth?pwa=true');
               } else {
                 // Для обычных браузеров просто показываем подсказку по установке

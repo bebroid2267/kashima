@@ -473,6 +473,18 @@ export default function Home() {
       // Прежде всего проверяем настоящие признаки PWA
       const isRealPWA = displayMode !== 'browser';
       
+      // Проверяем специальную куку, устанавливаемую только в реальном PWA
+      function getCookie(name: string): string | null {
+        if (typeof document === 'undefined') return null;
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+        return null;
+      }
+      
+      // Проверка специальной куки realer-pwa
+      const hasRealerPwaCookie = getCookie('realer-pwa') === 'true';
+      
       // Вторичные индикаторы
       const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
                               sessionStorage.getItem('isPwa') === 'true';
@@ -480,13 +492,16 @@ export default function Home() {
       // URL параметр - важный индикатор, так как устанавливается middleware
       const hasUrlPwaParam = window.location.href.includes('pwa=true');
       
-      // ВАЖНОЕ ИЗМЕНЕНИЕ: Для совместимости с middleware, считаем PWA 
-      // если хотя бы один из индикаторов положительный
-      const isPWA = isRealPWA || storedPwaStatus || hasUrlPwaParam;
+      // Обновленное определение PWA статуса:
+      // 1. Реальный PWA через API браузера
+      // 2. Наличие специальной куки realer-pwa
+      // 3. Комбинация обычной куки/localStorage И URL параметра
+      const isPWA = isRealPWA || hasRealerPwaCookie || (storedPwaStatus && hasUrlPwaParam);
       
       console.log('PWA check on main page:', { 
         displayMode, 
         isRealPWA,
+        hasRealerPwaCookie,
         storedPwaStatus, 
         hasUrlPwaParam,
         isPWA,
@@ -500,10 +515,18 @@ export default function Home() {
         return false;
       }
       
-      // Устанавливаем PWA-флаги для последующих проверок
-      localStorage.setItem('isPwa', 'true');
-      sessionStorage.setItem('isPwa', 'true');
-      document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      // Устанавливаем PWA-флаги для последующих проверок, но только если это реальное PWA
+      // или если есть специальная кука
+      if (isRealPWA || hasRealerPwaCookie) {
+        localStorage.setItem('isPwa', 'true');
+        sessionStorage.setItem('isPwa', 'true');
+        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+        
+        // Если это реальное PWA, устанавливаем нашу специальную куку
+        if (isRealPWA) {
+          document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
+        }
+      }
       
       return isPWA;
     };
