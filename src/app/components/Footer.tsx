@@ -4,23 +4,35 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 interface TranslationsType {
-  fr: {
-    homeFooter: string;
-    faqFooter: string;
-  };
-  ar: {
+  [key: string]: {
     homeFooter: string;
     faqFooter: string;
   };
 }
 
 interface FooterProps {
-  selectedLang?: 'fr' | 'ar';
+  selectedLang?: 'fr' | 'ar'; // По умолчанию французский
   translations?: TranslationsType;
 }
 
-export default function Footer({ selectedLang, translations }: FooterProps) {
+export default function Footer({ selectedLang = 'fr', translations }: FooterProps) {
   const pathname = usePathname();
+  // Дефолтные переводы, если не переданы извне
+  const defaultTranslations: TranslationsType = {
+    fr: {
+      homeFooter: "ACCUEIL",
+      faqFooter: "FAQ"
+    },
+    ar: {
+      homeFooter: "الرئيسية",
+      faqFooter: "الأسئلة"
+    }
+  };
+
+  // Используем переданные переводы или дефолтные
+  const trans = translations || defaultTranslations;
+  const currentTrans = trans[selectedLang] || trans.fr;
+
   return (
     <footer
       style={{
@@ -73,9 +85,7 @@ export default function Footer({ selectedLang, translations }: FooterProps) {
         }}>
           <span style={{ fontSize: 28, marginBottom: 4, filter: pathname === '/' ? 'drop-shadow(0 0 8px #38e0ff)' : 'none' }}>▶️</span>
           <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
-            {selectedLang === 'fr' && translations ? translations.fr.homeFooter :
-             selectedLang === 'ar' && translations ? translations.ar.homeFooter :
-             "HOME"}
+            {currentTrans.homeFooter}
           </span>
         </div>
       </Link>
@@ -109,9 +119,7 @@ export default function Footer({ selectedLang, translations }: FooterProps) {
         }}>
           <span style={{ fontSize: 28, marginBottom: 4, filter: pathname.startsWith('/faq') ? 'drop-shadow(0 0 8px #ffe066)' : 'none' }}>❓</span>
           <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
-            {selectedLang === 'fr' && translations ? translations.fr.faqFooter :
-             selectedLang === 'ar' && translations ? translations.ar.faqFooter :
-             "FAQ"}
+            {currentTrans.faqFooter}
           </span>
         </div>
       </Link>

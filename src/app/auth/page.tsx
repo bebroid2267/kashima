@@ -21,6 +21,21 @@ export default function AuthPage() {
     const checkPWAStatus = () => {
       if (typeof window === 'undefined') return;
       
+      // Проверка DEV режима - если есть параметр dev=true, пропускаем все проверки
+      const isDevMode = window.location.href.includes('dev=true');
+      if (isDevMode) {
+        console.log('AUTH PAGE: DEV MODE активирован, пропускаем проверки PWA');
+        
+        // В dev режиме сразу устанавливаем все необходимые флаги
+        localStorage.setItem('isPwa', 'true');
+        sessionStorage.setItem('isPwa', 'true');
+        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+        document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
+        
+        // И возвращаем true, чтобы не выполнять редирект на страницу download
+        return true;
+      }
+      
       // Функция для определения PWA режима
       const getPWADisplayMode = () => {
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches;

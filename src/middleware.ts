@@ -21,6 +21,26 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
+  // DEV MODE: Проверяем наличие параметра dev=true
+  const isDevMode = url.searchParams.has('dev');
+  
+  // Если активирован dev режим, пропускаем все проверки PWA
+  if (isDevMode) {
+    console.log(`[Middleware] DEV MODE активирован, пропускаем проверки PWA для: ${pathname}`);
+    
+    // Если пользователь пытается перейти на /download в режиме разработки, 
+    // перенаправляем на auth с сохранением dev параметра
+    if (pathname === '/download') {
+      url.pathname = '/auth';
+      return NextResponse.redirect(url);
+    }
+    
+    // В остальных случаях разрешаем доступ, сохраняя dev параметр
+    return NextResponse.next();
+  }
+  
+  // Стандартная проверка PWA для обычных пользователей
+  
   // Доверенные индикаторы PWA режима (заголовки браузера)
   const isRealPWA = 
     request.headers.get('display-mode') === 'standalone' || 
@@ -28,7 +48,7 @@ export function middleware(request: NextRequest) {
   
   // Вторичные индикаторы (могут быть подделаны)
   const hasPwaCookie = request.cookies.has('isPwa');
-  const hasRealerPwaCookie = request.cookies.has('realer-pwa');
+  const hasRealerPwaCookie = request.cookies.has('realer-pwa'); // Новая кука, установленная только в PWA
   const hasPwaParam = url.searchParams.has('pwa');
   
   // ВАЖНО: Определение PWA более гибкое

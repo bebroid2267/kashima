@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import chance from '@/../public/chance.jpg';
-import round from '@/../public/resultas.jpg';
-import winner from '@/../public/loading.jpg';
+import chanceImg from '@/../public/chance.png';
+import koefImg from '@/../public/koef.png';
+import energyImg from '@/../public/energy.png';
+import depositImg from '@/../public/deposit.png';
+import aviatorImg from '@/../public/aviator.png';
+import messageImg from '@/../public/message.png';
 
 interface FAQBlock {
   title: string;
@@ -19,55 +22,105 @@ interface FAQContent {
 }
 
 interface FAQData {
-  ru: FAQContent;
+  fr: FAQContent;
   ar: FAQContent;
 }
 
 const FAQ_CONTENT: FAQData = {
-  ru: {
-    title: "КАК ЭТО РАБОТАЕТ?",
+  fr: {
+    title: "F.A.Q. — Questions fréquemment posées",
     blocks: [
-  {
-        title: 'КАК УВЕЛИЧИТЬ СВОЙ ШАНС В KASHIF?',
-        text: 'Чтобы увеличить свой шанс в Kashif, вам нужно быть активным — делать депозиты и играть регулярно. Чем больше вы играете и вносите депозиты, тем выше становятся ваши шансы. Регулярная активность помогает улучшить ваш потенциал выигрыша.',
-        image: chance.src
-  },
-  {
-        title: 'РАУНД НАЧАЛСЯ',
-        text: 'Когда раунд начинается, молния ударяет, и множители начинают расти. Наблюдайте, как накапливается энергия и числа растут выше. Каждый момент приносит потенциал для больших выигрышей.',
-        image: round.src
-  },
-  {
-        title: 'РАУНД ПОБЕДИТЕЛЯ',
-        text: "Вы в зоне прибыли, и множитель продолжает расти. Система компенсирует низкие множители (1.05x, 1.28x, 1.36x) более высокими. Просто подождите и наблюдайте, как увеличивается ваш потенциальный выигрыш.",
-        image: winner.src
+      {
+        title: "Que fait le bouton Vision IA ?",
+        text: "Le bouton Vision IA lance un algorithme d'intelligence artificielle qui fait une prédiction personnalisée pour le prochain tour du jeu Aviator. Chaque prédiction comprend :\n\n💡 Un coefficient spécifique\n🧠 Une justification basée sur ce coefficient particulier\n⚠️ Un avertissement sur le niveau de risque (élevé, moyen ou sûr)\n📌 1 prédiction = 1 unité d'énergie. Utilisez-la judicieusement.",
+        image: ""
+      },
+      {
+        title: "Où s'affiche la prédiction ?",
+        text: "Votre prédiction actuelle s'affiche au centre de l'écran dans la partie supérieure. Vous voyez immédiatement le coefficient, l'explication et la probabilité qu'il se réalise.",
+        image: koefImg.src
+      },
+      {
+        title: "Que fait le bouton Aviator ?",
+        text: "Le bouton Aviator ouvre la section du jeu Aviator sur le site Mostbet.\n📲 Vous pouvez utiliser simultanément Kashif IA et Aviator, en basculant entre les fenêtres — c'est pratique et rapide.",
+        image: aviatorImg.src
+      },
+      {
+        title: "Comment fonctionne l'énergie ?",
+        text: "⚡ Chaque jour où vous vous connectez à l'application, vous recevez 1 unité d'énergie (mise à jour toutes les 24 heures)\n🔁 1 énergie = 1 prédiction\n⛔ Si l'énergie est épuisée, vous pouvez la reconstituer par un dépôt",
+        image: energyImg.src
+      },
+      {
+        title: "Qu'est-ce que la Probabilité de gagner ?",
+        text: "C'est votre pourcentage de précision de prédiction. Il :\n\n📈 Augmente automatiquement après chaque dépôt\n🔐 Est calculé par l'algorithme d'IA\n💸 Plus le pourcentage est élevé, plus votre prévision est précise et, par conséquent, vous commencez à gagner plus. L'IA commence à mieux prédire les coefficients et à vous aider à analyser les graphiques.",
+        image: chanceImg.src
+      },
+      {
+        title: "Comment fonctionne le bouton Faire un Dépôt ?",
+        text: "Appuyez pour accéder à la section des dépôts. Le dépôt :\n- Augmente vos chances de prédictions précises\n- Augmente l'énergie dans le programme pour de nouveaux lancements de Vision IA",
+        image: depositImg.src
+      },
+      {
+        title: "Bouton Aide-moi",
+        text: "Si vous rencontrez des problèmes ou souhaitez en savoir plus, écrivez-moi",
+        image: messageImg.src
+      },
+      {
+        title: "L'essentiel :",
+        text: "- Utilisez Vision IA pour les prédictions\n- Basculez entre Kashif AI et Aviator, c'est pratique 😉\n- Surveillez votre niveau d'énergie et de précision\n- Faites des dépôts pour augmenter vos chances",
+        image: ""
       }
     ]
   },
   ar: {
-    title: "كيف يعمل؟",
+    title: "الأسئلة الشائعة",
     blocks: [
-  {
-        title: 'كيف تزيد فرصتك في KASHIF؟',
-        text: 'لزيادة فرصتك في Kashif، عليك أن تكون نشطًا - قم بالإيداع واللعب بانتظام. كلما زاد لعبك وإيداعك، زادت فرصك. النشاط المنتظم يساعد في تحسين إمكانات الفوز.',
-        image: chance.src
-  },
-  {
-        title: 'الجولة جارية',
-        text: 'عندما تبدأ الجولة، يضرب البرق وتبدأ المضاعفات في الارتفاع. راقب كيف تتراكم الطاقة وتنمو الأرقام. كل لحظة تحمل إمكانية تحقيق مكاسب أكبر.',
-        image: round.src
-  },
-  {
-        title: 'جولة الفائز جارية',
-        text: 'أنت في منطقة الربح الآن، والمضاعف يستمر في النمو. يعوض النظام المضاعفات المنخفضة (1.05x، 1.28x، 1.36x) بمضاعفات أعلى. فقط انتظر وشاهد أرباحك المحتملة تزداد.',
-        image: winner.src
+      {
+        title: "ماذا يفعل زر رؤية الذكاء الاصطناعي؟",
+        text: "يطلق زر رؤية الذكاء الاصطناعي خوارزمية ذكاء اصطناعي تقدم تنبؤًا شخصيًا للجولة التالية في لعبة Aviator. يتضمن كل تنبؤ:\n\n💡 معامل محدد واحد\n🧠 تبرير لسبب اختيار هذا المعامل بالتحديد\n⚠️ تحذير بشأن مستوى المخاطرة (عالي، متوسط، أو آمن)\n📌 تنبؤ واحد = وحدة طاقة واحدة. استخدمها بحكمة.",
+        image: ""
+      },
+      {
+        title: "أين يظهر التنبؤ؟",
+        text: "يظهر تنبؤك الحالي في وسط الشاشة في الجزء العلوي. يمكنك رؤية المعامل والشرح واحتمالية تحققه على الفور.",
+        image: koefImg.src
+      },
+      {
+        title: "ماذا يفعل زر Aviator؟",
+        text: "يفتح زر Aviator قسم لعبة Aviator على موقع Mostbet.\n📲 يمكنك استخدام Kashif IA و Aviator في نفس الوقت، بالتبديل بين النوافذ - إنه مريح وسريع.",
+        image: aviatorImg.src
+      },
+      {
+        title: "كيف تعمل الطاقة؟",
+        text: "⚡ في كل يوم تدخل فيه إلى التطبيق، تحصل على وحدة طاقة واحدة (يتم تحديثها كل 24 ساعة)\n🔁 طاقة واحدة = تنبؤ واحد\n⛔ إذا نفدت الطاقة، يمكنك تجديدها من خلال الإيداع",
+        image: energyImg.src
+      },
+      {
+        title: "ما هي احتمالية الفوز؟",
+        text: "هذه هي نسبة دقة تنبؤاتك. وهي:\n\n📈 تزداد تلقائيًا بعد كل إيداع\n🔐 تُحسب بواسطة خوارزمية الذكاء الاصطناعي\n💸 كلما زادت النسبة المئوية، كان تنبؤك أكثر دقة وبالتالي تبدأ في كسب المزيد. يبدأ الذكاء الاصطناعي في التنبؤ بشكل أفضل بالمعاملات ومساعدتك في تحليل الرسوم البيانية.",
+        image: chanceImg.src
+      },
+      {
+        title: "كيف يعمل زر الإيداع؟",
+        text: "اضغط للانتقال إلى قسم الإيداع. الإيداع:\n- يزيد من فرصك في الحصول على تنبؤات دقيقة\n- يزيد الطاقة في البرنامج لإطلاقات جديدة لرؤية الذكاء الاصطناعي",
+        image: depositImg.src
+      },
+      {
+        title: "زر المساعدة",
+        text: "إذا واجهت أي مشاكل أو أردت معرفة أي شيء، اكتب لي",
+        image: messageImg.src
+      },
+      {
+        title: "النقاط الرئيسية:",
+        text: "- استخدم رؤية الذكاء الاصطناعي للتنبؤات\n- قم بالتبديل بين Kashif AI و Aviator، إنه مريح 😉\n- راقب مستوى الطاقة والدقة لديك\n- قم بالإيداعات لزيادة فرصك",
+        image: ""
       }
     ]
   }
 };
 
 export default function FAQ() {
-  const [currentLang, setCurrentLang] = useState<'ru' | 'ar'>('ru');
+  const [currentLang, setCurrentLang] = useState<'fr' | 'ar'>('fr');
   const content = FAQ_CONTENT[currentLang];
 
   // Функция выхода
@@ -87,15 +140,15 @@ export default function FAQ() {
       <div className="faq-container">
         <div className="language-switcher">
           <button 
-            className={`lang-btn ${currentLang === 'ru' ? 'active' : ''}`}
-            onClick={() => setCurrentLang('ru')}
+            className={`lang-btn ${currentLang === 'fr' ? 'active' : ''}`}
+            onClick={() => setCurrentLang('fr')}
           >
-            РУС
+            FR
           </button>
           <button 
             className={`lang-btn ${currentLang === 'ar' ? 'active' : ''}`}
             onClick={() => setCurrentLang('ar')}
-      >
+          >
             عربي
           </button>
         </div>
@@ -110,7 +163,14 @@ export default function FAQ() {
                   <h2 className="block-title">{block.title}</h2>
                 </div>
                 <div className="faq-block">
-                  <p className="block-text">{block.text}</p>
+                  <div className="block-text">
+                    {block.text.split('\n').map((line, i) => (
+                      <React.Fragment key={i}>
+                        {line}
+                        {i < block.text.split('\n').length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </div>
                   {block.image && (
                     <div className="image-container">
                       <Image
@@ -118,21 +178,30 @@ export default function FAQ() {
                         alt={block.title}
                         width={600}
                         height={400}
-              style={{
+                        style={{
                           borderRadius: '12px',
                           maxWidth: '100%',
                           height: 'auto'
                         }}
                       />
-              </div>
+                    </div>
                   )}
-          </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <Footer />
+        <Footer selectedLang={currentLang} translations={{
+          fr: {
+            homeFooter: "ACCUEIL",
+            faqFooter: "FAQ"
+          },
+          ar: {
+            homeFooter: "الرئيسية",
+            faqFooter: "الأسئلة"
+          }
+        }} />
 
         <style jsx global>{`
           html, body {
@@ -197,7 +266,7 @@ export default function FAQ() {
             display: flex;
             flex-direction: column;
             gap: 60px;
-            margin-bottom: 40px;
+            margin-bottom: 150px;
           }
 
           .faq-block-wrapper {
@@ -273,6 +342,7 @@ export default function FAQ() {
 
             .faq-blocks {
               gap: 40px;
+              margin-bottom: 130px;
             }
 
             .block-title-wrapper {
@@ -310,6 +380,10 @@ export default function FAQ() {
             .main-title {
               font-size: 20px;
               margin-bottom: 25px;
+            }
+
+            .faq-blocks {
+              margin-bottom: 120px;
             }
 
             .block-title {
