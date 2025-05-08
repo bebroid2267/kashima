@@ -454,12 +454,25 @@ export default function Home() {
   // PWA installation logic
   useEffect(() => {
     console.log('PWA installation effect running');
-    // Check if we're in standalone mode (already installed as PWA)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         (window.navigator as any).standalone || 
-                         document.referrer.includes('android-app://');
     
-    console.log('PWA isStandalone check:', isStandalone);
+    // Use the same function for reliable PWA detection
+    const getPWADisplayMode = () => {
+      if (typeof window === 'undefined') return 'browser';
+      
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      if (document.referrer.startsWith('android-app://')) {
+        return 'twa';
+      } else if ((window.navigator as any).standalone || isStandalone) {
+        return 'standalone';
+      }
+      return 'browser';
+    };
+    
+    // Check if we're in standalone mode (already installed as PWA)
+    const displayMode = getPWADisplayMode();
+    const isStandalone = displayMode !== 'browser';
+    
+    console.log('PWA display mode check:', { displayMode, isStandalone });
     
     if (isStandalone) {
       console.log('App is running in standalone mode (installed as PWA)');

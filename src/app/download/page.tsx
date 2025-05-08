@@ -3,12 +3,26 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import font from '../../../public/go.jpg';
 
+// Function to reliably detect PWA mode
+function getPWADisplayMode() {
+  if (typeof window === 'undefined') return 'browser';
+  
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (document.referrer.startsWith('android-app://')) {
+    return 'twa';
+  } else if ((window.navigator as any).standalone || isStandalone) {
+    return 'standalone';
+  }
+  return 'browser';
+}
+
 export default function DownloadPage() {
   const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPwa, setIsPwa] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [displayMode, setDisplayMode] = useState<string>('browser');
   const router = useRouter();
   
   // UI text translations
@@ -31,90 +45,77 @@ export default function DownloadPage() {
 
   // Immediate check for PWA mode on component mount
   useEffect(() => {
-    const checkIfPwaAndRedirect = () => {
-      // Check all possible standalone indicators
-      const isStandalone = 
-        window.matchMedia('(display-mode: standalone)').matches || 
-        (window.navigator as any).standalone === true || // iOS
-        document.referrer.includes('android-app://') ||
-        window.location.href.includes('mode=standalone') ||
-        localStorage.getItem('isPwa') === 'true' ||
-        sessionStorage.getItem('isPwa') === 'true';
-
-      // Debug output
-      console.log('PWA CHECK on download page:', {
-        matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+    // Force client-side execution only
+    if (typeof window === 'undefined') return;
+    
+    const detectPWAAndRedirect = () => {
+      const mode = getPWADisplayMode();
+      setDisplayMode(mode);
+      console.log('PWA detection result:', mode);
+      
+      // Consider the app to be a PWA if it's in standalone or TWA mode
+      const isPwaMode = mode === 'standalone' || mode === 'twa';
+      setIsPwa(isPwaMode);
+      
+      // Additional fallback checks for PWA mode
+      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
+                              sessionStorage.getItem('isPwa') === 'true';
+      
+      console.log('PWA detection details:', {
+        displayMode: mode,
+        isPwaMode,
+        storedPwaStatus,
         navigatorStandalone: (window.navigator as any).standalone,
-        referrer: document.referrer.includes('android-app://'),
-        urlMode: window.location.href.includes('mode=standalone'),
-        localStorage: localStorage.getItem('isPwa'),
-        sessionStorage: sessionStorage.getItem('isPwa'),
-        overall: isStandalone
+        matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+        referrer: document.referrer
       });
-
-      if (isStandalone) {
-        setIsPwa(true);
+      
+      // If it's a PWA or we previously determined it's a PWA
+      if (isPwaMode || storedPwaStatus) {
         setIsRedirecting(true);
+        
+        // Store the PWA state in multiple places
         try {
-          // Ensure storage is set
           localStorage.setItem('isPwa', 'true');
           sessionStorage.setItem('isPwa', 'true');
-          
-          // Also set a cookie for the middleware
           document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
           
-          // Redirect to auth page
-          console.log('PWA detected, redirecting to auth page');
-          setTimeout(() => {
-            router.push('/auth');
-          }, 500);
+          // Add a flag to the URL for re-detection if needed
+          if (!window.location.href.includes('pwa=true')) {
+            // Store the fact we're redirecting to prevent loops
+            sessionStorage.setItem('redirecting', 'true');
+            
+            // Check if we're already redirecting to prevent infinite loops
+            if (sessionStorage.getItem('redirecting') !== 'true') {
+              console.log('PWA mode detected, redirecting to auth page');
+              setTimeout(() => router.push('/auth'), 300);
+            }
+          }
         } catch (e) {
           console.error('Error storing PWA state:', e);
         }
       }
     };
     
-    // Run immediately on component mount
-    checkIfPwaAndRedirect();
+    // Run detection immediately and again after a short delay
+    detectPWAAndRedirect();
+    const fallbackCheck = setTimeout(detectPWAAndRedirect, 1000);
     
-    // Fallback check after a short delay to ensure everything is loaded
-    const fallbackCheck = setTimeout(checkIfPwaAndRedirect, 1000);
-    return () => clearTimeout(fallbackCheck);
-  }, [router]);
-
-  // Listen for display mode changes
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      console.log('Display mode changed to standalone:', e.matches);
-      setIsPwa(e.matches);
-      if (e.matches) {
-        setIsRedirecting(true);
-        sessionStorage.setItem('isPwa', 'true');
-        localStorage.setItem('isPwa', 'true');
-        router.push('/auth');
-      }
-    };
-    
-    if (mediaQueryList.addEventListener) {
-      mediaQueryList.addEventListener('change', handleChange);
-    } else {
-      // Fallback for older browsers
-      mediaQueryList.addListener(handleChange);
-    }
+    // Clear the redirecting flag after a while to prevent getting stuck
+    const clearRedirectingFlag = setTimeout(() => {
+      sessionStorage.removeItem('redirecting');
+    }, 5000);
     
     return () => {
-      if (mediaQueryList.removeEventListener) {
-        mediaQueryList.removeEventListener('change', handleChange);
-      } else {
-        // Fallback for older browsers
-        mediaQueryList.removeListener(handleChange);
-      }
+      clearTimeout(fallbackCheck);
+      clearTimeout(clearRedirectingFlag);
     };
   }, [router]);
 
   // PWA installation logic
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // If already in PWA mode, don't show install button
     if (isPwa) {
       setShowInstallButton(false);
@@ -141,11 +142,12 @@ export default function DownloadPage() {
       setIsRedirecting(true);
       
       // Set PWA status after installation
-      sessionStorage.setItem('isPwa', 'true');
       localStorage.setItem('isPwa', 'true');
-      
-      // Also set a cookie for server-side detection
+      sessionStorage.setItem('isPwa', 'true');
       document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+      
+      // Set display mode to standalone after installation
+      setDisplayMode('standalone');
       
       // Add a small delay before redirecting to ensure everything is set
       setTimeout(() => {
@@ -185,8 +187,6 @@ export default function DownloadPage() {
       setTimeout(() => {
         localStorage.setItem('isPwa', 'true');
         sessionStorage.setItem('isPwa', 'true');
-        
-        // Set a cookie for server-side detection
         document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
       }, 500);
     }
@@ -251,6 +251,14 @@ export default function DownloadPage() {
             textAlign: 'center'
           }}>
             {selectedLang === 'fr' ? translations.fr.redirecting : translations.ar.redirecting}
+          </div>
+          <div style={{
+            color: '#7ecbff',
+            fontSize: 14,
+            marginTop: 10,
+            opacity: 0.8
+          }}>
+            Display mode: {displayMode}
           </div>
         </div>
         
@@ -386,7 +394,48 @@ export default function DownloadPage() {
         >
           {selectedLang === 'fr' ? translations.fr.downloadApp : translations.ar.downloadApp}
         </button>
+        
+        {/* Debug button to manually trigger PWA check */}
+        <button
+          onClick={() => {
+            // First set all flags
+            localStorage.setItem('isPwa', 'true');
+            sessionStorage.setItem('isPwa', 'true');
+            document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+            
+            // Force redirection
+            setIsRedirecting(true);
+            setTimeout(() => router.push('/auth?pwa=true'), 500);
+          }}
+          style={{
+            marginTop: 10,
+            padding: '8px 20px',
+            borderRadius: 6,
+            border: '1px dashed #38e0ff',
+            background: 'rgba(56, 224, 255, 0.1)',
+            color: '#38e0ff',
+            fontSize: 14,
+            cursor: 'pointer',
+          }}
+        >
+          Already installed? Click here
+        </button>
       </header>
+
+      {/* Display mode indicator for debugging */}
+      <div style={{
+        position: 'fixed',
+        top: 10,
+        right: 10,
+        background: 'rgba(10, 26, 47, 0.8)',
+        color: '#38e0ff',
+        padding: '5px 10px',
+        borderRadius: 4,
+        fontSize: 12,
+        zIndex: 999
+      }}>
+        Mode: {displayMode}
+      </div>
 
       {/* MAIN CONTENT */}
       <main
