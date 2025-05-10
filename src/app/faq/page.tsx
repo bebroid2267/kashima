@@ -135,24 +135,25 @@ export default function FAQ() {
     <>
       {/* HEADER */}
       <div className="faq-header">
-        <button className="faq-exit-btn" onClick={handleExit}>Exit</button>
+        <div className="header-content">
+          <button className="faq-exit-btn" onClick={handleExit}>Exit</button>
+          <div className="language-switcher">
+            <button 
+              className={`lang-btn ${currentLang === 'fr' ? 'active' : ''}`}
+              onClick={() => setCurrentLang('fr')}
+            >
+              FR
+            </button>
+            <button 
+              className={`lang-btn ${currentLang === 'ar' ? 'active' : ''}`}
+              onClick={() => setCurrentLang('ar')}
+            >
+              عربي
+            </button>
+          </div>
+        </div>
       </div>
       <div className="faq-container">
-        <div className="language-switcher">
-          <button 
-            className={`lang-btn ${currentLang === 'fr' ? 'active' : ''}`}
-            onClick={() => setCurrentLang('fr')}
-          >
-            FR
-          </button>
-          <button 
-            className={`lang-btn ${currentLang === 'ar' ? 'active' : ''}`}
-            onClick={() => setCurrentLang('ar')}
-          >
-            عربي
-          </button>
-        </div>
-
         <div className={`content-wrapper ${currentLang === 'ar' ? 'rtl' : ''}`}>
           <h1 className="main-title">{content.title}</h1>
           
@@ -217,13 +218,47 @@ export default function FAQ() {
             overflow-x: hidden;
           }
 
+          .faq-header {
+            width: 100%;
+            padding: 24px 5vw 12px 5vw;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 20;
+            background: none !important;
+            box-shadow: none !important;
+            border: none !important;
+            color: inherit !important;
+          }
+
+          .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+          }
+
           .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
             display: flex;
             gap: 10px;
             z-index: 10;
+          }
+
+          .faq-exit-btn {
+            background: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            border-radius: 8px;
+            padding: 10px 28px;
+            text-decoration: none;
+            box-shadow: 0 0 8px #ff7eb955;
+            letter-spacing: 1.1px;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+            font-family: 'Orbitron', Segoe UI, Arial, sans-serif;
+            border: none;
+            outline: none;
           }
 
           .lang-btn {
@@ -414,37 +449,6 @@ export default function FAQ() {
             }
           }
 
-          .faq-header {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 24px 5vw 12px 5vw;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 20;
-            background: none !important;
-            box-shadow: none !important;
-            border: none !important;
-            color: inherit !important;
-          }
-          .faq-exit-btn {
-            background: none;
-            color: #fff;
-            font-weight: 700;
-            font-size: 18px;
-            border-radius: 8px;
-            padding: 10px 28px;
-            text-decoration: none;
-            box-shadow: 0 0 8px #ff7eb955;
-            letter-spacing: 1.1px;
-            transition: background 0.2s, color 0.2s;
-            cursor: pointer;
-            font-family: 'Orbitron', Segoe UI, Arial, sans-serif;
-            border: none;
-            outline: none;
-            margin-left: 12px;
-          }
           @media (max-width: 600px) {
             .faq-header {
               padding: 12px 4vw 8px 4vw;

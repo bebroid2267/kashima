@@ -266,33 +266,6 @@ export default function DownloadPage() {
     }
   };
   
-  // Function to test deposit API
-  const handleTestDeposit = async () => {
-    try {
-      const response = await fetch('/api/deposit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: '228337',
-          deposit: 50
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        alert(`Депозит успешно добавлен! Новый шанс: ${result.chance}%`);
-      } else {
-        alert(`Ошибка: ${result.error || 'Неизвестная ошибка'}`);
-      }
-    } catch (error) {
-      console.error('Error calling deposit API:', error);
-      alert('Ошибка при вызове API депозита');
-    }
-  };
-  
   // If we're redirecting, show a loading screen
   if (isRedirecting) {
     return (
@@ -732,29 +705,6 @@ export default function DownloadPage() {
             </div>
           </div>
         </div>
-        
-        {/* Тестовая кнопка для вызова API депозита */}
-        <button
-          onClick={handleTestDeposit}
-          style={{
-            marginTop: 30,
-            padding: '10px 20px',
-            borderRadius: 6,
-            border: '1px solid #38e0ff',
-            background: 'rgba(56, 224, 255, 0.15)',
-            color: '#38e0ff',
-            fontWeight: 600,
-            fontSize: 14,
-            boxShadow: '0 0 10px rgba(56, 224, 255, 0.3)',
-            cursor: 'pointer',
-            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
-            transition: 'all 0.2s',
-          }}
-          onMouseOver={e => { e.currentTarget.style.background = 'rgba(56, 224, 255, 0.25)'; }}
-          onMouseOut={e => { e.currentTarget.style.background = 'rgba(56, 224, 255, 0.15)'; }}
-        >
-          TEST DEPOSIT (ID:228337, $50)
-        </button>
         
         {/* Маленькая скрытая ссылка - изменим для безопасности */}
         <div style={{ marginTop: 40, textAlign: 'center' }}>
