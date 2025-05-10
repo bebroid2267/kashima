@@ -413,7 +413,7 @@ export default function DownloadPage() {
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 2,
-          marginTop: 8
+          marginTop: 25
         }}
       >
         <div
