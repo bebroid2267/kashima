@@ -214,20 +214,20 @@ export default function DownloadPage() {
     
     // For iOS Safari
     if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
-      alert('Для установки на iOS:\n1. Нажмите кнопку "Поделиться" (Share) внизу экрана\n2. Прокрутите вниз и выберите "На экран «Домой»" (Add to Home Screen)');
+      alert('Pour installer sur iOS :\n1. Appuyez sur le bouton "Partager" (Share) en bas de l\'écran\n2. Faites défiler vers le bas et sélectionnez "Sur l\'écran d\'accueil" (Add to Home Screen)');
       return;
     }
     
     // For Android browsers without install API
     if (/Android/.test(navigator.userAgent) && !deferredPrompt) {
-      alert('Для установки на Android:\n1. Нажмите на три точки (⋮) в правом верхнем углу\n2. Выберите "Установить приложение" или "Добавить на главный экран"');
+      alert('Pour installer sur Android :\n1. Appuyez sur les trois points (⋮) dans le coin supérieur droit\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
       return;
     }
 
     if (!deferredPrompt) {
-      console.log('No installation prompt available');
-      // Показать специальное сообщение пользователю
-      alert('Для установки приложения: \n1. Нажмите на кнопку меню в вашем браузере (⋮ или ···) \n2. Выберите "Установить приложение" или "Добавить на главный экран"');
+      console.log('Aucune invite d\'installation disponible');
+      // Afficher un message spécial à l'utilisateur
+      alert('Pour installer l\'application :\n1. Cliquez sur le bouton menu de votre navigateur (⋮ ou ···)\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
       
       // Попробуем явно вызвать событие для мобильных устройств, где это может сработать
       try {
@@ -262,7 +262,34 @@ export default function DownloadPage() {
       }
     } catch (error) {
       console.error('Error during PWA installation:', error);
-      alert('Для установки: нажмите на кнопку меню в браузере (⋮) и выберите "Установить приложение"');
+      alert('Pour installer : appuyez sur le bouton menu du navigateur (⋮) et sélectionnez "Installer l\'application"');
+    }
+  };
+  
+  // Function to test deposit API
+  const handleTestDeposit = async () => {
+    try {
+      const response = await fetch('/api/deposit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: '228337',
+          deposit: 50
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert(`Депозит успешно добавлен! Новый шанс: ${result.chance}%`);
+      } else {
+        alert(`Ошибка: ${result.error || 'Неизвестная ошибка'}`);
+      }
+    } catch (error) {
+      console.error('Error calling deposit API:', error);
+      alert('Ошибка при вызове API депозита');
     }
   };
   
@@ -705,6 +732,29 @@ export default function DownloadPage() {
             </div>
           </div>
         </div>
+        
+        {/* Тестовая кнопка для вызова API депозита */}
+        <button
+          onClick={handleTestDeposit}
+          style={{
+            marginTop: 30,
+            padding: '10px 20px',
+            borderRadius: 6,
+            border: '1px solid #38e0ff',
+            background: 'rgba(56, 224, 255, 0.15)',
+            color: '#38e0ff',
+            fontWeight: 600,
+            fontSize: 14,
+            boxShadow: '0 0 10px rgba(56, 224, 255, 0.3)',
+            cursor: 'pointer',
+            fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={e => { e.currentTarget.style.background = 'rgba(56, 224, 255, 0.25)'; }}
+          onMouseOut={e => { e.currentTarget.style.background = 'rgba(56, 224, 255, 0.15)'; }}
+        >
+          TEST DEPOSIT (ID:228337, $50)
+        </button>
         
         {/* Маленькая скрытая ссылка - изменим для безопасности */}
         <div style={{ marginTop: 40, textAlign: 'center' }}>

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
     // Check if supabase client is available
     if (!supabase) {
@@ -12,10 +12,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const data = await request.json();
+    // Get URL parameters
+    const url = new URL(request.url);
+    const user_id = url.searchParams.get('user_id');
+    const deposit = url.searchParams.get('deposit');
+    const event = url.searchParams.get('event');
     
     // Validate required fields
-    if (!data.user_id || !data.deposit) {
+    if (!user_id || !deposit) {
       return NextResponse.json(
         { error: 'Missing required fields: user_id and deposit' },
         { status: 400 }
@@ -23,7 +27,7 @@ export async function POST(request: Request) {
     }
     
     // Parse deposit amount to ensure it's a number
-    const depositAmount = parseFloat(data.deposit);
+    const depositAmount = parseFloat(deposit);
     if (isNaN(depositAmount) || depositAmount <= 0) {
       return NextResponse.json(
         { error: 'Invalid deposit amount. Must be a positive number.' },
@@ -35,7 +39,7 @@ export async function POST(request: Request) {
     const { data: existingUser, error: fetchError } = await supabase
       .from('users')
       .select('*')
-      .eq('mb_id', data.user_id)
+      .eq('mb_id', user_id)
       .single();
     
     if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means not found
@@ -57,12 +61,17 @@ export async function POST(request: Request) {
       energy = existingUser.energy || 1;
     }
     
-    // Calculate new chance based on total deposit amount
-    const newChance = calculateChance(totalDeposit);
+    // Calculate new chance based on event type and total deposit amount
+    let newChance = currentChance;
+    if (event === 'redep') {
+      newChance = calculateChance(totalDeposit);
+    } else if (event === 'dep') {
+      newChance = 30; // Default chance for 'dep' event
+    }
     
     // Prepare user data
     const userData = {
-      mb_id: data.user_id,
+      mb_id: user_id,
       deposit_amount: totalDeposit,
       chance: newChance,
       energy: energy,
@@ -74,8 +83,8 @@ export async function POST(request: Request) {
     const { error: upsertError } = await supabase
       .from('users')
       .upsert(userData, { 
-        onConflict: 'mb_id',  // Указываем колонку, которая является уникальным идентификатором
-        ignoreDuplicates: false // Обновляем существующие записи
+        onConflict: 'mb_id',
+        ignoreDuplicates: false
       });
     
     if (upsertError) {
@@ -88,11 +97,37 @@ export async function POST(request: Request) {
     
     return NextResponse.json({
       success: true,
-      user_id: data.user_id,
+      user_id: user_id,
       deposit_amount: totalDeposit,
       chance: newChance
     });
     
+  } catch (error) {
+    console.error('Unhandled error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// Keep POST method for backward compatibility
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const url = new URL(request.url);
+    url.searchParams.set('user_id', data.user_id);
+    url.searchParams.set('deposit', data.deposit);
+    url.searchParams.set('event', data.event);
+    
+    // Create a new request with the constructed URL
+    const newRequest = new Request(url.toString(), {
+      method: 'GET',
+      headers: request.headers
+    });
+    
+    // Call the GET handler with the new request
+    return GET(newRequest);
   } catch (error) {
     console.error('Unhandled error:', error);
     return NextResponse.json(
