@@ -197,7 +197,7 @@ export default function DownloadPage() {
       
       // ВАЖНО: Не выполняем редирект и не устанавливаем флаги PWA в браузере
       // Вместо этого показываем сообщение, чтобы пользователь открыл установленное приложение
-      alert('Приложение успешно установлено! Пожалуйста, закройте браузер и откройте приложение Kashif AI на главном экране вашего устройства.');
+      alert('L\'application a été installée avec succès ! Veuillez fermer le navigateur et ouvrir l\'application Kashif AI sur l\'écran d\'accueil de votre appareil.');
       
       // Обновляем только состояние UI без редиректа
       setDisplayMode('installed_pending');
@@ -413,7 +413,6 @@ export default function DownloadPage() {
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 2,
-          marginTop: 0
         }}
       >
         <div
@@ -425,6 +424,7 @@ export default function DownloadPage() {
             textShadow: '0 0 8px #38e0ff99',
             fontFamily: "'montserrat', Arial, Helvetica, sans-serif",
             marginBottom: 15,
+            marginTop: 25
           }}
         >
           {selectedLang === 'fr' ? translations.fr.title : translations.ar.title}
