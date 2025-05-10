@@ -409,11 +409,11 @@ export default function DownloadPage() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: '24px 5vw 12px 5vw',
+          padding: '35px 5vw 12px 5vw',
           boxSizing: 'border-box',
           position: 'relative',
           zIndex: 2,
-          marginTop: 25
+          marginTop: 0
         }}
       >
         <div
