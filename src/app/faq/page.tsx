@@ -451,7 +451,7 @@ export default function FAQ() {
 
           @media (max-width: 600px) {
             .faq-header {
-              padding: 12px 4vw 8px 4vw;
+              padding: 35px 4vw 8px 4vw;
             }
             .faq-exit-btn {
               font-size: 14px;
