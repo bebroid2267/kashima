@@ -14,9 +14,10 @@ export async function GET(request: Request) {
 
     // Get URL parameters
     const url = new URL(request.url);
-    const user_id = url.searchParams.get('user_id');
-    const deposit = url.searchParams.get('deposit');
+    const user_id = url.searchParams.get('player_id');
+    const deposit = url.searchParams.get('amount');
     const event = url.searchParams.get('event');
+
     
     // Validate required fields
     if (!user_id || !deposit) {
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
     let totalDeposit = depositAmount;
     let currentChance = 30; // Default chance for new users
     let energy = 1; // Default energy for new users
+    const currentDate = new Date().toISOString();
     
     // If user exists, update their deposit and recalculate chance
     if (existingUser) {
@@ -75,8 +77,7 @@ export async function GET(request: Request) {
       deposit_amount: totalDeposit,
       chance: newChance,
       energy: energy,
-      // Don't override these fields if they already exist
-      last_login_date: existingUser?.last_login_date || null
+      last_login_date: event === 'reg' || event === 'dep' ? currentDate : existingUser?.last_login_date || null
     };
     
     // Upsert user (insert if not exists, update if exists)
