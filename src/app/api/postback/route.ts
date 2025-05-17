@@ -22,14 +22,22 @@ export async function GET(request: Request) {
     // Validate required fields
     if (!user_id || !deposit) {
       return NextResponse.json(
-        { error: 'Missing required fields: user_id and deposit' },
+        { error: 'Missing required fields: player_id and amount' },
         { status: 400 }
       );
     }
     
     // Parse deposit amount to ensure it's a number
     const depositAmount = parseFloat(deposit);
-    if (isNaN(depositAmount) || depositAmount <= 0) {
+    if (isNaN(depositAmount)) {
+      return NextResponse.json(
+        { error: 'Invalid deposit amount. Must be a number.' },
+        { status: 400 }
+      );
+    }
+
+    // Only check for positive amount if it's not a registration event
+    if (event !== 'reg' && depositAmount <= 0) {
       return NextResponse.json(
         { error: 'Invalid deposit amount. Must be a positive number.' },
         { status: 400 }
