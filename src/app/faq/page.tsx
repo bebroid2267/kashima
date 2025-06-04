@@ -42,7 +42,7 @@ const FAQ_CONTENT: FAQData = {
       },
       {
         title: "Que fait le bouton Aviator ?",
-        text: "Le bouton Aviator ouvre la section du jeu Aviator sur le site Mostbet.\n📲 Vous pouvez utiliser simultanément Kashif IA et Aviator, en basculant entre les fenêtres — c'est pratique et rapide.",
+        text: "Le bouton Aviator ouvre la section du jeu Aviator sur le site 1xbet.\n📲 Vous pouvez utiliser simultanément Kashif IA et Aviator, en basculant entre les fenêtres — c'est pratique et rapide.",
         image: aviatorImg.src
       },
       {
@@ -87,7 +87,7 @@ const FAQ_CONTENT: FAQData = {
       },
       {
         title: "ماذا يفعل زر Aviator؟",
-        text: "يفتح زر Aviator قسم لعبة Aviator على موقع Mostbet.\n📲 يمكنك استخدام Kashif IA و Aviator في نفس الوقت، بالتبديل بين النوافذ - إنه مريح وسريع.",
+        text: "يفتح زر Aviator قسم لعبة Aviator على موقع 1xbet.\n📲 يمكنك استخدام Kashif IA و Aviator في نفس الوقت، بالتبديل بين النوافذ - إنه مريح وسريع.",
         image: aviatorImg.src
       },
       {
