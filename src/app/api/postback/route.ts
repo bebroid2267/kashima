@@ -41,13 +41,15 @@ export async function GET(request: Request) {
       user_id = player_id;
       deposit = amount;
       event = eventParam;
-    } else if ((subid || fieldsUserId) && fieldsSum) {
-      // New format
+    } else if ((subid || fieldsUserId) && (fieldsSum || trackerEvent === 'registration')) {
+      // New format - allow registration without fieldsSum
       user_id = fieldsUserId || subid; // Prefer fields.user_id, fallback to subid
-      deposit = fieldsSum;
+      deposit = fieldsSum || '0'; // Default to 0 for registration
       
       // Map tracker.event and status to our event types
-      if (trackerEvent === 'sale' || status === 'sale') {
+      if (trackerEvent === 'registration') {
+        event = 'reg'; // Registration
+      } else if (trackerEvent === 'sale' || status === 'sale') {
         event = 'dep'; // First deposit
       } else {
         event = trackerEvent || status || 'dep'; // Default to dep
@@ -55,10 +57,10 @@ export async function GET(request: Request) {
     }
 
     // Validate required fields
-    if (!user_id || !deposit) {
+    if (!user_id || deposit === null) {
       return NextResponse.json(
         { 
-          error: 'Missing required fields. Expected either (player_id + amount) or (subid/fields.user_id + fields.summ)',
+          error: 'Missing required fields. Expected either (player_id + amount) or (subid/fields.user_id + fields.summ) or (subid/fields.user_id + tracker.event=registration)',
           receivedParams: {
             player_id,
             amount,
@@ -87,7 +89,7 @@ export async function GET(request: Request) {
     // Only check for positive amount if it's not a registration event
     if (event !== 'reg' && depositAmount <= 0) {
       return NextResponse.json(
-        { error: 'Invalid deposit amount. Must be a positive number.' },
+        { error: 'Invalid deposit amount. Must be a positive number for deposits.' },
         { status: 400 }
       );
     }
@@ -111,12 +113,19 @@ export async function GET(request: Request) {
     let currentChance = 30; // Default chance for new users
     let energy = 1; // Default energy for new users
     const currentDate = new Date().toISOString();
+    let isFirstDeposit = false;
     
     // If user exists, update their deposit and recalculate chance
     if (existingUser) {
       totalDeposit = (existingUser.deposit_amount || 0) + depositAmount;
       currentChance = existingUser.chance || 30;
       energy = existingUser.energy || 1;
+      
+      // Check if this is the first deposit (user exists but has no previous deposits)
+      isFirstDeposit = (existingUser.deposit_amount || 0) === 0 && depositAmount > 0;
+    } else {
+      // New user making their first deposit
+      isFirstDeposit = depositAmount > 0;
     }
     
     // Calculate new chance based on event type and total deposit amount
@@ -125,6 +134,11 @@ export async function GET(request: Request) {
       newChance = calculateChance(totalDeposit);
     } else if (event === 'dep') {
       newChance = calculateChance(totalDeposit); // Calculate chance for first deposit too
+    }
+    
+    // Update energy for first deposit
+    if (isFirstDeposit && depositAmount > 0 && event !== 'reg') {
+      energy = 10; // Give 10 energy for first deposit
     }
     
     // Prepare user data
