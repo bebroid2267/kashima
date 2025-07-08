@@ -14,15 +14,63 @@ export async function GET(request: Request) {
 
     // Get URL parameters
     const url = new URL(request.url);
-    const user_id = url.searchParams.get('player_id');
-    const deposit = url.searchParams.get('amount');
-    const event = url.searchParams.get('event');
-
     
+    // Support for multiple parameter formats
+    let user_id: string | null = null;
+    let deposit: string | null = null;
+    let event: string | null = null;
+    
+    // Format 1: Original format
+    // ?event={status}&amount={conversion_revenue}&player_id={sub_id_12}
+    const player_id = url.searchParams.get('player_id');
+    const amount = url.searchParams.get('amount');
+    const eventParam = url.searchParams.get('event');
+    
+    // Format 2: New format
+    // ?subid={clickid}&fields.user_id={id}&tracker.event=sale&fields.summ={profit}&status=sale&tracker.currency=usd
+    const subid = url.searchParams.get('subid');
+    const fieldsUserId = url.searchParams.get('fields.user_id');
+    const fieldsSum = url.searchParams.get('fields.summ');
+    const trackerEvent = url.searchParams.get('tracker.event');
+    const status = url.searchParams.get('status');
+    const currency = url.searchParams.get('tracker.currency');
+    
+    // Determine which format is being used and extract values
+    if (player_id && amount) {
+      // Original format
+      user_id = player_id;
+      deposit = amount;
+      event = eventParam;
+    } else if ((subid || fieldsUserId) && fieldsSum) {
+      // New format
+      user_id = fieldsUserId || subid; // Prefer fields.user_id, fallback to subid
+      deposit = fieldsSum;
+      
+      // Map tracker.event and status to our event types
+      if (trackerEvent === 'sale' || status === 'sale') {
+        event = 'dep'; // First deposit
+      } else {
+        event = trackerEvent || status || 'dep'; // Default to dep
+      }
+    }
+
     // Validate required fields
     if (!user_id || !deposit) {
       return NextResponse.json(
-        { error: 'Missing required fields: player_id and amount' },
+        { 
+          error: 'Missing required fields. Expected either (player_id + amount) or (subid/fields.user_id + fields.summ)',
+          receivedParams: {
+            player_id,
+            amount,
+            event: eventParam,
+            subid,
+            'fields.user_id': fieldsUserId,
+            'fields.summ': fieldsSum,
+            'tracker.event': trackerEvent,
+            status,
+            'tracker.currency': currency
+          }
+        },
         { status: 400 }
       );
     }
@@ -76,7 +124,7 @@ export async function GET(request: Request) {
     if (event === 'redep') {
       newChance = calculateChance(totalDeposit);
     } else if (event === 'dep') {
-      newChance = 30; // Default chance for 'dep' event
+      newChance = calculateChance(totalDeposit); // Calculate chance for first deposit too
     }
     
     // Prepare user data
@@ -108,7 +156,9 @@ export async function GET(request: Request) {
       success: true,
       user_id: user_id,
       deposit_amount: totalDeposit,
-      chance: newChance
+      chance: newChance,
+      event: event,
+      format_detected: player_id && amount ? 'original' : 'new'
     });
     
   } catch (error) {
