@@ -28,9 +28,12 @@ export async function GET(request: Request) {
     
     // Format 2: New format
     // ?subid={clickid}&fields.user_id={id}&tracker.event=sale&fields.summ={profit}&status=sale&tracker.currency=usd
+    // Format 3: Extended format with last_deposit
+    // ?subid={clickid}&fields.user_id={id}&tracker.event=sale&fields.last_deposit=100.00&status=sale&tracker.currency=usd
     const subid = url.searchParams.get('subid');
     const fieldsUserId = url.searchParams.get('fields.user_id');
     const fieldsSum = url.searchParams.get('fields.summ');
+    const fieldsLastDeposit = url.searchParams.get('fields.last_deposit');
     const trackerEvent = url.searchParams.get('tracker.event');
     const status = url.searchParams.get('status');
     const currency = url.searchParams.get('tracker.currency');
@@ -41,10 +44,13 @@ export async function GET(request: Request) {
       user_id = player_id;
       deposit = amount;
       event = eventParam;
-    } else if ((subid || fieldsUserId) && (fieldsSum || trackerEvent === 'registration')) {
+      console.log('Using original format:', { user_id, deposit, event });
+    } else if ((subid || fieldsUserId) && (fieldsSum || fieldsLastDeposit || trackerEvent === 'registration')) {
       // New format - allow registration without fieldsSum
       user_id = fieldsUserId || subid; // Prefer fields.user_id, fallback to subid
-      deposit = fieldsSum || '0'; // Default to 0 for registration
+      
+      // Use fields.last_deposit if available, otherwise use fields.summ, default to 0 for registration
+      deposit = fieldsLastDeposit || fieldsSum || '0';
       
       // Map tracker.event and status to our event types
       if (trackerEvent === 'registration') {
@@ -54,13 +60,23 @@ export async function GET(request: Request) {
       } else {
         event = trackerEvent || status || 'dep'; // Default to dep
       }
+      
+      console.log('Using new format:', { 
+        user_id, 
+        deposit, 
+        event, 
+        fieldsLastDeposit, 
+        fieldsSum, 
+        trackerEvent, 
+        status 
+      });
     }
 
     // Validate required fields
     if (!user_id || deposit === null) {
       return NextResponse.json(
         { 
-          error: 'Missing required fields. Expected either (player_id + amount) or (subid/fields.user_id + fields.summ) or (subid/fields.user_id + tracker.event=registration)',
+          error: 'Missing required fields. Expected either (player_id + amount) or (subid/fields.user_id + fields.summ/fields.last_deposit) or (subid/fields.user_id + tracker.event=registration)',
           receivedParams: {
             player_id,
             amount,
@@ -68,6 +84,7 @@ export async function GET(request: Request) {
             subid,
             'fields.user_id': fieldsUserId,
             'fields.summ': fieldsSum,
+            'fields.last_deposit': fieldsLastDeposit,
             'tracker.event': trackerEvent,
             status,
             'tracker.currency': currency
@@ -172,7 +189,9 @@ export async function GET(request: Request) {
       deposit_amount: totalDeposit,
       chance: newChance,
       event: event,
-      format_detected: player_id && amount ? 'original' : 'new'
+      format_detected: player_id && amount ? 'original' : 'new',
+      deposit_source: fieldsLastDeposit ? 'fields.last_deposit' : fieldsSum ? 'fields.summ' : 'amount',
+      original_deposit_value: deposit
     });
     
   } catch (error) {
