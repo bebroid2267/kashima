@@ -128,7 +128,7 @@ export async function GET(request: Request) {
     
     let totalDeposit = depositAmount;
     let currentChance = 30; // Default chance for new users
-    let energy = 1; // Default energy for new users
+    let energy = 0; // Default energy for new users (will be 0 for registration, 10 for first deposit)
     const currentDate = new Date().toISOString();
     let isFirstDeposit = false;
     
@@ -136,13 +136,15 @@ export async function GET(request: Request) {
     if (existingUser) {
       totalDeposit = (existingUser.deposit_amount || 0) + depositAmount;
       currentChance = existingUser.chance || 30;
-      energy = existingUser.energy || 1;
+      energy = existingUser.energy || 0; // Default to 0 for existing users too
       
       // Check if this is the first deposit (user exists but has no previous deposits)
       isFirstDeposit = (existingUser.deposit_amount || 0) === 0 && depositAmount > 0;
+      console.log('Existing user - isFirstDeposit:', isFirstDeposit, 'previous deposit:', existingUser.deposit_amount, 'new deposit:', depositAmount, 'current energy:', energy);
     } else {
       // New user making their first deposit
       isFirstDeposit = depositAmount > 0;
+      console.log('New user - isFirstDeposit:', isFirstDeposit, 'deposit:', depositAmount, 'event:', event);
     }
     
     // Calculate new chance based on event type and total deposit amount
@@ -153,9 +155,18 @@ export async function GET(request: Request) {
       newChance = calculateChance(totalDeposit); // Calculate chance for first deposit too
     }
     
-    // Update energy for first deposit
-    if (isFirstDeposit && depositAmount > 0 && event !== 'reg') {
-      energy = 10; // Give 10 energy for first deposit
+    // Update energy based on event type
+    if (event === 'reg') {
+      // Registration: energy = 0
+      energy = 0;
+      console.log('Registration event: setting energy to 0');
+    } else if (isFirstDeposit && depositAmount > 0) {
+      // First deposit: energy = 10
+      energy = 10;
+      console.log('First deposit: setting energy to 10');
+    } else {
+      // Other cases: keep current energy
+      console.log('Energy remains:', energy, '(isFirstDeposit:', isFirstDeposit, 'depositAmount:', depositAmount, 'event:', event, ')');
     }
     
     // Prepare user data
@@ -188,7 +199,9 @@ export async function GET(request: Request) {
       user_id: user_id,
       deposit_amount: totalDeposit,
       chance: newChance,
+      energy: energy,
       event: event,
+      is_first_deposit: isFirstDeposit,
       format_detected: player_id && amount ? 'original' : 'new',
       deposit_source: fieldsLastDeposit ? 'fields.last_deposit' : fieldsSum ? 'fields.summ' : 'amount',
       original_deposit_value: deposit
