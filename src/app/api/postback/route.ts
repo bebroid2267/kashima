@@ -136,7 +136,7 @@ export async function GET(request: Request) {
     if (existingUser) {
       totalDeposit = (existingUser.deposit_amount || 0) + depositAmount;
       currentChance = existingUser.chance || 30;
-      energy = existingUser.energy || 0; // Default to 0 for existing users too
+      energy = existingUser.energy || 0;
       
       // Check if this is the first deposit (user exists but has no previous deposits)
       isFirstDeposit = (existingUser.deposit_amount || 0) === 0 && depositAmount > 0;
@@ -147,15 +147,20 @@ export async function GET(request: Request) {
       console.log('New user - isFirstDeposit:', isFirstDeposit, 'deposit:', depositAmount, 'event:', event);
     }
     
-    // Calculate new chance based on event type and total deposit amount
+    // Calculate new chance based on event type and deposit amount
     let newChance = currentChance;
-    if (event === 'redep') {
-      newChance = calculateChance(totalDeposit);
-    } else if (event === 'dep') {
-      newChance = calculateChance(totalDeposit); // Calculate chance for first deposit too
+    if (event === 'reg') {
+      // Registration: keep default chance (30%)
+      newChance = 30;
+    } else if (event === 'dep' || event === 'redep') {
+      // For deposits: calculate chance increase based on current deposit amount only
+      const chanceIncrease = calculateChanceIncrease(depositAmount);
+      newChance = currentChance + chanceIncrease;
+      // Cap at 85%
+      newChance = Math.min(newChance, 85);
     }
     
-    // Update energy based on event type
+    // Update energy based on event type and deposit amount
     if (event === 'reg') {
       // Registration: energy = 0
       energy = 0;
@@ -164,6 +169,10 @@ export async function GET(request: Request) {
       // First deposit: energy = 10
       energy = 10;
       console.log('First deposit: setting energy to 10');
+    } else if (depositAmount > 0) {
+      // Subsequent deposits: add 10 energy
+      energy = (energy || 0) + 10;
+      console.log('Subsequent deposit: adding 10 energy, new total:', energy);
     } else {
       // Other cases: keep current energy
       console.log('Energy remains:', energy, '(isFirstDeposit:', isFirstDeposit, 'depositAmount:', depositAmount, 'event:', event, ')');
@@ -243,7 +252,31 @@ export async function POST(request: Request) {
 }
 
 /**
- * Calculate chance based on deposit amount according to the following logic:
+ * Calculate chance increase based on current deposit amount according to the following logic:
+ * $0-$100 → +1% for every $5 deposited
+ * $100-$300 → +1% for every $10 deposited  
+ * $300-$950 → +1% for every $50 deposited
+ */
+function calculateChanceIncrease(depositAmount: number): number {
+  let chanceIncrease = 0;
+  
+  if (depositAmount <= 100) {
+    // For deposits up to $100, each $5 gives +1%
+    chanceIncrease = Math.floor(depositAmount / 5);
+  } else if (depositAmount <= 300) {
+    // For deposits between $100-$300, each $10 gives +1%
+    chanceIncrease = Math.floor(depositAmount / 10);
+  } else {
+    // For deposits above $300, each $50 gives +1%
+    chanceIncrease = Math.floor(depositAmount / 50);
+  }
+  
+  return chanceIncrease;
+}
+
+/**
+ * Legacy function - kept for reference but not used
+ * Calculate chance based on total deposit amount according to the following logic:
  * $0-$100 → chance 30-50% (+1% for every $5)
  * $100-$300 → chance 50-70% (+1% for every $10)
  * $300-$950 → chance 70-85% (+1% for every $50)
@@ -265,4 +298,4 @@ function calculateChance(depositAmount: number): number {
   }
   
   return Math.min(chance, 85); // Cap at 85%
-} 
+}
