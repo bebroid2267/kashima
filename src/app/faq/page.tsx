@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Footer from '../components/Footer';
 import Image from 'next/image';
 import chance from '@/../public/image.png';
@@ -19,83 +19,39 @@ interface FAQContent {
   blocks: FAQBlock[];
 }
 
-interface FAQData {
-  ru: FAQContent;
-  ar: FAQContent;
-}
-
-const FAQ_CONTENT: FAQData = {
-  ru: {
-    title: "КАК ЭТО РАБОТАЕТ?",
-    blocks: [
-  {
-        title: 'КАК УВЕЛИЧИТЬ СВОЙ ШАНС В KASHIF?',
-        text: 'Чтобы увеличить свой шанс в Kashif, вам нужно быть активным — делать депозиты и играть регулярно. Чем больше вы играете и вносите депозиты, тем выше становятся ваши шансы. Регулярная активность помогает улучшить ваш потенциал выигрыша.',
-        image: chance.src
-  },
-  {
-        title: 'РАУНД НАЧАЛСЯ',
-        text: 'Когда раунд начинается, молния ударяет, и множители начинают расти. Наблюдайте, как накапливается энергия и числа растут выше. Каждый момент приносит потенциал для больших выигрышей.',
-        image: round.src
-  },
-  {
-        title: 'РАУНД ПОБЕДИТЕЛЯ',
-        text: "Вы в зоне прибыли, и множитель продолжает расти. Система компенсирует низкие множители (1.05x, 1.28x, 1.36x) более высокими. Просто подождите и наблюдайте, как увеличивается ваш потенциальный выигрыш.",
-        image: winner.src
-      }
-    ]
-  },
-  ar: {
-    title: "كيف يعمل؟",
-    blocks: [
-  {
-        title: 'كيف تزيد فرصتك في KASHIF؟',
-        text: 'لزيادة فرصتك في Kashif، عليك أن تكون نشطًا - قم بالإيداع واللعب بانتظام. كلما زاد لعبك وإيداعك، زادت فرصك. النشاط المنتظم يساعد في تحسين إمكانات الفوز.',
-        image: chance.src
-  },
-  {
-        title: 'الجولة جارية',
-        text: 'عندما تبدأ الجولة، يضرب البرق وتبدأ المضاعفات في الارتفاع. راقب كيف تتراكم الطاقة وتنمو الأرقام. كل لحظة تحمل إمكانية تحقيق مكاسب أكبر.',
-        image: round.src
-  },
-  {
-        title: 'جولة الفائز جارية',
-        text: 'أنت في منطقة الربح الآن، والمضاعف يستمر في النمو. يعوض النظام المضاعفات المنخفضة (1.05x، 1.28x، 1.36x) بمضاعفات أعلى. فقط انتظر وشاهد أرباحك المحتملة تزداد.',
-        image: winner.src
-      }
-    ]
-  }
+const FAQ_CONTENT: FAQContent = {
+  title: "HOW DOES IT WORK?",
+  blocks: [
+    {
+      title: 'HOW TO INCREASE YOUR CHANCE IN KASHIF?',
+      text: 'To increase your chance in Kashif, you need to be active - make deposits and play regularly. The more you play and deposit, the higher your chances become. Regular activity helps improve your winning potential.',
+      image: chance.src
+    },
+    {
+      title: 'ROUND STARTED',
+      text: 'When the round starts, lightning strikes and multipliers begin to rise. Watch as energy accumulates and numbers grow higher. Every moment brings potential for bigger wins.',
+      image: round.src
+    },
+    {
+      title: 'WINNER ROUND IN PROGRESS',
+      text: 'You are in the profit zone now, and the multiplier continues to grow. The system compensates low multipliers (1.05x, 1.28x, 1.36x) with higher ones. Just wait and watch your potential winnings increase.',
+      image: winner.src
+    }
+  ]
 };
 
 export default function FAQ() {
-  const [currentLang, setCurrentLang] = useState<'ru' | 'ar'>('ru');
-  const content = FAQ_CONTENT[currentLang];
-
   return (
     <div className="faq-container">
       <Head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" />
       </Head>
-      <div className="language-switcher">
-        <button 
-          className={`lang-btn ${currentLang === 'ru' ? 'active' : ''}`}
-          onClick={() => setCurrentLang('ru')}
-        >
-          РУС
-        </button>
-        <button 
-          className={`lang-btn ${currentLang === 'ar' ? 'active' : ''}`}
-          onClick={() => setCurrentLang('ar')}
-    >
-          عربي
-        </button>
-      </div>
 
-      <div className={`content-wrapper ${currentLang === 'ar' ? 'rtl' : ''}`}>
-        <h1 className="main-title">{content.title}</h1>
+      <div className="content-wrapper">
+        <h1 className="main-title">{FAQ_CONTENT.title}</h1>
         
         <div className="faq-blocks">
-          {content.blocks.map((block, idx) => (
+          {FAQ_CONTENT.blocks.map((block, idx) => (
             <div key={idx} className="faq-block-wrapper">
               <div className="block-title-wrapper">
                 <h2 className="block-title">{block.title}</h2>
@@ -136,30 +92,7 @@ export default function FAQ() {
           overflow-x: hidden;
         }
 
-        .language-switcher {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          display: flex;
-          gap: 10px;
-          z-index: 10;
-        }
 
-        .lang-btn {
-          background: rgba(20, 40, 70, 0.35);
-          border: 1px solid #38e0ff;
-          color: #38e0ff;
-          padding: 8px 16px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-family: 'Orbitron', sans-serif;
-          transition: all 0.3s ease;
-        }
-
-        .lang-btn.active {
-          background: #38e0ff;
-          color: #07101e;
-        }
 
         .content-wrapper {
           max-width: 1000px;
@@ -317,15 +250,7 @@ export default function FAQ() {
             padding: 8px;
           }
 
-          .language-switcher {
-            top: 15px;
-            right: 15px;
-          }
 
-          .lang-btn {
-            padding: 6px 12px;
-            font-size: 14px;
-          }
         }
       `}</style>
     </div>
