@@ -13,269 +13,101 @@ const fakeCoeffs = [1.25, 3.88, 1.54, 1.28, 1.06];
 const predictionMessages = {
   '30-50': {
     "low": [  // 1.1–1.3x (40%)
-      "📡 AI точно просчитал слабую активность — уверенный прогноз на короткий рейс.",
-      "📉 График сейчас нестабилен — но я точно предсказываю минимальный взлёт.",
-      "🧠 ИИ зафиксировал сжатие сигнала — прогноз ограничен, но точен.",
-      "🚦 Вероятность полёта выше 1.3x крайне мала, прогноз подтверждён.",
-      "⚙️ История раундов указывает на скорое падение — точка входа определена.",
-      "📊 Движение в пределах нормы — рекомендую не рисковать.",
-      "🟢 Уверенное падение активности — зафиксировал шанс ниже среднего.",
-      "🎯 Риск минимальный — на основе анализа прогноз ограничен, но точный."
+      "📡 AI precisely calculated weak activity — confident forecast for short flight.",
+      "📉 Chart is currently unstable — but I accurately predict minimal takeoff.",
+      "🧠 AI detected signal compression — forecast limited but precise.",
+      "🚦 Probability of flight above 1.3x is extremely low, forecast confirmed.",
+      "⚙️ Round history indicates imminent drop — entry point defined.",
+      "📊 Movement within normal range — recommend not taking risks.",
+      "🟢 Confident activity decline — recorded below-average chance.",
+      "🎯 Minimal risk — based on analysis, forecast limited but accurate."
     ],
     "medium": [  // 2–5x (30%)
-      "🔍 Обнаружен уверенный паттерн — шанс поймать до 5x.",
-      "📈 Вижу сигналы роста — коэффициент 3.2x возможен.",
-      "🧩 Статистика указывает на устойчивую зону — прогноз в пределах 4x.",
-      "🚀 Волна усиливается — коэффициент от 2x реален.",
-      "🛠️ AI вычислил устойчивое окно — может выстрелить.",
-      "📎 Синхронизация с прошлым пиком — предсказание обосновано.",
-      "🔁 Траектория повторяется — шанс до 5x оправдан расчётами."
+      "🔍 Confident pattern detected — chance to catch up to 5x.",
+      "📈 I see growth signals — 3.2x coefficient possible.",
+      "🧩 Statistics indicate stable zone — forecast within 4x.",
+      "🚀 Wave strengthening — coefficient from 2x is real.",
+      "🛠️ AI calculated stable window — may shoot up.",
+      "📎 Synchronization with past peak — prediction justified.",
+      "🔁 Trajectory repeating — chance up to 5x justified by calculations."
     ],
     "high": [  // 5–10x (30%)
-      "🔥 Выявлена аномалия — возможен мощный всплеск до 7x.",
-      "🌊 График повторяет модель перед прошлым рекордом — потенциал высок.",
-      "🎲 Редкий импульс — AI предсказывает скачок выше 6x.",
-      "🧠 Искусственный интеллект зафиксировал критическую точку — момент силы.",
-      "📡 Предупреждение: шанс на 9x, но предсказание требует более точной калибровки."
+      "🔥 Anomaly detected — powerful surge up to 7x possible.",
+      "🌊 Chart repeats model before past record — high potential.",
+      "🎲 Rare impulse — AI predicts jump above 6x.",
+      "🧠 Artificial intelligence detected critical point — moment of strength.",
+      "📡 Warning: chance for 9x, but prediction requires more precise calibration."
     ]
   },
   '50-70': {
     "low": [  // 1.1–1.6x (60%)
-      "🧠 Модель предсказывает устойчивый рост до 1.6x — риск минимален.",
-      "📊 График показывает слабую, но стабильную активность.",
-      "⚙️ Плавная волна — AI зафиксировал безопасную точку входа.",
-      "📉 Колебания минимальны, прогноз — до 1.5x.",
-      "🛡️ Высокая точность на коротком отрезке — ставка под контролем.",
-      "📈 Данные подтверждают, что коэффициент не превысит 1.6x.",
-      "🔎 ИИ обнаружил предсказуемое движение — отличный момент для аккуратной ставки.",
-      "🎯 Прогноз стабилен, импульс невысокий — идеален для спокойной игры."
+      "🧠 Model predicts stable growth up to 1.6x — minimal risk.",
+      "📊 Chart shows weak but stable activity.",
+      "⚙️ Smooth wave — AI detected safe entry point.",
+      "📉 Fluctuations minimal, forecast — up to 1.5x.",
+      "🛡️ High accuracy on short segment — bet under control.",
+      "📈 Data confirms coefficient won't exceed 1.6x.",
+      "🔎 AI discovered predictable movement — excellent moment for careful bet.",
+      "🎯 Forecast stable, low impulse — ideal for calm play."
     ],
     "medium": [  // 1.6–2x (20%)
-      "🧬 AI засёк ростовой паттерн — коэффициент может достичь 2x.",
-      "📡 Уверенный сигнал на подъём — граница 1.9x вполне достижима.",
-      "📈 Всплеск вероятен — рекомендую контролировать ставку до 2x.",
-      "🔍 Совпадение с предыдущей волной — коэффициент 1.7–1.9x на горизонте."
+      "🧬 AI caught growth pattern — coefficient may reach 2x.",
+      "📡 Confident upward signal — 1.9x boundary quite achievable.",
+      "📈 Surge probable — recommend controlling bet up to 2x.",
+      "🔍 Match with previous wave — coefficient 1.7–1.9x on horizon."
     ],
     "high": [  // 1.9–4x (20%)
-      "⚠️ AI предсказал редкий отклоняющийся сигнал — возможен рост до 4x.",
-      "🚀 Анализ указывает на сильный импульс — шанс до 3.5x.",
-      "💥 Вероятность пикового роста увеличивается — момент может быть ключевым."
+      "⚠️ AI predicted rare deviating signal — growth up to 4x possible.",
+      "🚀 Analysis indicates strong impulse — chance up to 3.5x.",
+      "💥 Probability of peak growth increasing — moment may be key."
     ]
   },
   '70-85': {
     "low": [  // 1.1–1.7x (85%)
-      "🧠 Высочайшая точность — ИИ гарантирует прогноз в пределах 1.7x.",
-      "🎯 Данные подтверждают стабильный рост — ставка под контролем.",
-      "📈 Уверенное движение вверх — идеально для уверенного входа.",
-      "🛡️ ИИ в полной уверенности — коэффициент до 1.6x.",
-      "📊 Расчёты сошлись — движение не выйдет за пределы 1.7x.",
-      "📎 Исторический паттерн полностью совпал — уверенная точка входа.",
-      "🎯 Прогноз приближен к идеальному — риск минимальный.",
-      "📡 Модель отработала сценарий на 95% — ставка без сюрпризов.",
-      "🔐 Всё под контролем — прогноз направлен в точку максимальной предсказуемости."
+      "🧠 Highest accuracy — AI guarantees forecast within 1.7x.",
+      "🎯 Data confirms stable growth — bet under control.",
+      "📈 Confident upward movement — perfect for confident entry.",
+      "🛡️ AI in full confidence — coefficient up to 1.6x.",
+      "📊 Calculations aligned — movement won't exceed 1.7x.",
+      "📎 Historical pattern fully matched — confident entry point.",
+      "🎯 Forecast approaching ideal — minimal risk.",
+      "📡 Model worked scenario at 95% — bet without surprises.",
+      "🔐 Everything under control — forecast aimed at maximum predictability."
     ],
     "medium": [  // 1.8–2x (10%)
-      "🔍 AI фиксирует всплеск — возможен коэффициент до 2x.",
-      "📈 Прогноз обоснован — редкое окно до 1.9x открыто.",
-      "💡 Вспышка активности зафиксирована — ставка разумна в пределах 2x."
+      "🔍 AI detects surge — coefficient up to 2x possible.",
+      "📈 Forecast justified — rare window up to 1.9x open.",
+      "💡 Activity flash detected — bet reasonable within 2x."
     ],
     "high": [  // 2–2.5x (5%)
-      "⚡ Исключительный случай — коэффициент до 2.5x подтверждён AI.",
-      "🚀 Уникальный паттерн выявлен — шанс на взлёт повышен.",
-      "💥 AI дал сигнал на пиковую точку — используй этот шанс."
+      "⚡ Exceptional case — coefficient up to 2.5x confirmed by AI.",
+      "🚀 Unique pattern identified — takeoff chance increased.",
+      "💥 AI gave signal for peak point — use this chance."
     ]
   }
 };
 
-// French translations for prediction messages
-const predictionMessagesFR = {
-  '30-50': {
-    "low": [  // 1.1–1.3x (40%)
-      "📡 L'IA a calculé une faible activité — prévision fiable pour un vol court.",
-      "📉 Le graphique est instable — mais je prédis une ascension minimale.",
-      "🧠 L'IA a détecté une compression du signal — prévision limitée mais précise.",
-      "🚦 La probabilité d'un vol au-dessus de 1.3x est très faible, prévision confirmée.",
-      "⚙️ L'historique des tours indique une chute imminente — point d'entrée défini.",
-      "📊 Mouvement dans les limites normales — je recommande de ne pas prendre de risques.",
-      "🟢 Baisse d'activité confirmée — j'ai enregistré une probabilité inférieure à la moyenne.",
-      "🎯 Risque minimal — basé sur l'analyse, la prévision est limitée mais précise."
-    ],
-    "medium": [  // 2–5x (30%)
-      "🔍 Motif fiable détecté — chance d'attraper jusqu'à 5x.",
-      "📈 Je vois des signaux de croissance — coefficient 3.2x possible.",
-      "🧩 Les statistiques indiquent une zone stable — prévision dans la limite de 4x.",
-      "🚀 La vague s'intensifie — un coefficient de 2x est réaliste.",
-      "🛠️ L'IA a calculé une fenêtre stable — peut décoller.",
-      "📎 Synchronisation avec le pic précédent — prédiction justifiée.",
-      "🔁 La trajectoire se répète — chance jusqu'à 5x justifiée par les calculs."
-    ],
-    "high": [  // 5–10x (30%)
-      "🔥 Anomalie détectée — forte hausse possible jusqu'à 7x.",
-      "🌊 Le graphique reproduit le modèle avant le record précédent — potentiel élevé.",
-      "🎲 Impulsion rare — l'IA prédit un saut au-dessus de 6x.",
-      "🧠 L'intelligence artificielle a détecté un point critique — moment de force.",
-      "📡 Avertissement: chance à 9x, mais la prédiction nécessite un calibrage plus précis."
-    ]
-  },
-  '50-70': {
-    "low": [  // 1.1–1.6x (60%)
-      "🧠 Le modèle prédit une croissance stable jusqu'à 1.6x — risque minimal.",
-      "📊 Le graphique montre une activité faible mais stable.",
-      "⚙️ Vague douce — l'IA a enregistré un point d'entrée sûr.",
-      "📉 Fluctuations minimales, prévision — jusqu'à 1.5x.",
-      "🛡️ Haute précision sur un court segment — mise sous contrôle.",
-      "📈 Les données confirment que le coefficient ne dépassera pas 1.6x.",
-      "🔎 L'IA a détecté un mouvement prévisible — excellent moment pour une mise prudente.",
-      "🎯 Prévision stable, impulsion faible — idéale pour un jeu tranquille."
-    ],
-    "medium": [  // 1.6–2x (20%)
-      "🧬 L'IA a détecté un modèle de croissance — le coefficient peut atteindre 2x.",
-      "📡 Signal fort pour une montée — la limite de 1.9x est tout à fait atteignable.",
-      "📈 Pic probable — je recommande de contrôler la mise jusqu'à 2x.",
-      "🔍 Concordance avec la vague précédente — coefficient 1.7-1.9x à l'horizon."
-    ],
-    "high": [  // 1.9–4x (20%)
-      "⚠️ L'IA a prédit un signal déviant rare — croissance possible jusqu'à 4x.",
-      "🚀 L'analyse indique une forte impulsion — chance jusqu'à 3.5x.",
-      "💥 La probabilité d'une croissance maximale augmente — le moment peut être crucial."
-    ]
-  },
-  '70-85': {
-    "low": [  // 1.1–1.7x (85%)
-      "🧠 Précision maximale — l'IA garantit une prévision dans la limite de 1.7x.",
-      "🎯 Les données confirment une croissance stable — mise sous contrôle.",
-      "📈 Mouvement ascendant confiant — idéal pour une entrée assurée.",
-      "🛡️ L'IA est pleinement confiante — coefficient jusqu'à 1.6x.",
-      "📊 Les calculs concordent — le mouvement ne dépassera pas 1.7x.",
-      "📎 Le modèle historique correspond parfaitement — point d'entrée fiable.",
-      "🎯 Prévision proche de la perfection — risque minimal.",
-      "📡 Le modèle a simulé le scénario à 95% — mise sans surprises.",
-      "🔐 Tout est sous contrôle — prévision dirigée vers le point de prévisibilité maximale."
-    ],
-    "medium": [  // 1.8–2x (10%)
-      "🔍 L'IA détecte un pic — coefficient possible jusqu'à 2x.",
-      "📈 Prévision justifiée — fenêtre rare jusqu'à 1.9x ouverte.",
-      "💡 Pic d'activité enregistré — mise raisonnable dans la limite de 2x."
-    ],
-    "high": [  // 2–2.5x (5%)
-      "⚡ Cas exceptionnel — coefficient jusqu'à 2.5x confirmé par l'IA.",
-      "🚀 Modèle unique identifié — chance de décollage augmentée.",
-      "💥 L'IA a donné un signal pour un point culminant — saisissez cette chance."
-    ]
-  }
-};
+// Removed French translations - using English only
 
-// Arabic translations for prediction messages
-const predictionMessagesAR = {
-  '30-50': {
-    "low": [
-      "📡 حسب الذكاء الاصطناعي النشاط ضعيف — توقع موثوق لرحلة قصيرة.",
-      "📉 الرسم البياني غير مستقر حاليًا — لكنني أتوقع ارتفاعًا بالحد الأدنى.",
-      "🧠 رصد الذكاء الاصطناعي ضغط الإشارة — التوقع محدود ولكنه دقيق.",
-      "🚦 احتمالية الطيران فوق 1.3x ضئيلة للغاية، التوقع مؤكد.",
-      "⚙️ تاريخ الجولات يشير إلى هبوط وشيك — نقطة الدخول محددة.",
-      "📊 الحركة ضمن الحدود الطبيعية — أنصح بعدم المخاطرة.",
-      "🟢 انخفاض مؤكد في النشاط — سجلت فرصة أقل من المتوسط.",
-      "🎯 المخاطرة بالحد الأدنى — بناءً على التحليل، التوقع محدود لكنه دقيق."
-    ],
-    "medium": [  // 2–5x (30%)
-      "🔍 تم اكتشاف نمط موثوق — فرصة للوصول إلى 5x.",
-      "📈 أرى إشارات نمو — معامل 3.2x محتمل.",
-      "  الإحصاءات تشير إلى منطقة مستقرة — توقع في حدود 4x.",
-      "🚀 الموجة تتصاعد — معامل بداية من 2x واقعي.",
-      "🛠️ حسب الذكاء الاصطناعي نافذة مستقرة — يمكن أن ينطلق.",
-      "📎 مزامنة مع الذروة السابقة — التنبؤ له ما يبرره.",
-      "🔁 المسار يتكرر — الفرصة حتى 5x مبررة بالحسابات."
-    ],
-    "high": [  // 5–10x (30%)
-      "🔥 تم الكشف عن شذوذ — ارتفاع قوي محتمل حتى 7x.",
-      "🌊 الرسم البياني يكرر النموذج قبل الرقم القياسي السابق — إمكانات عالية.",
-      "🎲 نبضة نادرة — يتنبأ الذكاء الاصطناعي بقفزة فوق 6x.",
-      "🧠 رصد الذكاء الاصطناعي نقطة حرجة — لحظة قوة.",
-      "📡 تحذير: فرصة عند 9x، لكن التنبؤ يتطلب معايرة أكثر دقة."
-    ]
-  },
-  '50-70': {
-    "low": [  // 1.1–1.6x (60%)
-      "🧠 يتنبأ النموذج بنمو مستقر حتى 1.6x — المخاطرة بالحد الأدنى.",
-      "📊 يُظهر الرسم البياني نشاطًا ضعيفًا ولكن مستقرًا.",
-      "⚙️ موجة سلسة — سجل الذكاء الاصطناعي نقطة دخول آمنة.",
-      "📉 التقلبات بالحد الأدنى، التوقع — حتى 1.5x.",
-      "🛡️ دقة عالية على قطعة قصيرة — الرهان تحت السيطرة.",
-      "📈 تؤكد البيانات أن المعامل لن يتجاوز 1.6x.",
-      "🔎 اكتشف الذكاء الاصطناعي حركة يمكن التنبؤ بها — لحظة ممتازة لرهان حذر.",
-      "🎯 توقع مستقر، نبضة منخفضة — مثالي للعب الهادئ."
-    ],
-    "medium": [  // 1.6–2x (20%)
-      "🧬 رصد الذكاء الاصطناعي نمط نمو — يمكن أن يصل المعامل إلى 2x.",
-      "📡 إشارة واثقة للصعود — حد 1.9x يمكن الوصول إليه تمامًا.",
-      "📈 ارتفاع محتمل — أوصي بمراقبة الرهان حتى 2x.",
-      "🔍 تطابق مع الموجة السابقة — معامل 1.7-1.9x في الأفق."
-    ],
-    "high": [  // 1.9–4x (20%)
-      "⚠️ تنبأ الذكاء الاصطناعي بإشارة منحرفة نادرة — نمو محتمل حتى 4x.",
-      "🚀 يشير التحليل إلى نبضة قوية — فرصة تصل إلى 3.5x.",
-      "💥 تزداد احتمالية النمو القصوى — اللحظة قد تكون حاسمة."
-    ]
-  },
-  '70-85': {
-    "low": [  // 1.1–1.7x (85%)
-      "🧠 أعلى دقة — يضمن الذكاء الاصطناعي توقعًا في حدود 1.7x.",
-      "🎯 تؤكد البيانات النمو المستقر — الرهان تحت السيطرة.",
-      "📈 حركة صعود واثقة — مثالية للدخول المؤكد.",
-      "🛡️ الذكاء الاصطناعي في ثقة كاملة — معامل يصل إلى 1.6x.",
-      "📊 الحسابات متطابقة — الحركة لن تتجاوز 1.7x.",
-      "📎 النمط التاريخي متطابق تمامًا — نقطة دخول موثوقة.",
-      "🎯 التوقع قريب من المثالي — مخاطرة بالحد الأدنى.",
-      "📡 عمل النموذج على السيناريو بنسبة 95٪ — رهان بدون مفاجآت.",
-      "🔐 كل شيء تحت السيطرة — التوقع موجه إلى نقطة الإمكانية القصوى للتنبؤ."
-    ],
-    "medium": [  // 1.8–2x (10%)
-      "🔍 يرصد الذكاء الاصطناعي ارتفاعًا — معامل محتمل يصل إلى 2x.",
-      "📈 التوقع له ما يبرره — نافذة نادرة حتى 1.9x مفتوحة.",
-      "💡 تم تسجيل اندلاع نشاط — الرهان معقول في حدود 2x."
-    ],
-    "high": [  // 2–2.5x (5%)
-      "⚡ حالة استثنائية — معامل يصل إلى 2.5x مؤكد من الذكاء الاصطناعي.",
-      "🚀 تم تحديد نمط فريد — فرصة الانطلاق زادت.",
-      "💥 أعطى الذكاء الاصطناعي إشارة لنقطة الذروة — استغل هذه الفرصة."
-    ]
-  }
-};
+// Arabic translations removed - using only English translations
 
-// UI text translations
+// UI text in English
 const translations = {
-  fr: {
-    aiVisionButton: "Vision IA",
-    aviatorButton: "Aviator",
-    clickForPrediction: "Cliquez sur Vision IA pour prédiction",
-    download: "Télécharger",
-    chanceOfWinning: "Probabilité de gagner",
-    howToIncreaseChance: "COMMENT AUGMENTER VOS CHANCES ?",
-    howToIncreaseDesc: "Effectuez des dépôts et jouez régulièrement à Aviator pour augmenter votre potentiel de gains. Plus vous êtes actif, plus vos chances augmentent !",
-    makeDeposit: "Faire un Dépôt",
-    helpMe: "Aide-moi",
-    fullEnergy: "Plein",
-    homeFooter: "ACCUEIL",
-    faqFooter: "FAQ"
-  },
-  ar: {
-    aiVisionButton: "رؤية الذكاء الاصطناعي",
-    aviatorButton: "أفياتور",
-    clickForPrediction: "انقر على رؤية الذكاء الاصطناعي للحصول على التنبؤ",
-    download: "تحميل",
-    chanceOfWinning: "فرصة الفوز",
-    howToIncreaseChance: "كيف تزيد من فرصتك؟",
-    howToIncreaseDesc: "قم بالإيداع والعب أفياتور بانتظام لزيادة إمكانية الفوز. كلما كنت أكثر نشاطًا، زادت فرصك!",
-    makeDeposit: "إيداع",
-    helpMe: "مساعدة",
-    fullEnergy: "كامل",
-    homeFooter: "الرئيسية",
-    faqFooter: "الأسئلة"
-  }
+  aiVisionButton: "AI Vision",
+  aviatorButton: "Aviator",
+  clickForPrediction: "Click AI Vision for prediction",
+  download: "Download",
+  chanceOfWinning: "Chance of Winning",
+  howToIncreaseChance: "HOW TO INCREASE YOUR CHANCES?",
+  howToIncreaseDesc: "Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances!",
+  makeDeposit: "Make Deposit",
+  helpMe: "Help Me",
+  fullEnergy: "Full",
+  homeFooter: "HOME",
+  faqFooter: "FAQ"
 };
 
-// Получить сегодняшнюю дату по МСК (UTC+3)
+// Get today's date in MSK (UTC+3)
 function getTodayMSK() {
   const now = new Date();
   // UTC+3
@@ -283,13 +115,13 @@ function getTodayMSK() {
   return msk.toISOString().split('T')[0];
 }
 
-// Получить текущее время по МСК (UTC+3)
+// Get current time in MSK (UTC+3)
 function getNowMSK() {
   const now = new Date();
   return new Date(now.getTime() + (3 * 60 - now.getTimezoneOffset()) * 60000);
 }
 
-// --- Уникальные коэффициенты для диапазонов шанса ---
+// --- Unique coefficients for chance ranges ---
 declare global {
   interface Window {
     __coeffPoolsRef?: {
@@ -309,40 +141,40 @@ function generateUniqueCoeffs(range: string, count: number): number[] {
   while (set.size < count) {
     let value: number = 0;
     if (range === '30-50') {
-      // Исключаем генерацию значений в диапазоне 1.3-2.0
+      // Exclude generation of values in range 1.3-2.0
       const rand = Math.random();
       if (rand < 0.4) {
         // Low: 1.1-1.3x (40%)
         value = +(Math.random() * (1.3 - 1.1) + 1.1).toFixed(2);
       } else if (rand < 0.7) {
-        // Medium: 2-5x (30%) - ничего в промежутке 1.3-2.0
+        // Medium: 2-5x (30%) - nothing in gap 1.3-2.0
         value = +(Math.random() * (5 - 2.0) + 2.0).toFixed(2);
       } else {
         // High: 5-10x (30%)
         value = +(Math.random() * (10 - 5.0) + 5.0).toFixed(2);
       }
     } else if (range === '50-70') {
-      // Для 50-70%: нет пробелов в диапазонах, но проблема с перекрытием
-      // 1.6-2.0 (medium) и 1.9-4.0 (high) перекрываются
+      // For 50-70%: no gaps in ranges, but overlap issue
+      // 1.6-2.0 (medium) and 1.9-4.0 (high) overlap
       const rand = Math.random();
       if (rand < 0.6) {
         // Low: 1.1-1.6x (60%)
         value = +(Math.random() * (1.6 - 1.1) + 1.1).toFixed(2);
       } else if (rand < 0.8) {
-        // Medium: 1.6-1.9x (20%) - избегаем перекрытия с high
+        // Medium: 1.6-1.9x (20%) - avoid overlap with high
         value = +(Math.random() * (1.9 - 1.6) + 1.6).toFixed(2);
       } else {
         // High: 1.9-4x (20%)
         value = +(Math.random() * (4.0 - 1.9) + 1.9).toFixed(2);
       }
     } else if (range === '70-85') {
-      // Для 70-85%: проверяем отсутствие пробелов
+      // For 70-85%: check for no gaps
       const rand = Math.random();
       if (rand < 0.85) {
         // Low: 1.1-1.7x (85%)
         value = +(Math.random() * (1.7 - 1.1) + 1.1).toFixed(2);
       } else if (rand < 0.95) {
-        // Medium: 1.8-2.0x (10%) - с учетом размера шага
+        // Medium: 1.8-2.0x (10%) - considering step size
         value = +(Math.random() * (2.0 - 1.8) + 1.8).toFixed(2);
       } else {
         // High: 2.0-2.5x (5%)
@@ -350,7 +182,7 @@ function generateUniqueCoeffs(range: string, count: number): number[] {
       }
     }
     
-    // Исключаем нежелательные пограничные значения и нули
+    // Exclude unwanted boundary values and zeros
     if (value >= 0.01 && !isNaN(value)) {
       set.add(value);
     }
@@ -379,30 +211,30 @@ function getUniqueCoefficient(chance: number): number {
 }
 
 function getCoeffColor(coefficient: number, chance: number): string {
-  // Определяем категорию шанса
+  // Determine chance category
   const range = getRangeByChance(chance);
   
   if (range === '30-50') {
-    // Для шанса 30-50%
-    if (coefficient <= 1.3) return '#52c41a'; // Зеленый для low (1.1-1.3x) - 40%
-    if (coefficient < 5.0) return '#faad14'; // Желтый для medium (2-5x) - 30%
-    return '#ff4d4f'; // Красный для high (5-10x) - 30%
+    // For 30-50% chance
+    if (coefficient <= 1.3) return '#52c41a'; // Green for low (1.1-1.3x) - 40%
+    if (coefficient < 5.0) return '#faad14'; // Yellow for medium (2-5x) - 30%
+    return '#ff4d4f'; // Red for high (5-10x) - 30%
   } 
   else if (range === '50-70') {
-    // Для шанса 50-70%
-    if (coefficient <= 1.6) return '#52c41a'; // Зеленый для low (1.1-1.6x) - 60%
-    if (coefficient < 1.9) return '#faad14'; // Желтый для medium (1.6-1.9x) - 20%
-    return '#ff4d4f'; // Красный для high (1.9-4x) - 20%
+    // For 50-70% chance
+    if (coefficient <= 1.6) return '#52c41a'; // Green for low (1.1-1.6x) - 60%
+    if (coefficient < 1.9) return '#faad14'; // Yellow for medium (1.6-1.9x) - 20%
+    return '#ff4d4f'; // Red for high (1.9-4x) - 20%
   } 
   else if (range === '70-85') {
-    // Для шанса 70-85%
-    if (coefficient <= 1.7) return '#52c41a'; // Зеленый для low (1.1-1.7x) - 85%
-    if (coefficient <= 2.0) return '#faad14'; // Желтый для medium (1.8-2.0x) - 10%
-    return '#ff4d4f'; // Красный для high (2.0-2.5x) - 5%
+    // For 70-85% chance
+    if (coefficient <= 1.7) return '#52c41a'; // Green for low (1.1-1.7x) - 85%
+    if (coefficient <= 2.0) return '#faad14'; // Yellow for medium (1.8-2.0x) - 10%
+    return '#ff4d4f'; // Red for high (2.0-2.5x) - 5%
   }
   
-  // Для других случаев (default)
-  return '#ffe066'; // Желтый по умолчанию
+  // For other cases (default)
+  return '#ffe066'; // Default yellow
 }
 
 // Ensure we handle null/undefined supabase client
@@ -419,7 +251,7 @@ export default function Home() {
   const [testDepositLoading, setTestDepositLoading] = useState(false);
   const [testDepositResult, setTestDepositResult] = useState<string | null>(null);
   const [user, setUser] = useState<any>(() => {
-    // Инициализация user из localStorage (SSR-safe)
+    // Initialize user from localStorage (SSR-safe)
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
       return storedUser ? JSON.parse(storedUser) : null;
@@ -427,7 +259,7 @@ export default function Home() {
     return null;
   });
   const [isCheckingAuth, setIsCheckingAuth] = useState(() => {
-    // Если user есть в localStorage, не показываем лоадер
+    // If user exists in localStorage, don't show loader
     if (typeof window !== 'undefined') {
       return !localStorage.getItem('user');
     }
@@ -445,15 +277,15 @@ export default function Home() {
   const starCanvasRef = useRef<HTMLCanvasElement>(null);
   const [starAnimActive, setStarAnimActive] = useState(true);
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
-  const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
-  // Состояние для отслеживания последнего цикла таймера, когда была начислена энергия
+
+  // State for tracking the last timer cycle when energy was awarded
   const [lastEnergyAwardCycle, setLastEnergyAwardCycle] = useState<string | null>(null);
-  // Состояние для отслеживания, выполняется ли в данный момент обновление всех пользователей
+  // State for tracking whether all users update is currently in progress
   const [isUpdatingAllUsers, setIsUpdatingAllUsers] = useState(false);
   
-  // Добавляем проверку PWA режима при загрузке страницы
+  // Add PWA mode check on page load
   useEffect(() => {
-    // Функция для проверки PWA режима
+    // Function to check PWA mode
     const checkPWAStatus = () => {
       
       // Используем ту же функцию обнаружения PWA
@@ -636,9 +468,9 @@ export default function Home() {
     
     try {
       const currentCycleId = getTodayMSK();
-      console.log('Проверка цикла начисления энергии:', currentCycleId);
-      console.log('Текущее значение энергии в состоянии:', energy);
-      console.log('Текущее значение энергии у пользователя:', user.energy);
+      console.log('Checking energy accrual cycle:', currentCycleId);
+      console.log('Current energy value in state:', energy);
+      console.log('Current energy value for user:', user.energy);
       
       // Проверяем, был ли этот цикл уже обработан
       const { data: existingCycle, error: cycleCheckError } = await supabaseClient
@@ -654,14 +486,14 @@ export default function Home() {
       
       // Если цикл уже обработан, запоминаем это в состоянии
       if (existingCycle) {
-        console.log('Цикл начисления энергии уже был выполнен:', existingCycle);
+        console.log('Energy accrual cycle already executed:', existingCycle);
         setLastEnergyAwardCycle(currentCycleId);
         return;
       }
       
       // ВАЖНО: При обычной загрузке страницы не начисляем энергию автоматически
       // Только запоминаем состояние цикла для будущих проверок
-      console.log('Цикл начисления энергии не найден, но не выполняем автоматическое начисление при загрузке');
+      console.log('Energy accrual cycle not found, but not performing automatic accrual on load');
       
       // Начисление энергии всем будет происходить только при истечении таймера
       // или при явном вызове updateAllUsersEnergy()
@@ -846,7 +678,7 @@ export default function Home() {
       const diff = next.getTime() - now.getTime();
       
       // Выводим отладочную информацию
-      console.log('Таймер:', {
+      console.log('Timer:', {
         now: now.toISOString(),
         next: next.toISOString(),
         diff: diff,
@@ -874,7 +706,7 @@ export default function Home() {
         // если это ещё не было сделано
         const currentCycleId = getTodayMSK();
         if (lastEnergyAwardCycle !== currentCycleId) {
-          console.log('Таймер истек, проверяем необходимость начисления энергии');
+          console.log('Timer expired, checking need for energy accrual');
           
           // Проверяем еще раз в базе данных
           (async () => {
@@ -887,22 +719,22 @@ export default function Home() {
               .single();
             
             if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
-              console.error('Ошибка при проверке цикла:', cycleCheckError);
+              console.error('Error checking cycle:', cycleCheckError);
               return;
             }
             
             if (existingCycle) {
-              console.log('Цикл начисления энергии уже был выполнен ранее:', existingCycle);
+              console.log('Energy accrual cycle was already executed earlier:', existingCycle);
               setLastEnergyAwardCycle(currentCycleId);
               return;
             }
             
             // Если цикл не был обработан, начисляем энергию
-            console.log('Цикл начисления энергии не найден, выполняем начисление');
+            console.log('Energy accrual cycle not found, performing accrual');
             updateAllUsersEnergy();
           })();
         } else {
-          console.log('Таймер истек, но энергия уже была начислена сегодня');
+          console.log('Timer expired, but energy was already accrued today');
         }
         
         // Перезапускаем таймер для следующего дня
@@ -1042,8 +874,7 @@ export default function Home() {
     const range = getRangeByChance(chance);
     
     if (range === 'default') {
-      return selectedLang === 'fr' ? "Prévision formée" : 
-             selectedLang === 'ar' ? "تم تشكيل التوقع" : "Прогноз сформирован";
+      return "Prediction formed";
     }
     
     // Determine subcategory based on coefficient value - точно в соответствии с generateUniqueCoeffs
@@ -1084,18 +915,11 @@ export default function Home() {
     }
     
     // Дополнительный отладочный вывод
-    console.log(`Выбрана подкатегория: ${subcategory} для коэффициента ${coefficient} и шанса ${chance}`);
-    console.log(`Диапазон шанса: ${range}, процент: ${chance}%, коэффициент: ${coefficient}x`);
+    console.log(`Selected subcategory: ${subcategory} for coefficient ${coefficient} and chance ${chance}`);
+    console.log(`Chance range: ${range}, percentage: ${chance}%, coefficient: ${coefficient}x`);
     
-    // Select the message collection based on the selected language
-    let messageCollection;
-    if (selectedLang === 'fr') {
-      messageCollection = predictionMessagesFR;
-    } else if (selectedLang === 'ar') {
-      messageCollection = predictionMessagesAR;
-    } else {
-      messageCollection = predictionMessages;
-    }
+    // Using only English translations
+    const messageCollection = predictionMessages;
     
     const messages = messageCollection[range as keyof typeof messageCollection][subcategory as "low" | "medium" | "high"];
     const randomIndex = Math.floor(Math.random() * messages.length);
@@ -1120,7 +944,7 @@ export default function Home() {
       
       // Check if Supabase client is available
       if (!supabaseClient) {
-        throw new Error('База данных недоступна. Попробуйте перезагрузить страницу.');
+        throw new Error('Database unavailable. Please try reloading the page.');
       }
       
       // Уменьшаем энергию на 1
@@ -1132,7 +956,7 @@ export default function Home() {
       // Обновляем только energy в базе данных
       if (!supabaseClient) {
         console.error('Supabase client is not available, cannot update energy');
-        throw new Error('База данных недоступна. Попробуйте перезагрузить страницу.');
+        throw new Error('Database unavailable. Please try reloading the page.');
       }
       
       const { error } = await supabaseClient
@@ -1151,31 +975,31 @@ export default function Home() {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         
         // Выводим в консоль для отладки
-        console.log('Энергия уменьшена:', energy, '->', newEnergy);
+        console.log('Energy decreased:', energy, '->', newEnergy);
       }
 
       // Simulate loading for 3 seconds
       setTimeout(() => {
         setIsLoading(false);
         let newCoefficient = getUniqueCoefficient(chance);
-        console.log(`Сгенерирован начальный коэффициент: ${newCoefficient}`);
+        console.log(`Generated initial coefficient: ${newCoefficient}`);
         
         // Проверка на попадание в запрещенные диапазоны
         const range = getRangeByChance(chance);
         if (range === '30-50') {
           // Проверяем, не попал ли коэффициент в запрещенный диапазон 1.3-2.0
           if (newCoefficient > 1.3 && newCoefficient < 2.0) {
-            console.warn(`Обнаружен коэффициент ${newCoefficient} в запрещенном диапазоне 1.3-2.0. Корректируем...`);
-            // Принудительно выбираем ближайшую границу
+            console.warn(`Detected coefficient ${newCoefficient} in forbidden range 1.3-2.0. Correcting...`);
+            // Force select nearest boundary
             newCoefficient = (newCoefficient - 1.3 < 2.0 - newCoefficient) ? 1.3 : 2.0;
-            console.log(`Коэффициент скорректирован на: ${newCoefficient}`);
+            console.log(`Coefficient corrected to: ${newCoefficient}`);
           }
         } else if (range === '70-85') {
           // Для 70-85% проверяем пробел между low и medium (1.7-1.8)
           if (newCoefficient > 1.7 && newCoefficient < 1.8) {
-            console.warn(`Обнаружен коэффициент ${newCoefficient} в запрещенном диапазоне 1.7-1.8. Корректируем...`);
+            console.warn(`Detected coefficient ${newCoefficient} in forbidden range 1.7-1.8. Correcting...`);
             newCoefficient = (newCoefficient - 1.7 < 1.8 - newCoefficient) ? 1.7 : 1.8;
-            console.log(`Коэффициент скорректирован на: ${newCoefficient}`);
+            console.log(`Coefficient corrected to: ${newCoefficient}`);
           }
         }
         
@@ -1352,13 +1176,13 @@ export default function Home() {
       
       // Проверяем, не была ли уже начислена энергия в этом цикле
       if (lastEnergyAwardCycle === currentCycleId) {
-        console.log('Энергия уже была начислена всем пользователям в текущем цикле:', currentCycleId);
+        console.log('Energy was already accrued to all users in current cycle:', currentCycleId);
         setIsUpdatingAllUsers(false);
         return;
       }
       
-      console.log('Начисление энергии всем пользователям...');
-      console.log('Текущее значение энергии перед начислением:', energy);
+      console.log('Accruing energy to all users...');
+      console.log('Current energy value before accrual:', energy);
       
       // Запрос к API для обновления энергии всех пользователей
       const response = await fetch('/api/update-all-energy', {
@@ -1372,14 +1196,14 @@ export default function Home() {
       const result = await response.json();
       
       if (response.ok) {
-        console.log('Энергия успешно начислена всем пользователям:', result);
+        console.log('Energy successfully accrued to all users:', result);
         
         // Обновляем состояние для текущего пользователя
         if (user) {
-          console.log('Обновление энергии для текущего пользователя');
-          console.log('Текущее значение энергии:', energy, 'max:', maxEnergy);
+          console.log('Updating energy for current user');
+          console.log('Current energy value:', energy, 'max:', maxEnergy);
           const newEnergy = Math.min((energy || 0) + 1, maxEnergy || 100);
-          console.log('Новое значение энергии:', newEnergy);
+          console.log('New energy value:', newEnergy);
           
           // Запрашиваем свежее значение энергии из базы
           const { data: freshUserData, error: userError } = await supabaseClient!
@@ -1389,16 +1213,16 @@ export default function Home() {
             .single();
             
           if (userError) {
-            console.error('Ошибка получения свежих данных пользователя:', userError);
+            console.error('Error getting fresh user data:', userError);
           } else if (freshUserData) {
-            console.log('Свежее значение энергии из БД:', freshUserData.energy);
+            console.log('Fresh energy value from DB:', freshUserData.energy);
             setEnergy(freshUserData.energy || 0);
             
             // Обновляем локальные данные пользователя
             const updatedUser = { ...user, energy: freshUserData.energy };
             setUser(updatedUser);
             localStorage.setItem('user', JSON.stringify(updatedUser));
-            console.log('Состояние пользователя обновлено с учетом свежих данных');
+            console.log('User state updated with fresh data');
           } else {
             // Если не удалось получить свежие данные, используем локальный расчет
             setEnergy(newEnergy);
@@ -1407,7 +1231,7 @@ export default function Home() {
             const updatedUser = { ...user, energy: newEnergy };
             setUser(updatedUser);
             localStorage.setItem('user', JSON.stringify(updatedUser));
-            console.log('Состояние пользователя обновлено на основе локального расчета');
+            console.log('User state updated based on local calculation');
           }
         }
         
@@ -1477,7 +1301,7 @@ export default function Home() {
             }}
           ></div>
           <div style={{ color: '#7ecbff', fontSize: 18 }}>
-            Проверка авторизации...
+            Checking authorization...
           </div>
           <button 
             onClick={() => router.push('/auth')}
@@ -1492,7 +1316,7 @@ export default function Home() {
               cursor: 'pointer',
             }}
           >
-            Перейти к авторизации
+            Go to Authorization
           </button>
         </div>
       </div>
@@ -1530,13 +1354,13 @@ export default function Home() {
           }}
         >
           <h2 style={{ color: '#ff9999', fontSize: 22, textAlign: 'center' }}>
-            Ошибка подключения
+            Connection Error
           </h2>
           <p style={{ color: '#ff9999', fontSize: 16, textAlign: 'center', lineHeight: 1.5 }}>
             {supabaseError}
           </p>
           <p style={{ color: '#7ecbff', fontSize: 14, textAlign: 'center', marginTop: 8 }}>
-            Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.
+            Please check your internet connection and try reloading the page.
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -1552,7 +1376,7 @@ export default function Home() {
               transition: 'all 0.2s',
             }}
           >
-            Перезагрузить
+            Reload
           </button>
         </div>
       </div>
@@ -1639,48 +1463,10 @@ export default function Home() {
                 fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
               }}
             >
-              {selectedLang === 'fr' ? translations.fr.download : 
-               selectedLang === 'ar' ? translations.ar.download : 
-               "Download"}
+              Download
             </button>
           )}
-          {/* Language Switcher */}
-          <div style={{ display: 'flex', gap: 6, marginLeft: 8 }}>
-            <button
-              onClick={() => setSelectedLang('fr')}
-              style={{
-                background: selectedLang === 'fr' ? '#38e0ff' : 'none',
-                color: selectedLang === 'fr' ? '#07101e' : '#38e0ff',
-                border: '1px solid #38e0ff',
-                borderRadius: 8,
-                padding: '6px 16px',
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: 'pointer',
-                fontFamily: 'Montserrat, sans-serif',
-                transition: 'all 0.2s',
-              }}
-            >
-              FR
-            </button>
-            <button
-              onClick={() => setSelectedLang('ar')}
-              style={{
-                background: selectedLang === 'ar' ? '#38e0ff' : 'none',
-                color: selectedLang === 'ar' ? '#07101e' : '#38e0ff',
-                border: '1px solid #38e0ff',
-                borderRadius: 8,
-                padding: '6px 16px',
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: 'pointer',
-                fontFamily: 'Montserrat, sans-serif',
-                transition: 'all 0.2s',
-              }}
-            >
-              عربي
-            </button>
-          </div>
+
         </div>
       </header>
       {/* MAIN CONTENT */}
@@ -1777,7 +1563,7 @@ export default function Home() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     animation: 'fadeIn 0.5s',
-                    direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+                    direction: 'ltr',
                     width: '90%',
                     height: '100%',
                     zIndex: 2
@@ -1818,12 +1604,10 @@ export default function Home() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+                      direction: 'ltr',
                       zIndex: 2
                     }}>
-                    {selectedLang === 'fr' ? translations.fr.clickForPrediction : 
-                      selectedLang === 'ar' ? translations.ar.clickForPrediction : 
-                      "Click AI Vision for prediction"}
+                    Click AI Vision for prediction
                   </div>
                 )}
               </div>
@@ -1859,7 +1643,7 @@ export default function Home() {
                     fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                     outline: 'none',
                     position: 'relative',
-                    direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                    direction: 'ltr'
                   }}
                   onMouseOver={e => {
                     if (!(isLoading || energy <= 0)) e.currentTarget.style.boxShadow = '0 0 24px #ffe066cc';
@@ -1868,9 +1652,7 @@ export default function Home() {
                     if (!(isLoading || energy <= 0)) e.currentTarget.style.boxShadow = '0 0 16px #ffe06699';
                   }}
                 >
-                  {selectedLang === 'fr' ? translations.fr.aiVisionButton : 
-                   selectedLang === 'ar' ? translations.ar.aiVisionButton : 
-                   "AI Vision"}
+                  AI Vision
                 </button>
                 <button
                   onClick={handleAviatorClick}
@@ -1890,14 +1672,12 @@ export default function Home() {
                     fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                     outline: 'none',
                     position: 'relative',
-                    direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                    direction: 'ltr'
                   }}
                   onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #ff7875cc'; }}
                   onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #ff4d4f99'; }}
                 >
-                  {selectedLang === 'fr' ? translations.fr.aviatorButton : 
-                   selectedLang === 'ar' ? translations.ar.aviatorButton : 
-                   "Aviator"}
+                  Aviator
                 </button>
               </div>
               {/* ЭНЕРГИЯ */}
@@ -1974,9 +1754,7 @@ export default function Home() {
                   )}
                   {energy >= maxEnergy && (
                     <>
-                      <span>{selectedLang === 'fr' ? translations.fr.fullEnergy : 
-                             selectedLang === 'ar' ? translations.ar.fullEnergy : 
-                             "Full"}</span>
+                      <span>Full</span>
                       <span style={{ color: '#ffe066', fontSize: 18 }}>⚡</span>
                     </>
                   )}
@@ -2017,9 +1795,7 @@ export default function Home() {
                           textShadow: '0 0 8px #7ecbff99',
                           fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                         }}>
-                          {selectedLang === 'fr' ? translations.fr.chanceOfWinning : 
-                           selectedLang === 'ar' ? translations.ar.chanceOfWinning : 
-                           "Chance of winning"}
+                          Chance of winning
                         </div>
                         <div style={{
                           fontSize: 27,
@@ -2066,20 +1842,16 @@ export default function Home() {
                           textAlign: 'center',
                           textShadow: '0 0 8px #ffe06644',
                         }}>
-                          {selectedLang === 'fr' ? translations.fr.howToIncreaseChance : 
-                           selectedLang === 'ar' ? translations.ar.howToIncreaseChance : 
-                           "HOW TO INCREASE YOUR CHANCE?"}
+                          HOW TO INCREASE YOUR CHANCE?
                         </div>
                         <div style={{
                           color: '#7ecbff',
                           fontSize: 10,
                           lineHeight: '1.5',
                           textAlign: 'center',
-                          direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                          direction: 'ltr'
                         }}>
-                          {selectedLang === 'fr' ? translations.fr.howToIncreaseDesc : 
-                           selectedLang === 'ar' ? translations.ar.howToIncreaseDesc : 
-                           "Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances become!"}
+                          Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances become!
                         </div>
                       </div>
                       {/* Кнопки для депозита и помощи */}
@@ -2109,14 +1881,12 @@ export default function Home() {
                             fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                             outline: 'none',
                             position: 'relative',
-                            direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                            direction: 'ltr'
                           }}
                           onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #ff7875cc'; }}
                           onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #ff4d4f99'; }}
                         >
-                          {selectedLang === 'fr' ? translations.fr.makeDeposit : 
-                           selectedLang === 'ar' ? translations.ar.makeDeposit : 
-                           "Make Deposit"}
+                          Make Deposit
                         </button>
                         <button
                           onClick={handleHelpClick}
@@ -2136,14 +1906,12 @@ export default function Home() {
                             fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                             outline: 'none',
                             position: 'relative',
-                            direction: selectedLang === 'ar' ? 'rtl' : 'ltr'
+                            direction: 'ltr'
                           }}
                           onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #faad14cc'; }}
                           onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #faad1499'; }}
                         >
-                          {selectedLang === 'fr' ? translations.fr.helpMe : 
-                           selectedLang === 'ar' ? translations.ar.helpMe : 
-                           "Help Me"}
+                          Help Me
                         </button>
                       </div>
                     </>
@@ -2154,7 +1922,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <Footer selectedLang={selectedLang} translations={translations} />
+      <Footer />
       {/* Адаптивность */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');

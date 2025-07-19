@@ -16,14 +16,14 @@ function getPWADisplayMode() {
   return 'browser';
 }
 
-// Добавим функцию для проверки реального PWA режима (без учета localStorage/sessionStorage)
+// Add function to check real PWA mode (without considering localStorage/sessionStorage)
 function isReallyPWA() {
   const mode = getPWADisplayMode();
   return mode === 'standalone' || mode === 'twa';
 }
 
 export default function DownloadPage() {
-  const [selectedLang, setSelectedLang] = useState<'fr' | 'ar'>('fr');
+  // Removed language selection - using English only
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isPwa, setIsPwa] = useState(false);
@@ -31,22 +31,13 @@ export default function DownloadPage() {
   const [displayMode, setDisplayMode] = useState<string>('browser');
   const router = useRouter();
   
-  // UI text translations
+  // UI text in English only
   const translations = {
-    fr: {
-      title: "Kashif AI",
-      aviatorPredictor: "Prédicteur Aviator",
-      aiPowered: "Propulsé par l'intelligence artificielle",
-      downloadApp: "Télécharger",
-      redirecting: "Redirection..."
-    },
-    ar: {
-      title: "كاشف AI",
-      aviatorPredictor: "متنبئ أفياتور",
-      aiPowered: "مدعوم بالذكاء الاصطناعي",
-      downloadApp: "تحميل",
-      redirecting: "جارٍ إعادة التوجيه..."
-    }
+    title: "Kashif AI",
+    aviatorPredictor: "Aviator Predictor",
+    aiPowered: "Powered by artificial intelligence",
+    downloadApp: "Download",
+    redirecting: "Redirecting..."
   };
 
   // Immediate check for PWA mode on component mount
@@ -62,7 +53,7 @@ export default function DownloadPage() {
       // Consider the app to be a PWA if it's in standalone or TWA mode
       const isPwaMode = mode === 'standalone' || mode === 'twa';
       
-      // Проверяем специальную куку, устанавливаемую только в реальном PWA
+      // Check special cookie set only in real PWA
       function getCookie(name: string): string | null {
         if (typeof document === 'undefined') return null;
         const value = `; ${document.cookie}`;
@@ -71,20 +62,20 @@ export default function DownloadPage() {
         return null;
       }
       
-      // Проверка специальной куки realer-pwa
+      // Check special realer-pwa cookie
       const hasRealerPwaCookie = getCookie('realer-pwa') === 'true';
       
       // Additional fallback checks for PWA mode
       const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
                               sessionStorage.getItem('isPwa') === 'true';
       
-      // URL параметр - важный индикатор, так как устанавливается middleware
+      // URL parameter - important indicator as it's set by middleware
       const hasUrlPwaParam = window.location.href.includes('pwa=true');
       
-      // Обновленное определение PWA статуса:
-      // 1. Реальный PWA через API браузера
-      // 2. Наличие специальной куки realer-pwa
-      // 3. Комбинация обычной куки/localStorage И URL параметра
+      // Updated PWA status definition:
+      // 1. Real PWA through browser API
+      // 2. Presence of special realer-pwa cookie
+      // 3. Combination of regular cookie/localStorage AND URL parameter
       const isPWA = isPwaMode || hasRealerPwaCookie || (storedPwaStatus && hasUrlPwaParam);
       setIsPwa(isPWA);
       
@@ -100,19 +91,19 @@ export default function DownloadPage() {
         isPWA
       });
       
-      // ВАЖНО: Если это PWA, то всегда перенаправляем на auth страницу,
-      // Эта страница должна быть доступна только для браузерных пользователей
+      // IMPORTANT: If this is PWA, always redirect to auth page,
+      // This page should only be accessible to browser users
       if (isPWA) {
         setIsRedirecting(true);
         
-        // Store the PWA state только если это реальное PWA или есть специальная кука
+        // Store the PWA state only if it's real PWA or has special cookie
         try {
           if (isPwaMode || hasRealerPwaCookie) {
             localStorage.setItem('isPwa', 'true');
             sessionStorage.setItem('isPwa', 'true');
             document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
             
-            // Если это реальное PWA, устанавливаем нашу специальную куку
+            // If this is real PWA, set our special cookie
             if (isPwaMode) {
               document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
             }
@@ -195,11 +186,11 @@ export default function DownloadPage() {
       console.log('App installed event triggered');
       setShowInstallButton(false);
       
-      // ВАЖНО: Не выполняем редирект и не устанавливаем флаги PWA в браузере
-      // Вместо этого показываем сообщение, чтобы пользователь открыл установленное приложение
-      alert('L\'application a été installée avec succès ! Veuillez fermer le navigateur et ouvrir l\'application Kashif AI sur l\'écran d\'accueil de votre appareil.');
+      // IMPORTANT: Don't redirect and don't set PWA flags in browser
+      // Instead show message for user to open the installed app
+      alert('The application has been successfully installed! Please close the browser and open the Kashif AI app from your device\'s home screen.');
       
-      // Обновляем только состояние UI без редиректа
+      // Update only UI state without redirect
       setDisplayMode('installed_pending');
     });
 
@@ -214,22 +205,22 @@ export default function DownloadPage() {
     
     // For iOS Safari
     if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
-      alert('Pour installer sur iOS :\n1. Appuyez sur le bouton "Partager" (Share) en bas de l\'écran\n2. Faites défiler vers le bas et sélectionnez "Sur l\'écran d\'accueil" (Add to Home Screen)');
+      alert('To install on iOS:\n1. Tap the "Share" button at the bottom of the screen\n2. Scroll down and select "Add to Home Screen"');
       return;
     }
     
     // For Android browsers without install API
     if (/Android/.test(navigator.userAgent) && !deferredPrompt) {
-      alert('Pour installer sur Android :\n1. Appuyez sur les trois points (⋮) dans le coin supérieur droit\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
+      alert('To install on Android:\n1. Tap the three dots (⋮) in the top right corner\n2. Select "Install app" or "Add to home screen"');
       return;
     }
 
     if (!deferredPrompt) {
-      console.log('Aucune invite d\'installation disponible');
-      // Afficher un message spécial à l'utilisateur
-      alert('Pour installer l\'application :\n1. Cliquez sur le bouton menu de votre navigateur (⋮ ou ···)\n2. Sélectionnez "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"');
+      console.log('No installation prompt available');
+      // Show special message to user
+      alert('To install the app:\n1. Click your browser\'s menu button (⋮ or ···)\n2. Select "Install app" or "Add to home screen"');
       
-      // Попробуем явно вызвать событие для мобильных устройств, где это может сработать
+      // Try to explicitly trigger event for mobile devices where this might work
       try {
         window.dispatchEvent(new Event('beforeinstallprompt'));
       } catch (e) {
@@ -262,7 +253,7 @@ export default function DownloadPage() {
       }
     } catch (error) {
       console.error('Error during PWA installation:', error);
-      alert('Pour installer : appuyez sur le bouton menu du navigateur (⋮) et sélectionnez "Installer l\'application"');
+      alert('To install: tap your browser\'s menu button (⋮) and select "Install app"');
     }
   };
   
@@ -324,7 +315,7 @@ export default function DownloadPage() {
             fontWeight: 600,
             textAlign: 'center'
           }}>
-            {selectedLang === 'fr' ? translations.fr.redirecting : translations.ar.redirecting}
+            {translations.redirecting}
           </div>
           <div style={{
             color: '#7ecbff',
@@ -377,11 +368,11 @@ export default function DownloadPage() {
         }}
       />
       
-      {/* Маленькая кнопка для перезагрузки страницы */}
+      {/* Small button to reload page */}
       <button
         onClick={() => {
-          // Вместо прямой установки PWA-флагов и перехода на auth, 
-          // просто перезагружаем текущую страницу
+          // Instead of directly setting PWA flags and going to auth,
+          // just reload the current page
           window.location.reload();
         }}
         style={{
@@ -396,7 +387,7 @@ export default function DownloadPage() {
           padding: 5,
           zIndex: 10
         }}
-        aria-label="Обновить страницу"
+        aria-label="Reload page"
       >
         ⟳
       </button>
@@ -427,46 +418,10 @@ export default function DownloadPage() {
             marginTop: 25
           }}
         >
-          {selectedLang === 'fr' ? translations.fr.title : translations.ar.title}
+          {translations.title}
         </div>
         
-        {/* Language Switcher */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-          <button
-            onClick={() => setSelectedLang('fr')}
-            style={{
-              background: selectedLang === 'fr' ? '#38e0ff' : 'none',
-              color: selectedLang === 'fr' ? '#07101e' : '#38e0ff',
-              border: '1px solid #38e0ff',
-              borderRadius: 8,
-              padding: '6px 16px',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer',
-              fontFamily: 'Montserrat, sans-serif',
-              transition: 'all 0.2s',
-            }}
-          >
-            FR
-          </button>
-          <button
-            onClick={() => setSelectedLang('ar')}
-            style={{
-              background: selectedLang === 'ar' ? '#38e0ff' : 'none',
-              color: selectedLang === 'ar' ? '#07101e' : '#38e0ff',
-              border: '1px solid #38e0ff',
-              borderRadius: 8,
-              padding: '6px 16px',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer',
-              fontFamily: 'Montserrat, sans-serif',
-              transition: 'all 0.2s',
-            }}
-          >
-            عربي
-          </button>
-        </div>
+
 
         {/* Download Button in Header */}
         <button
@@ -490,7 +445,7 @@ export default function DownloadPage() {
           onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 25px rgba(255, 224, 102, 0.8)'; }}
           onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 224, 102, 0.6)'; }}
         >
-          {selectedLang === 'fr' ? translations.fr.downloadApp : translations.ar.downloadApp}
+          {translations.downloadApp}
         </button>
       </header>
 
@@ -560,7 +515,7 @@ export default function DownloadPage() {
               marginBottom: 10,
               fontFamily: "'Orbitron', sans-serif",
             }}>
-              {selectedLang === 'fr' ? translations.fr.aviatorPredictor : translations.ar.aviatorPredictor}
+              {translations.aviatorPredictor}
             </h1>
             
             {/* Subtitle */}
@@ -569,10 +524,10 @@ export default function DownloadPage() {
               fontSize: 18,
               textAlign: 'center',
               margin: 0,
-              direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+              direction: 'ltr',
               fontFamily: "'montserrat', sans-serif",
             }}>
-              {selectedLang === 'fr' ? translations.fr.aiPowered : translations.ar.aiPowered}
+              {translations.aiPowered}
             </p>
           </div>
           
@@ -668,7 +623,7 @@ export default function DownloadPage() {
             <div style={{
               width: '100%',
               padding: '0 10px',
-              direction: selectedLang === 'ar' ? 'rtl' : 'ltr',
+              direction: 'ltr',
             }}>
               <div style={{
                 display: 'flex',
@@ -678,7 +633,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  {selectedLang === 'fr' ? "Prédictions précises des coefficients" : "تنبؤات دقيقة للمعاملات"}
+                  Accurate coefficient predictions
                 </span>
               </div>
               <div style={{
@@ -689,7 +644,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  {selectedLang === 'fr' ? "Algorithme IA avancé" : "خوارزمية ذكاء اصطناعي متقدمة"}
+                  Advanced AI algorithm
                 </span>
               </div>
               <div style={{
@@ -699,7 +654,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  {selectedLang === 'fr' ? "Augmentez vos chances de gains" : "زيادة فرصك في الفوز"}
+                  Increase your winning chances
                 </span>
               </div>
             </div>
@@ -783,4 +738,4 @@ export default function DownloadPage() {
       `}</style>
     </div>
   );
-} 
+}

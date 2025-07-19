@@ -67,7 +67,7 @@ export function middleware(request: NextRequest) {
   // ПРАВИЛО 1: Если пользователь в PWA и пытается зайти на страницу download
   if (isPWA && pathname === '/download') {
     // Перенаправляем на страницу auth с флагом pwa=true
-    console.log('[Middleware] PWA пользователь перенаправлен с download на auth');
+    console.log('[Middleware] PWA user redirected from download to auth');
     url.pathname = '/auth';
     url.searchParams.set('pwa', 'true');
     const redirectResponse = NextResponse.redirect(url);
@@ -87,7 +87,7 @@ export function middleware(request: NextRequest) {
   // ПРАВИЛО 2: Если пользователь НЕ в PWA и пытается зайти на любую страницу, кроме download
   if (!isPWA && pathname !== '/download') {
     // Перенаправляем на страницу download
-    console.log(`[Middleware] НЕ-PWA пользователь перенаправлен на download с: ${pathname}`);
+    console.log(`[Middleware] Non-PWA user redirected to download from: ${pathname}`);
     url.pathname = '/download';
     return NextResponse.redirect(url);
   }
@@ -123,4 +123,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
-}; 
+};

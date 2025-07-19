@@ -24,7 +24,7 @@ export default function AuthPage() {
       // Проверка DEV режима - если есть параметр dev=true, пропускаем все проверки
       const isDevMode = window.location.href.includes('dev=true');
       if (isDevMode) {
-        console.log('AUTH PAGE: DEV MODE активирован, пропускаем проверки PWA');
+        console.log('AUTH PAGE: DEV MODE activated, skipping PWA checks');
         
         // В dev режиме сразу устанавливаем все необходимые флаги
         localStorage.setItem('isPwa', 'true');
@@ -142,7 +142,7 @@ export default function AuthPage() {
         // Check if Supabase is initialized
         if (typeof window !== 'undefined' && window.supabaseInitError) {
           console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-          setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
+          setSupabaseError(`Database connection error: ${window.supabaseInitError}`);
           setIsCheckingAuth(false);
           return;
         }
@@ -209,12 +209,12 @@ export default function AuthPage() {
       // Check if Supabase is properly initialized
       if (typeof window !== 'undefined' && window.supabaseInitError) {
         console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-        throw new Error(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
+        throw new Error(`Database connection error: ${window.supabaseInitError}`);
       }
       
       if (!supabaseClient) {
         console.error('AUTH PAGE: Supabase client is not available');
-        throw new Error('База данных недоступна. Проверьте интернет-соединение и попробуйте снова.');
+        throw new Error('Database unavailable. Please check your internet connection and try again.');
       }
       
       console.log('AUTH PAGE: Supabase client is available, querying users table');
@@ -413,8 +413,8 @@ export default function AuthPage() {
               lineHeight: 1.5,
             }}
           >
-            <p><strong>Ошибка соединения:</strong> {supabaseError}</p>
-            <p style={{ marginTop: 8 }}>Пожалуйста, проверьте интернет-соединение и попробуйте перезагрузить страницу.</p>
+            <p><strong>Connection Error:</strong> {supabaseError}</p>
+            <p style={{ marginTop: 8 }}>Please check your internet connection and try reloading the page.</p>
           </div>
         )}
         

@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Kashif AI",
-  description: "Kashif AI - votre assistant intelligent pour les prévisions",
+  description: "Kashif AI - your intelligent assistant for predictions",
   themeColor: "#000000",
   appleWebApp: {
     capable: true,

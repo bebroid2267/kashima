@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Footer from '../components/Footer';
 import Image from 'next/image';
 import chanceImg from '@/../public/chance.png';
@@ -21,109 +21,58 @@ interface FAQContent {
   blocks: FAQBlock[];
 }
 
-interface FAQData {
-  fr: FAQContent;
-  ar: FAQContent;
-}
-
-const FAQ_CONTENT: FAQData = {
-  fr: {
-    title: "F.A.Q. — Questions fréquemment posées",
-    blocks: [
-      {
-        title: "Que fait le bouton Vision IA ?",
-        text: "Le bouton Vision IA lance un algorithme d'intelligence artificielle qui fait une prédiction personnalisée pour le prochain tour du jeu Aviator. Chaque prédiction comprend :\n\n💡 Un coefficient spécifique\n🧠 Une justification basée sur ce coefficient particulier\n⚠️ Un avertissement sur le niveau de risque (élevé, moyen ou sûr)\n📌 1 prédiction = 1 unité d'énergie. Utilisez-la judicieusement.",
-        image: ""
-      },
-      {
-        title: "Où s'affiche la prédiction ?",
-        text: "Votre prédiction actuelle s'affiche au centre de l'écran dans la partie supérieure. Vous voyez immédiatement le coefficient, l'explication et la probabilité qu'il se réalise.",
-        image: koefImg.src
-      },
-      {
-        title: "Que fait le bouton Aviator ?",
-        text: "Le bouton Aviator ouvre la section du jeu Aviator sur le site 1xbet.\n📲 Vous pouvez utiliser simultanément Kashif IA et Aviator, en basculant entre les fenêtres — c'est pratique et rapide.",
-        image: aviatorImg.src
-      },
-      {
-        title: "Comment fonctionne l'énergie ?",
-        text: "⚡ Chaque jour où vous vous connectez à l'application, vous recevez 1 unité d'énergie (mise à jour toutes les 24 heures)\n🔁 1 énergie = 1 prédiction\n⛔ Si l'énergie est épuisée, vous pouvez la reconstituer par un dépôt",
-        image: energyImg.src
-      },
-      {
-        title: "Qu'est-ce que la Probabilité de gagner ?",
-        text: "C'est votre pourcentage de précision de prédiction. Il :\n\n📈 Augmente automatiquement après chaque dépôt\n🔐 Est calculé par l'algorithme d'IA\n💸 Plus le pourcentage est élevé, plus votre prévision est précise et, par conséquent, vous commencez à gagner plus. L'IA commence à mieux prédire les coefficients et à vous aider à analyser les graphiques.",
-        image: chanceImg.src
-      },
-      {
-        title: "Comment fonctionne le bouton Faire un Dépôt ?",
-        text: "Appuyez pour accéder à la section des dépôts. Le dépôt :\n- Augmente vos chances de prédictions précises\n- Augmente l'énergie dans le programme pour de nouveaux lancements de Vision IA",
-        image: depositImg.src
-      },
-      {
-        title: "Bouton Aide-moi",
-        text: "Si vous rencontrez des problèmes ou souhaitez en savoir plus, écrivez-moi",
-        image: messageImg.src
-      },
-      {
-        title: "L'essentiel :",
-        text: "- Utilisez Vision IA pour les prédictions\n- Basculez entre Kashif AI et Aviator, c'est pratique 😉\n- Surveillez votre niveau d'énergie et de précision\n- Faites des dépôts pour augmenter vos chances",
-        image: ""
-      }
-    ]
-  },
-  ar: {
-    title: "الأسئلة الشائعة",
-    blocks: [
-      {
-        title: "ماذا يفعل زر رؤية الذكاء الاصطناعي؟",
-        text: "يطلق زر رؤية الذكاء الاصطناعي خوارزمية ذكاء اصطناعي تقدم تنبؤًا شخصيًا للجولة التالية في لعبة Aviator. يتضمن كل تنبؤ:\n\n💡 معامل محدد واحد\n🧠 تبرير لسبب اختيار هذا المعامل بالتحديد\n⚠️ تحذير بشأن مستوى المخاطرة (عالي، متوسط، أو آمن)\n📌 تنبؤ واحد = وحدة طاقة واحدة. استخدمها بحكمة.",
-        image: ""
-      },
-      {
-        title: "أين يظهر التنبؤ؟",
-        text: "يظهر تنبؤك الحالي في وسط الشاشة في الجزء العلوي. يمكنك رؤية المعامل والشرح واحتمالية تحققه على الفور.",
-        image: koefImg.src
-      },
-      {
-        title: "ماذا يفعل زر Aviator؟",
-        text: "يفتح زر Aviator قسم لعبة Aviator على موقع 1xbet.\n📲 يمكنك استخدام Kashif IA و Aviator في نفس الوقت، بالتبديل بين النوافذ - إنه مريح وسريع.",
-        image: aviatorImg.src
-      },
-      {
-        title: "كيف تعمل الطاقة؟",
-        text: "⚡ في كل يوم تدخل فيه إلى التطبيق، تحصل على وحدة طاقة واحدة (يتم تحديثها كل 24 ساعة)\n🔁 طاقة واحدة = تنبؤ واحد\n⛔ إذا نفدت الطاقة، يمكنك تجديدها من خلال الإيداع",
-        image: energyImg.src
-      },
-      {
-        title: "ما هي احتمالية الفوز؟",
-        text: "هذه هي نسبة دقة تنبؤاتك. وهي:\n\n📈 تزداد تلقائيًا بعد كل إيداع\n🔐 تُحسب بواسطة خوارزمية الذكاء الاصطناعي\n💸 كلما زادت النسبة المئوية، كان تنبؤك أكثر دقة وبالتالي تبدأ في كسب المزيد. يبدأ الذكاء الاصطناعي في التنبؤ بشكل أفضل بالمعاملات ومساعدتك في تحليل الرسوم البيانية.",
-        image: chanceImg.src
-      },
-      {
-        title: "كيف يعمل زر الإيداع؟",
-        text: "اضغط للانتقال إلى قسم الإيداع. الإيداع:\n- يزيد من فرصك في الحصول على تنبؤات دقيقة\n- يزيد الطاقة في البرنامج لإطلاقات جديدة لرؤية الذكاء الاصطناعي",
-        image: depositImg.src
-      },
-      {
-        title: "زر المساعدة",
-        text: "إذا واجهت أي مشاكل أو أردت معرفة أي شيء، اكتب لي",
-        image: messageImg.src
-      },
-      {
-        title: "النقاط الرئيسية:",
-        text: "- استخدم رؤية الذكاء الاصطناعي للتنبؤات\n- قم بالتبديل بين Kashif AI و Aviator، إنه مريح 😉\n- راقب مستوى الطاقة والدقة لديك\n- قم بالإيداعات لزيادة فرصك",
-        image: ""
-      }
-    ]
-  }
+const FAQ_CONTENT = {
+  title: "F.A.Q. — Frequently Asked Questions",
+  blocks: [
+    {
+      title: "What does the AI Vision button do?",
+      text: "The AI Vision button launches an artificial intelligence algorithm that makes a personalized prediction for the next round of the Aviator game. Each prediction includes:\n\n💡 A specific coefficient\n🧠 A justification based on this particular coefficient\n⚠️ A warning about the risk level (high, medium or safe)\n📌 1 prediction = 1 energy unit. Use it wisely.",
+      image: ""
+    },
+    {
+      title: "Where is the prediction displayed?",
+      text: "Your current prediction is displayed in the center of the screen in the upper part. You immediately see the coefficient, explanation and probability of it being realized.",
+      image: koefImg.src
+    },
+    {
+      title: "What does the Aviator button do?",
+      text: "The Aviator button opens the Aviator game section on the 1xbet website.\n📲 You can use Kashif AI and Aviator simultaneously, switching between windows — it's convenient and fast.",
+      image: aviatorImg.src
+    },
+    {
+      title: "How does energy work?",
+      text: "⚡ Every day you log into the app, you receive 1 energy unit (updated every 24 hours)\n🔁 1 energy = 1 prediction\n⛔ If energy is depleted, you can replenish it with a deposit",
+      image: energyImg.src
+    },
+    {
+      title: "What is Winning Probability?",
+      text: "This is your prediction accuracy percentage. It:\n\n📈 Increases automatically after each deposit\n🔐 Is calculated by the AI algorithm\n💸 The higher the percentage, the more accurate your prediction and consequently you start earning more. AI starts predicting coefficients better and helps you analyze charts.",
+      image: chanceImg.src
+    },
+    {
+      title: "How does the Make Deposit button work?",
+      text: "Press to access the deposits section. Deposit:\n- Increases your chances of accurate predictions\n- Increases energy in the program for new AI Vision launches",
+      image: depositImg.src
+    },
+    {
+      title: "Help Me button",
+      text: "If you encounter problems or want to learn more, write to me",
+      image: messageImg.src
+    },
+    {
+      title: "The essentials:",
+      text: "- Use AI Vision for predictions\n- Switch between Kashif AI and Aviator, it's convenient 😉\n- Monitor your energy and accuracy levels\n- Make deposits to increase your chances",
+      image: ""
+    }
+  ]
 };
 
-export default function FAQ() {
-  const [currentLang, setCurrentLang] = useState<'fr' | 'ar'>('fr');
-  const content = FAQ_CONTENT[currentLang];
+// Removed Arabic translations - using English only
 
-  // Функция выхода
+export default function FAQ() {
+  const content = FAQ_CONTENT;
+
+  // Exit function
   const handleExit = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
@@ -137,24 +86,10 @@ export default function FAQ() {
       <div className="faq-header">
         <div className="header-content">
           <button className="faq-exit-btn" onClick={handleExit}>Exit</button>
-          <div className="language-switcher">
-            <button 
-              className={`lang-btn ${currentLang === 'fr' ? 'active' : ''}`}
-              onClick={() => setCurrentLang('fr')}
-            >
-              FR
-            </button>
-            <button 
-              className={`lang-btn ${currentLang === 'ar' ? 'active' : ''}`}
-              onClick={() => setCurrentLang('ar')}
-            >
-              عربي
-            </button>
-          </div>
         </div>
       </div>
       <div className="faq-container">
-        <div className={`content-wrapper ${currentLang === 'ar' ? 'rtl' : ''}`}>
+        <div className="content-wrapper">
           <h1 className="main-title">{content.title}</h1>
           
           <div className="faq-blocks">
@@ -193,16 +128,7 @@ export default function FAQ() {
           </div>
         </div>
 
-        <Footer selectedLang={currentLang} translations={{
-          fr: {
-            homeFooter: "ACCUEIL",
-            faqFooter: "FAQ"
-          },
-          ar: {
-            homeFooter: "الرئيسية",
-            faqFooter: "الأسئلة"
-          }
-        }} />
+        <Footer />
 
         <style jsx global>{`
           html, body {
@@ -238,43 +164,18 @@ export default function FAQ() {
             margin: 0 auto;
           }
 
-          .language-switcher {
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-          }
-
           .faq-exit-btn {
             background: none;
             color: #fff;
             font-weight: 700;
             font-size: 18px;
-            border-radius: 8px;
-            padding: 10px 28px;
-            text-decoration: none;
-            box-shadow: 0 0 8px #ff7eb955;
-            letter-spacing: 1.1px;
-            transition: background 0.2s, color 0.2s;
-            cursor: pointer;
-            font-family: 'Orbitron', Segoe UI, Arial, sans-serif;
             border: none;
-            outline: none;
-          }
-
-          .lang-btn {
-            background: rgba(20, 40, 70, 0.35);
-            border: 1px solid #38e0ff;
-            color: #38e0ff;
-            padding: 8px 16px;
-            border-radius: 8px;
             cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
-            transition: all 0.3s ease;
+            transition: color 0.3s;
           }
 
-          .lang-btn.active {
-            background: #38e0ff;
-            color: #07101e;
+          .faq-exit-btn:hover {
+            color: #38e0ff;
           }
 
           .content-wrapper {
@@ -283,10 +184,7 @@ export default function FAQ() {
             padding: 20px;
           }
 
-          .rtl {
-            direction: rtl;
-            text-align: right;
-          }
+
 
           .main-title {
             color: #38e0ff;
@@ -323,9 +221,7 @@ export default function FAQ() {
             text-align: center;
             }
 
-          .rtl .block-title-wrapper {
-            direction: rtl;
-          }
+
 
           .block-title {
             color: #ffe066;

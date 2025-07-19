@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Таблица для хранения информации о циклах обновления энергии
+// Table for storing energy update cycle information
 const ENERGY_CYCLES_TABLE = 'energy_update_cycles';
 
 export async function POST(request: Request) {
   try {
-    // Проверяем доступность Supabase
+    // Check Supabase availability
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database connection not available' },
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const data = await request.json();
     
-    // Проверяем наличие ID цикла
+    // Check for cycle ID presence
     if (!data.cycleId) {
       return NextResponse.json(
         { error: 'Missing required fields: cycleId' },
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     
     const cycleId = data.cycleId;
     
-    // Проверяем, не обрабатывался ли уже этот цикл обновления
+    // Check if this update cycle has already been processed
     const { data: existingCycle, error: cycleCheckError } = await supabase
       .from(ENERGY_CYCLES_TABLE)
       .select('*')
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
     
-    // Если цикл уже был обработан, возвращаем соответствующее сообщение
+    // If cycle was already processed, return appropriate message
     if (existingCycle) {
       return NextResponse.json({
         success: true,
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       });
     }
     
-    // Получаем всех пользователей
+    // Get all users
     const { data: users, error: usersError } = await supabase
       .from('users')
       .select('mb_id, energy');
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
     
-    // Если пользователей нет, ничего не делаем
+    // If no users found, do nothing
     if (!users || users.length === 0) {
       return NextResponse.json({
         success: true,
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       });
     }
     
-    // Создаем записи обновлений для каждого пользователя
+    // Create update records for each user
     const updates = users.map(user => {
       const currentEnergy = user.energy || 0;
       const newEnergy = Math.min(currentEnergy + 1, 100);
@@ -86,16 +86,16 @@ export async function POST(request: Request) {
       };
     });
     
-    // Выполняем массовое обновление
+    // Perform bulk update
     let success = false;
     let error = null;
     
-    // Если пользователей слишком много, обновляем их небольшими группами
+    // If too many users, update them in small batches
     const BATCH_SIZE = 50;
     for (let i = 0; i < updates.length; i += BATCH_SIZE) {
       const batch = updates.slice(i, i + BATCH_SIZE);
       
-      // Для каждого пользователя выполняем отдельное обновление
+      // Perform individual update for each user
       for (const update of batch) {
         const { error: updateError } = await supabase
           .from('users')
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       }
     }
     
-    // Записываем информацию о выполненном цикле обновления
+    // Record information about completed update cycle
     const { error: cycleCreateError } = await supabase
       .from(ENERGY_CYCLES_TABLE)
       .insert({
@@ -137,4 +137,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
