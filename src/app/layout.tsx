@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import type { Metadata, Viewport } from "next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,25 +12,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1.0,
-  maximumScale: 1.0,
-  userScalable: false,
-  viewportFit: "cover",
-};
-
 export const metadata: Metadata = {
   title: "Kashif AI",
-  description: "Kashif AI - your intelligent assistant for predictions",
-  themeColor: "#000000",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-  },
-  formatDetection: {
-    telephone: false,
-  },
+  description: "Kashif AI - ваш умный помощник для прогнозирования",
 };
 
 export default function RootLayout({
@@ -41,28 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/192.jpg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Kashif AI - ваш умный помощник для прогнозирования" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/16.png" />
-        <style>{`
-          html {
-            height: 100%;
-          }
-          
-          body {
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-          }
-
-          * {
-            -webkit-tap-highlight-color: transparent;
-          }
-        `}</style>
       </head>      
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
       </body>
     </html>

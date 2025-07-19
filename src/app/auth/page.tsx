@@ -3,245 +3,114 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
-
-// Ensure we handle null/undefined supabase client
-const supabaseClient = supabase as SupabaseClient | undefined;
 
 export default function AuthPage() {
   const [mbId, setMbId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [supabaseError, setSupabaseError] = useState<string | null>(null);
   const router = useRouter();
-
-  // Проверяем, что пользователь находится в PWA режиме
-  useEffect(() => {
-    const checkPWAStatus = () => {
-      if (typeof window === 'undefined') return;
-      
-      // Проверка DEV режима - если есть параметр dev=true, пропускаем все проверки
-      const isDevMode = window.location.href.includes('dev=true');
-      if (isDevMode) {
-        console.log('AUTH PAGE: DEV MODE activated, skipping PWA checks');
-        
-        // В dev режиме сразу устанавливаем все необходимые флаги
-        localStorage.setItem('isPwa', 'true');
-        sessionStorage.setItem('isPwa', 'true');
-        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-        document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
-        
-        // И возвращаем true, чтобы не выполнять редирект на страницу download
-        return true;
-      }
-      
-      // Функция для определения PWA режима
-      const getPWADisplayMode = () => {
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-        if (document.referrer.startsWith('android-app://')) {
-          return 'twa';
-        } else if ((window.navigator as any).standalone || isStandalone) {
-          return 'standalone';
-        }
-        return 'browser';
-      };
-      
-      // Проверяем специальную куку, устанавливаемую только в реальном PWA
-      function getCookie(name: string): string | null {
-        if (typeof document === 'undefined') return null;
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-        return null;
-      }
-      
-      // Проверка специальной куки realer-pwa
-      const hasRealerPwaCookie = getCookie('realer-pwa') === 'true';
-      
-      const displayMode = getPWADisplayMode();
-      
-      // Прежде всего проверяем настоящие признаки PWA
-      const isRealPWA = displayMode !== 'browser';
-      
-      // Вторичные индикаторы
-      const storedPwaStatus = localStorage.getItem('isPwa') === 'true' || 
-                              sessionStorage.getItem('isPwa') === 'true';
-      
-      // URL параметр - важный индикатор, так как устанавливается middleware
-      const hasUrlPwaParam = window.location.href.includes('pwa=true');
-      
-      // Обновленное определение PWA статуса:
-      // 1. Реальный PWA через API браузера
-      // 2. Наличие специальной куки realer-pwa
-      // 3. Комбинация обычной куки/localStorage И URL параметра
-      const isPWA = isRealPWA || hasRealerPwaCookie || (storedPwaStatus && hasUrlPwaParam);
-      
-      // Расширенное логирование
-      console.log('AUTH PAGE: PWA check details:', { 
-        displayMode, 
-        isRealPWA,
-        hasRealerPwaCookie,
-        storedPwaStatus, 
-        hasUrlPwaParam,
-        isPWA,
-        userAgent: navigator.userAgent,
-        referrer: document.referrer,
-        standalone: (window.navigator as any).standalone,
-        matchMedia: window.matchMedia('(display-mode: standalone)').matches
-      });
-      
-      // Если не PWA, перенаправляем на страницу download
-      if (!isPWA) {
-        console.log('AUTH PAGE: Not in PWA mode, redirecting to download page');
-        router.push('/download');
-        return false;
-      }
-      
-      // Устанавливаем PWA-флаги для последующих проверок, но только если это реальное PWA
-      // или если есть специальная кука
-      if (isRealPWA || hasRealerPwaCookie) {
-        localStorage.setItem('isPwa', 'true');
-        sessionStorage.setItem('isPwa', 'true');
-        document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-        
-        // Если это реальное PWA, устанавливаем нашу специальную куку
-        if (isRealPWA) {
-          document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
-        }
-      }
-      
-      return isPWA;
-    };
-    
-    // Проверяем PWA статус при загрузке и после небольшой задержки
-    checkPWAStatus();
-    const fallbackCheck = setTimeout(checkPWAStatus, 1000);
-    
-    return () => clearTimeout(fallbackCheck);
-  }, [router]);
 
   // Check if user is already authenticated
   useEffect(() => {
-    console.log('AUTH PAGE: useEffect start');
-    console.log('window:', typeof window !== 'undefined');
-    console.log('localStorage:', typeof localStorage !== 'undefined');
-    console.log('supabaseClient:', !!supabaseClient);
-    
     const checkUser = async () => {
       try {
         // Проверяем доступность localStorage
         if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-          console.error('AUTH PAGE: localStorage is not available');
+          console.error('localStorage is not available');
           setIsCheckingAuth(false);
           return;
         }
-        
-        console.log('AUTH PAGE: localStorage is available');
-
-        // Check if Supabase is initialized
-        if (typeof window !== 'undefined' && window.supabaseInitError) {
-          console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-          setSupabaseError(`Database connection error: ${window.supabaseInitError}`);
-          setIsCheckingAuth(false);
-          return;
-        }
-        
-        console.log('AUTH PAGE: No Supabase init errors found');
         
         // Безопасная проверка наличия пользователя в localStorage
         let storedUser = null;
         try {
-          console.log('AUTH PAGE: Checking for user in localStorage');
           storedUser = localStorage.getItem('user');
-          console.log('AUTH PAGE: User exists in localStorage:', !!storedUser);
         } catch (localStorageError) {
-          console.error('AUTH PAGE: Error accessing localStorage:', localStorageError);
+          console.error('Error accessing localStorage:', localStorageError);
         }
         
         if (storedUser) {
           // Безопасный парсинг JSON
           try {
-            console.log('AUTH PAGE: Parsing user data from localStorage');
-            const userData = JSON.parse(storedUser);
-            console.log('AUTH PAGE: Successfully parsed user data, redirecting to home');
-            setTimeout(() => {
-              console.log('AUTH PAGE: router.push(/)');
-              router.push('/');
-            }, 100);
+            JSON.parse(storedUser);
+            router.push('/');
           } catch (parseError) {
-            console.error('AUTH PAGE: Error parsing user data:', parseError);
+            console.error('Error parsing user data:', parseError);
             // Удаляем повреждённые данные
             localStorage.removeItem('user');
             setIsCheckingAuth(false);
           }
         } else {
-          console.log('AUTH PAGE: No stored user, showing login form');
           setIsCheckingAuth(false);
         }
       } catch (error) {
-        console.error('AUTH PAGE: Error checking authentication:', error);
+        console.error('Error checking authentication:', error);
         setIsCheckingAuth(false);
       }
     };
     
     checkUser();
-    
-    // Adding a fallback to ensure we don't get stuck in loading state
-    const timeout = setTimeout(() => {
-      if (isCheckingAuth) {
-        console.log('AUTH PAGE: Fallback timeout triggered - forcing auth screen to show');
-        setIsCheckingAuth(false);
-      }
-    }, 5000); // 5 second timeout as failsafe
-    
-    return () => clearTimeout(timeout);
-  }, [router, isCheckingAuth]);
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    console.log('AUTH PAGE: handleLogin called');
+
     try {
-      console.log('AUTH PAGE: Login attempt with MB ID:', mbId);
+      console.log('Attempting to login with MB ID:', mbId);
       
-      // Check if Supabase is properly initialized
-      if (typeof window !== 'undefined' && window.supabaseInitError) {
-        console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-        throw new Error(`Database connection error: ${window.supabaseInitError}`);
+      // Защита от пустого ID
+      if (!mbId.trim()) {
+        throw new Error('Please enter your ID');
       }
       
-      if (!supabaseClient) {
-        console.error('AUTH PAGE: Supabase client is not available');
-        throw new Error('Database unavailable. Please check your internet connection and try again.');
-      }
-      
-      console.log('AUTH PAGE: Supabase client is available, querying users table');
+      // Добавляем таймаут для запроса к базе данных
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Connection timeout. Please try again.')), 10000)
+      );
       
       // Проверяем, существует ли пользователь в таблице users
-      const { data: userData, error: userError } = await supabaseClient
-        .from('users')
-        .select('*')
-        .eq('mb_id', mbId)
-        .maybeSingle();
+      console.log('Querying users table for mb_id:', mbId);
       
-      console.log('AUTH PAGE: Query result:', { userData: !!userData, userError });
+      // Обрабатываем запрос с таймаутом
+      const { data: userData, error: userError } = await Promise.race([
+        supabase
+          .from('users')
+          .select('*')
+          .eq('mb_id', mbId)
+          .maybeSingle(),
+        timeoutPromise
+      ]) as any;
+      
+      console.log('Query result:', { userData, userError });
       
       if (userError) {
-        console.error('AUTH PAGE: Database error:', userError);
-        if (userError.message.includes('invalid input syntax for type bigint')) {
+        console.error('Database error:', userError);
+        // Проверяем различные типы ошибок
+        if (userError.code === 'PGRST116') {
+          throw new Error('User not found');
+        } else if (userError.message && userError.message.includes('invalid input syntax for type bigint')) {
           throw new Error('Invalid ID format. Please enter numbers only');
+        } else if (userError.message && userError.message.includes('timeout')) {
+          throw new Error('Connection timeout. Please try again');
+        } else {
+          throw new Error(`Database error: ${userError.message || 'Unknown error'}`);
         }
-        throw new Error(`Database error: ${userError.message}`);
       }
       
       if (!userData) {
-        console.error('AUTH PAGE: No user found with mb_id:', mbId);
+        console.error('No user found with mb_id:', mbId);
         throw new Error('User not found');
       }
       
-      console.log('AUTH PAGE: User found, checking energy/login date');
+      console.log('User found:', userData);
+
+      // Устанавливаем значения по умолчанию, если данные отсутствуют
+      if (!userData.max_energy) userData.max_energy = 100;
+      if (!userData.chance) userData.chance = 30;
+      if (userData.energy === undefined || userData.energy === null) userData.energy = 1;
 
       // Проверяем, нужно ли инициализировать энергию пользователя
       const today = new Date().toISOString().split('T')[0]; // Формат YYYY-MM-DD
@@ -249,13 +118,13 @@ export default function AuthPage() {
       
       // Если у пользователя нет энергии или даты последнего входа, инициализируем их
       if (userData.energy === undefined || userData.energy === null || userData.last_login_date === undefined || userData.last_login_date === null) {
-        console.log('AUTH PAGE: Initializing user energy');
+        console.log('Инициализация энергии пользователя');
         
         // Устанавливаем начальные значения
         const initialEnergy = 1;
         
         // Обновляем данные в базе
-        const { data: updatedData, error: updateError } = await supabaseClient
+        const { data: updatedData, error: updateError } = await supabase
           .from('users')
           .update({ 
             energy: initialEnergy,
@@ -266,9 +135,8 @@ export default function AuthPage() {
           .single();
           
         if (updateError) {
-          console.error('AUTH PAGE: Error initializing energy:', updateError);
+          console.error('Error initializing energy:', updateError);
         } else if (updatedData) {
-          console.log('AUTH PAGE: Energy initialized successfully');
           updatedUserData = updatedData;
         }
       } else {
@@ -277,13 +145,13 @@ export default function AuthPage() {
         
         // Если пользователь не входил сегодня, увеличиваем энергию
         if (lastLogin !== today) {
-          console.log('AUTH PAGE: Increasing user energy (last login was not today)');
+          console.log('Увеличиваем энергию пользователя');
           
           // Ограничиваем максимальное значение энергии
           const newEnergy = Math.min((userData.energy || 0) + 1, 100);
           
           // Обновляем данные в базе
-          const { data: updatedData, error: updateError } = await supabaseClient
+          const { data: updatedData, error: updateError } = await supabase
             .from('users')
             .update({ 
               energy: newEnergy,
@@ -294,26 +162,20 @@ export default function AuthPage() {
             .single();
             
           if (updateError) {
-            console.error('AUTH PAGE: Error updating energy:', updateError);
+            console.error('Error updating energy:', updateError);
           } else if (updatedData) {
-            console.log('AUTH PAGE: Energy updated successfully');
             updatedUserData = updatedData;
           }
         }
       }
 
       // Сохраняем данные пользователя в localStorage
-      console.log('AUTH PAGE: Saving user data to localStorage');
       localStorage.setItem('user', JSON.stringify(updatedUserData));
       
-      console.log('AUTH PAGE: Login successful, redirecting to home page');
-      setTimeout(() => {
-        console.log('AUTH PAGE: router.push(/) after login');
-        router.push('/');
-      }, 100);
-      
+      console.log('Login successful, redirecting to home page');
+      router.push('/');
     } catch (err: any) {
-      console.error('AUTH PAGE: Login error:', err);
+      console.error('Login error:', err);
       setError(err.message || 'An error occurred during login');
     } finally {
       setLoading(false);
@@ -322,7 +184,6 @@ export default function AuthPage() {
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
-    console.log('AUTH PAGE: RENDER: Showing authentication check loading screen');
     return (
       <div
         style={{
@@ -399,24 +260,6 @@ export default function AuthPage() {
         >
           Kashif AI
         </h1>
-        
-        {supabaseError && (
-          <div
-            style={{
-              backgroundColor: 'rgba(255, 70, 70, 0.2)',
-              border: '1px solid #ff4646',
-              borderRadius: 8,
-              padding: 16,
-              marginBottom: 20,
-              color: '#ff9999',
-              fontSize: 14,
-              lineHeight: 1.5,
-            }}
-          >
-            <p><strong>Connection Error:</strong> {supabaseError}</p>
-            <p style={{ marginTop: 8 }}>Please check your internet connection and try reloading the page.</p>
-          </div>
-        )}
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
