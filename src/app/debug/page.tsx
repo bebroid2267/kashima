@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export default function DebugPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -10,33 +11,40 @@ export default function DebugPage() {
   const [searchResult, setSearchResult] = useState<any | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<string>('Проверка подключения...');
+  const [connectionStatus, setConnectionStatus] = useState<string>('Checking connection...');
 
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        console.log('Проверка подключения к Supabase...');
+        console.log('Checking Supabase connection...');
         console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log('Ключ:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Установлен' : 'Отсутствует');
+        console.log('Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Missing');
         
-        // Проверяем подключение, запрашивая информацию о таблице
+        if (!supabase) {
+          console.error('Supabase client not available');
+          setConnectionStatus('Error: Supabase client not initialized');
+          setError('Database unavailable. Check environment variables and connection.');
+          return;
+        }
+        
+        // Check connection by requesting table information
         const { data, error } = await supabase
           .from('users')
           .select('count');
         
         if (error) {
-          console.error('Ошибка подключения к Supabase:', error);
-          setConnectionStatus(`Ошибка подключения: ${error.message}`);
-          setError(`Ошибка подключения к базе данных: ${error.message}`);
+          console.error('Supabase connection error:', error);
+          setConnectionStatus(`Connection error: ${error.message}`);
+          setError(`Database connection error: ${error.message}`);
         } else {
-          console.log('Подключение к Supabase успешно');
-          setConnectionStatus('Подключение успешно');
+          console.log('Supabase connection successful');
+          setConnectionStatus('Connection successful');
           fetchUsers();
         }
       } catch (err: any) {
-        console.error('Исключение при проверке подключения:', err);
-        setConnectionStatus(`Исключение: ${err.message}`);
-        setError(`Ошибка: ${err.message}`);
+        console.error('Exception during connection check:', err);
+        setConnectionStatus(`Exception: ${err.message}`);
+        setError(`Error: ${err.message}`);
       }
     };
     
@@ -45,23 +53,27 @@ export default function DebugPage() {
 
   const fetchUsers = async () => {
     try {
-      console.log('Запрос всех пользователей...');
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+      
+      console.log('Requesting all users...');
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
       
-      console.log('Результат запроса пользователей:', { data, error });
+      console.log('User request result:', { data, error });
       
       if (error) {
-        console.error('Ошибка при получении пользователей:', error);
+        console.error('Error getting users:', error);
         throw error;
       }
       
-      console.log(`Получено пользователей: ${data?.length || 0}`);
+      console.log(`Users received: ${data?.length || 0}`);
       setUsers(data || []);
     } catch (err: any) {
-      console.error('Ошибка при получении пользователей:', err);
+      console.error('Error getting users:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -70,11 +82,15 @@ export default function DebugPage() {
 
   const handleSearch = async () => {
     if (!searchMbId.trim()) {
-      setSearchError('Пожалуйста, введите MB ID');
+      setSearchError('Please enter MB ID');
       return;
     }
     
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+      
       setSearchLoading(true);
       setSearchError(null);
       
@@ -91,7 +107,7 @@ export default function DebugPage() {
       setSearchResult(data);
     } catch (err: any) {
       console.error('Error searching user:', err);
-      setSearchError(err.message || 'Ошибка при поиске пользователя');
+      setSearchError(err.message || 'Error searching for user');
       setSearchResult(null);
     } finally {
       setSearchLoading(false);
@@ -137,7 +153,7 @@ export default function DebugPage() {
           letterSpacing: 1.2,
         }}
       >
-        Страница отладки
+        Debug Page
       </h1>
       
       <div
@@ -149,7 +165,7 @@ export default function DebugPage() {
           gap: 32,
         }}
       >
-        {/* Поиск пользователя */}
+        {/* User Search */}
         <div
           style={{
             background: 'rgba(20, 40, 70, 0.5)',
@@ -167,7 +183,7 @@ export default function DebugPage() {
               marginBottom: 16,
             }}
           >
-            Поиск пользователя по MB ID
+            Search User by MB ID
           </h2>
           
           <div
@@ -192,7 +208,7 @@ export default function DebugPage() {
                 outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              placeholder="Введите MB ID"
+              placeholder="Enter MB ID"
             />
             
             <button
@@ -213,7 +229,7 @@ export default function DebugPage() {
                 transition: 'background 0.2s',
               }}
             >
-              {searchLoading ? 'Поиск...' : 'Найти'}
+              {searchLoading ? 'Searching...' : 'Find'}
             </button>
           </div>
           
@@ -249,7 +265,7 @@ export default function DebugPage() {
                   marginBottom: 12,
                 }}
               >
-                Результат поиска
+                Search Result
               </h3>
               
               <div
@@ -270,29 +286,29 @@ export default function DebugPage() {
                 </div>
                 
                 <div>
-                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Энергия</div>
+                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Energy</div>
                   <div style={{ fontSize: 16 }}>
                     {searchResult.energy !== undefined && searchResult.energy !== null
                       ? `${searchResult.energy} / 100`
-                      : 'Не установлено'}
+                      : 'Not set'}
                   </div>
                 </div>
                 
                 <div>
-                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Последний вход</div>
+                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Last Login</div>
                   <div style={{ fontSize: 16 }}>
                     {searchResult.last_login_date
                       ? formatDate(searchResult.last_login_date)
-                      : 'Никогда'}
+                      : 'Never'}
                   </div>
                 </div>
                 
                 <div>
-                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Дата создания</div>
+                  <div style={{ color: '#7ecbff', fontSize: 14, marginBottom: 4 }}>Created Date</div>
                   <div style={{ fontSize: 16 }}>
                     {searchResult.created_at
                       ? formatDate(searchResult.created_at)
-                      : 'Неизвестно'}
+                      : 'Unknown'}
                   </div>
                 </div>
               </div>
@@ -300,7 +316,7 @@ export default function DebugPage() {
           )}
         </div>
         
-        {/* Список всех пользователей */}
+        {/* All Users List */}
         <div
           style={{
             background: 'rgba(20, 40, 70, 0.5)',
@@ -318,7 +334,7 @@ export default function DebugPage() {
               marginBottom: 16,
             }}
           >
-            Все пользователи
+            All Users
           </h2>
           
           {loading ? (
@@ -364,7 +380,7 @@ export default function DebugPage() {
                 textAlign: 'center',
               }}
             >
-              Пользователи не найдены
+              No users found
             </div>
           ) : (
             <div
@@ -411,7 +427,7 @@ export default function DebugPage() {
                         borderBottom: '1px solid #2a4a7a',
                       }}
                     >
-                      Энергия
+                      Energy
                     </th>
                     <th
                       style={{
@@ -420,7 +436,7 @@ export default function DebugPage() {
                         borderBottom: '1px solid #2a4a7a',
                       }}
                     >
-                      Последний вход
+                      Last Login
                     </th>
                     <th
                       style={{
@@ -429,7 +445,7 @@ export default function DebugPage() {
                         borderBottom: '1px solid #2a4a7a',
                       }}
                     >
-                      Дата создания
+                      Created Date
                     </th>
                   </tr>
                 </thead>
@@ -462,7 +478,7 @@ export default function DebugPage() {
                       >
                         {user.energy !== undefined && user.energy !== null
                           ? `${user.energy} / 100`
-                          : 'Не установлено'}
+                          : 'Not set'}
                       </td>
                       <td
                         style={{
@@ -471,7 +487,7 @@ export default function DebugPage() {
                       >
                         {user.last_login_date
                           ? formatDate(user.last_login_date)
-                          : 'Никогда'}
+                          : 'Never'}
                       </td>
                       <td
                         style={{
@@ -480,7 +496,7 @@ export default function DebugPage() {
                       >
                         {user.created_at
                           ? formatDate(user.created_at)
-                          : 'Неизвестно'}
+                          : 'Unknown'}
                       </td>
                     </tr>
                   ))}
@@ -499,4 +515,4 @@ export default function DebugPage() {
       `}</style>
     </div>
   );
-} 
+}
