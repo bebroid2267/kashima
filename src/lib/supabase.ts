@@ -19,24 +19,37 @@ const createSafeSupabaseClient = () => {
     
     // Возвращаем заглушку клиента, которая не вызовет ошибок при вызове методов
     return {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            maybeSingle: async () => ({ data: null, error: { message: 'Database connection error' } }),
-            single: async () => ({ data: null, error: { message: 'Database connection error' } })
-          })
-        }),
-        update: () => ({
-          eq: () => ({
-            select: () => ({
-              single: async () => ({ data: null, error: { message: 'Database connection error' } })
+      from: (table: string) => {
+        const mockResponse = { data: null, error: { message: 'Database connection error' } };
+        return {
+          select: (columns?: string) => {
+            // Если это простой select без дальнейших методов
+            const selectResult = {
+              ...mockResponse,
+              single: async () => mockResponse,
+              maybeSingle: async () => mockResponse,
+              eq: () => ({
+                single: async () => mockResponse,
+                maybeSingle: async () => mockResponse
+              })
+            };
+            return selectResult;
+          },
+          update: () => ({
+            eq: () => ({
+              ...mockResponse,
+              select: () => ({
+                single: async () => ({ data: null, error: { message: 'Database connection error' } })
+              })
             })
-          })
-        })
-      })
+          }),
+          upsert: async () => ({ data: null, error: { message: 'Database connection error' } }),
+          insert: async () => ({ data: null, error: { message: 'Database connection error' } })
+        };
+      }
     };
   }
 };
 
 // Create a single supabase client for interacting with your database
-export const supabase = createSafeSupabaseClient(); 
+export const supabase = createSafeSupabaseClient();

@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
 
 // Table for storing energy update cycle information
 const ENERGY_CYCLES_TABLE = 'energy_update_cycles';
@@ -34,7 +33,7 @@ export async function POST(request: Request) {
       .eq('cycle_id', cycleId)
       .single();
     
-    if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
+    if (cycleCheckError && 'code' in cycleCheckError && cycleCheckError.code !== 'PGRST116') {
       console.error('Error checking cycle:', cycleCheckError);
       return NextResponse.json(
         { error: 'Database error when checking cycle' },

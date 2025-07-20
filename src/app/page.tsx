@@ -255,7 +255,7 @@ export default function Home() {
           if (error) {
             console.error('Ошибка при получении данных пользователя:', error);
             // Если ошибка критичная (например, пользователь удалён) — разлогиниваем
-            if (error.code === 'PGRST116') {
+            if ('code' in error && error.code === 'PGRST116') {
               localStorage.removeItem('user');
               setUser(null);
               // Устанавливаем задержку перед переходом для избежания проблем с состоянием

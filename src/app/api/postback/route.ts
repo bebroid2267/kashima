@@ -118,7 +118,7 @@ export async function GET(request: Request) {
       .eq('mb_id', user_id)
       .single();
     
-    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means not found
+    if (fetchError && 'code' in fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means not found
       console.error('Error fetching user:', fetchError);
       return NextResponse.json(
         { error: 'Database error when fetching user' },
