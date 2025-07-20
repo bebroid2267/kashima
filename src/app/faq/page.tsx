@@ -8,7 +8,7 @@ import koefImg from '@/../public/koef2.png';
 import energyImg from '@/../public/energy.png';
 import depositImg from '@/../public/dep2.png';
 import aviatorImg from '@/../public/aviator.png';
-import messageImg from '@/../public/message.png';
+import messageImg from '@/../public/help2.png';
 
 interface FAQBlock {
   title: string;
