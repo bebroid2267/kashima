@@ -72,11 +72,18 @@ export default function DownloadPage() {
       // URL parameter - important indicator as it's set by middleware
       const hasUrlPwaParam = window.location.href.includes('pwa=true');
       
+      // Additional PWA detection methods
+      const isNavigatorStandalone = (window.navigator as any).standalone === true;
+      const isMatchMediaStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isFromHomeScreen = document.referrer === '' || document.referrer.includes('android-app://');
+      
       // Updated PWA status definition:
       // 1. Real PWA through browser API
       // 2. Presence of special realer-pwa cookie
-      // 3. Combination of regular cookie/localStorage AND URL parameter
-      const isPWA = isPwaMode || hasRealerPwaCookie || (storedPwaStatus && hasUrlPwaParam);
+      // 3. Navigator standalone (iOS)
+      // 4. Match media standalone
+      // 5. Combination of regular cookie/localStorage AND URL parameter
+      const isPWA = isPwaMode || hasRealerPwaCookie || isNavigatorStandalone || isMatchMediaStandalone || (storedPwaStatus && hasUrlPwaParam) || (isFromHomeScreen && storedPwaStatus);
       setIsPwa(isPWA);
       
       console.log('PWA detection details:', {
@@ -85,9 +92,11 @@ export default function DownloadPage() {
         hasRealerPwaCookie,
         storedPwaStatus,
         hasUrlPwaParam,
-        navigatorStandalone: (window.navigator as any).standalone,
-        matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+        isNavigatorStandalone,
+        isMatchMediaStandalone,
+        isFromHomeScreen,
         referrer: document.referrer,
+        userAgent: navigator.userAgent,
         isPWA
       });
       
@@ -96,22 +105,43 @@ export default function DownloadPage() {
       if (isPWA) {
         setIsRedirecting(true);
         
-        // Store the PWA state only if it's real PWA or has special cookie
+        // Store the PWA state for all PWA cases
         try {
-          if (isPwaMode || hasRealerPwaCookie) {
-            localStorage.setItem('isPwa', 'true');
-            sessionStorage.setItem('isPwa', 'true');
-            document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
-            
-            // If this is real PWA, set our special cookie
-            if (isPwaMode) {
-              document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
-            }
+          localStorage.setItem('isPwa', 'true');
+          sessionStorage.setItem('isPwa', 'true');
+          document.cookie = 'isPwa=true; path=/; max-age=31536000; SameSite=Strict';
+          
+          // If this is real PWA, set our special cookie
+          if (isPwaMode || isNavigatorStandalone || isMatchMediaStandalone) {
+            document.cookie = 'realer-pwa=true; path=/; max-age=31536000; SameSite=Strict';
           }
           
           // Force redirect to auth page in all cases
           console.log('PWA mode detected, redirecting to auth page');
-          setTimeout(() => router.push('/auth?pwa=true'), 300);
+          
+          // Try multiple redirect methods for better reliability
+          const redirectToAuth = () => {
+            try {
+              router.push('/auth?pwa=true');
+            } catch (routerError) {
+              console.error('Router push failed:', routerError);
+              window.location.href = '/auth?pwa=true';
+            }
+          };
+          
+          // Immediate redirect
+          redirectToAuth();
+          
+          // Backup redirect after short delay
+          setTimeout(redirectToAuth, 100);
+          
+          // Final fallback redirect
+          setTimeout(() => {
+            if (window.location.pathname === '/download') {
+              window.location.replace('/auth?pwa=true');
+            }
+          }, 500);
+          
         } catch (e) {
           console.error('Error storing PWA state:', e);
           // Try direct location change as backup

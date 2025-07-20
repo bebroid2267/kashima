@@ -25,9 +25,14 @@ export function middleware(request: NextRequest) {
   // Стандартная проверка PWA для обычных пользователей
   
   // Доверенные индикаторы PWA режима (заголовки браузера)
+  const userAgent = request.headers.get('user-agent') || '';
   const isRealPWA = 
     request.headers.get('display-mode') === 'standalone' || 
-    request.headers.has('app-platform');
+    request.headers.has('app-platform') ||
+    // Дополнительные проверки для PWA
+    userAgent.includes('wv') || // WebView indicator
+    request.headers.get('sec-fetch-site') === 'none' || // PWA launch
+    request.headers.get('sec-fetch-mode') === 'navigate';
   
   // Вторичные индикаторы (могут быть подделаны)
   const hasPwaCookie = request.cookies.has('isPwa');
@@ -50,7 +55,9 @@ export function middleware(request: NextRequest) {
   // Считаем PWA если:
   // 1. Реальный PWA (индикаторы браузера) 
   // ИЛИ
-  // 2. Есть наша специальная кука realer-pwa или обычная isPwa И параметр pwa=true
+  // 2. Есть наша специальная кука realer-pwa 
+  // ИЛИ
+  // 3. Есть обычная isPwa кука И параметр pwa=true
   const isPWA = isRealPWA || hasRealerPwaCookie || (hasPwaCookie && hasPwaParam);
   
   // Логируем информацию о проверке PWA статуса
