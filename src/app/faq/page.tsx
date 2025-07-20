@@ -3,10 +3,10 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import Image from 'next/image';
-import chanceImg from '@/../public/chance.png';
-import koefImg from '@/../public/koef.png';
+import chanceImg from '@/../public/chance2.png';
+import koefImg from '@/../public/koef2.png';
 import energyImg from '@/../public/energy.png';
-import depositImg from '@/../public/deposit.png';
+import depositImg from '@/../public/dep2.png';
 import aviatorImg from '@/../public/aviator.png';
 import messageImg from '@/../public/message.png';
 
