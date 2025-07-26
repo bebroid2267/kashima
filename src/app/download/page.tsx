@@ -31,13 +31,13 @@ export default function DownloadPage() {
   const [displayMode, setDisplayMode] = useState<string>('browser');
   const router = useRouter();
   
-  // UI text in English only
+  // UI text in Italian
   const translations = {
-    title: "Kashif AI",
-    aviatorPredictor: "Aviator Predictor",
-    aiPowered: "Powered by artificial intelligence",
-    downloadApp: "Download",
-    redirecting: "Redirecting..."
+    title: "Oracolo AI",
+    aviatorPredictor: "Predittore Aviator",
+    aiPowered: "Alimentato dall'intelligenza artificiale",
+    downloadApp: "Scarica",
+    redirecting: "Reindirizzamento..."
   };
 
   // Immediate check for PWA mode on component mount
@@ -188,7 +188,7 @@ export default function DownloadPage() {
       
       // IMPORTANT: Don't redirect and don't set PWA flags in browser
       // Instead show message for user to open the installed app
-      alert('The application has been successfully installed! Please close the browser and open the Kashif AI app from your device\'s home screen.');
+      alert('L\'applicazione è stata installata con successo! Chiudi il browser e apri l\'app Oracolo AI dalla schermata home del tuo dispositivo.');
       
       // Update only UI state without redirect
       setDisplayMode('installed_pending');
@@ -205,20 +205,20 @@ export default function DownloadPage() {
     
     // For iOS Safari
     if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.matchMedia('(display-mode: standalone)').matches) {
-      alert('To install on iOS:\n1. Tap the "Share" button at the bottom of the screen\n2. Scroll down and select "Add to Home Screen"');
+      alert('Per installare su iOS:\n1. Tocca il pulsante "Condividi" nella parte inferiore dello schermo\n2. Scorri verso il basso e seleziona "Aggiungi alla schermata Home"');
       return;
     }
     
     // For Android browsers without install API
     if (/Android/.test(navigator.userAgent) && !deferredPrompt) {
-      alert('To install on Android:\n1. Tap the three dots (⋮) in the top right corner\n2. Select "Install app" or "Add to home screen"');
+      alert('Per installare su Android:\n1. Tocca i tre punti (⋮) nell\'angolo in alto a destra\n2. Seleziona "Installa app" o "Aggiungi alla schermata home"');
       return;
     }
 
     if (!deferredPrompt) {
       console.log('No installation prompt available');
       // Show special message to user
-      alert('To install the app:\n1. Click your browser\'s menu button (⋮ or ···)\n2. Select "Install app" or "Add to home screen"');
+      alert('Per installare l\'app:\n1. Clicca sul pulsante menu del tuo browser (⋮ o ···)\n2. Seleziona "Installa app" o "Aggiungi alla schermata home"');
       
       // Try to explicitly trigger event for mobile devices where this might work
       try {
@@ -253,7 +253,7 @@ export default function DownloadPage() {
       }
     } catch (error) {
       console.error('Error during PWA installation:', error);
-      alert('To install: tap your browser\'s menu button (⋮) and select "Install app"');
+      alert('Per installare: tocca il pulsante menu del tuo browser (⋮) e seleziona "Installa app"');
     }
   };
   
@@ -563,7 +563,7 @@ export default function DownloadPage() {
                   fontSize: 22,
                   fontWeight: 'bold',
                 }}>
-                  Kashif AI
+                  Oracolo AI
                 </span>
               </div>
               
@@ -633,7 +633,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  Accurate coefficient predictions
+                  Previsioni accurate dei coefficienti
                 </span>
               </div>
               <div style={{
@@ -644,7 +644,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  Advanced AI algorithm
+                  Algoritmo AI avanzato
                 </span>
               </div>
               <div style={{
@@ -654,7 +654,7 @@ export default function DownloadPage() {
               }}>
                 <span style={{ color: '#ffe066', fontSize: 18 }}>✓</span>
                 <span style={{ color: '#fff', fontSize: 16 }}>
-                  Increase your winning chances
+                  Aumenta le tue possibilità di vincita
                 </span>
               </div>
             </div>
