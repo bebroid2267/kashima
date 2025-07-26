@@ -22,46 +22,46 @@ interface FAQContent {
 }
 
 const FAQ_CONTENT = {
-  title: "F.A.Q. — Frequently Asked Questions",
+  title: "F.A.Q. — Domande Frequenti",
   blocks: [
     {
-      title: "What does the AI Vision button do?",
-      text: "The AI Vision button launches an artificial intelligence algorithm that makes a personalized prediction for the next round of the Aviator game. Each prediction includes:\n\n💡 A specific coefficient\n🧠 A justification based on this particular coefficient\n⚠️ A warning about the risk level (high, medium or safe)\n📌 1 prediction = 1 energy unit. Use it wisely.",
+      title: "Cosa fa il pulsante AI Vision?",
+      text: "Il pulsante AI Vision avvia un algoritmo di intelligenza artificiale che fa una previsione personalizzata per il prossimo round del gioco Aviator. Ogni previsione include:\n\n💡 Un coefficiente specifico\n🧠 Una giustificazione basata su questo particolare coefficiente\n⚠️ Un avviso sul livello di rischio (alto, medio o sicuro)\n📌 1 previsione = 1 unità di energia. Usala saggiamente.",
       image: ""
     },
     {
-      title: "Where is the prediction displayed?",
-      text: "Your current prediction is displayed in the center of the screen in the upper part. You immediately see the coefficient, explanation and probability of it being realized.",
+      title: "Dove viene visualizzata la previsione?",
+      text: "La tua previsione attuale viene visualizzata al centro dello schermo nella parte superiore. Vedi immediatamente il coefficiente, la spiegazione e la probabilità che si realizzi.",
       image: koefImg.src
     },
     {
-      title: "What does the Aviator button do?",
-      text: "The Aviator button opens the Aviator game section on the 1xbet website.\n📲 You can use Kashif AI and Aviator simultaneously, switching between windows — it's convenient and fast.",
+      title: "Cosa fa il pulsante Aviator?",
+      text: "Il pulsante Aviator apre la sezione del gioco Aviator sul sito web 1xbet.\n📲 Puoi usare Oracolo AI e Aviator simultaneamente, passando tra le finestre — è comodo e veloce.",
       image: aviatorImg.src
     },
     {
-      title: "How does energy work?",
-      text: "⚡ Every day you log into the app, you receive 1 energy unit (updated every 24 hours)\n🔁 1 energy = 1 prediction\n⛔ If energy is depleted, you can replenish it with a deposit",
+      title: "Come funziona l'energia?",
+      text: "⚡ Ogni giorno che accedi all'app, ricevi 1 unità di energia (aggiornata ogni 24 ore)\n🔁 1 energia = 1 previsione\n⛔ Se l'energia si esaurisce, puoi ricaricarla con un deposito",
       image: energyImg.src
     },
     {
-      title: "What is Winning Probability?",
-      text: "This is your prediction accuracy percentage. It:\n\n📈 Increases automatically after each deposit\n🔐 Is calculated by the AI algorithm\n💸 The higher the percentage, the more accurate your prediction and consequently you start earning more. AI starts predicting coefficients better and helps you analyze charts.",
+      title: "Cos'è la Probabilità di Vincita?",
+      text: "Questa è la percentuale di accuratezza delle tue previsioni. Essa:\n\n📈 Aumenta automaticamente dopo ogni deposito\n🔐 È calcolata dall'algoritmo AI\n💸 Più alta è la percentuale, più accurate sono le tue previsioni e di conseguenza inizi a guadagnare di più. L'AI inizia a prevedere meglio i coefficienti e ti aiuta ad analizzare i grafici.",
       image: chanceImg.src
     },
     {
-      title: "How does the Make Deposit button work?",
-      text: "Press to access the deposits section. Deposit:\n- Increases your chances of accurate predictions\n- Increases energy in the program for new AI Vision launches",
+      title: "Come funziona il pulsante Effettua Deposito?",
+      text: "Premi per accedere alla sezione depositi. Il deposito:\n- Aumenta le tue possibilità di previsioni accurate\n- Aumenta l'energia nel programma per nuovi lanci di AI Vision",
       image: depositImg.src
     },
     {
-      title: "Help Me button",
-      text: "If you encounter problems or want to learn more, write to me",
+      title: "Pulsante Aiutami",
+      text: "Se incontri problemi o vuoi saperne di più, scrivimi",
       image: messageImg.src
     },
     {
-      title: "The essentials:",
-      text: "- Use AI Vision for predictions\n- Switch between Kashif AI and Aviator, it's convenient 😉\n- Monitor your energy and accuracy levels\n- Make deposits to increase your chances",
+      title: "L'essenziale:",
+      text: "- Usa AI Vision per le previsioni\n- Passa tra Oracolo AI e Aviator, è comodo 😉\n- Monitora i tuoi livelli di energia e accuratezza\n- Effettua depositi per aumentare le tue possibilità",
       image: ""
     }
   ]
@@ -85,7 +85,7 @@ export default function FAQ() {
       {/* HEADER */}
       <div className="faq-header">
         <div className="header-content">
-          <button className="faq-exit-btn" onClick={handleExit}>Exit</button>
+          <button className="faq-exit-btn" onClick={handleExit}>Esci</button>
         </div>
       </div>
       <div className="faq-container">

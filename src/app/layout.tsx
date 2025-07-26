@@ -21,8 +21,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Kashif AI",
-  description: "Kashif AI - your intelligent assistant for predictions",
+  title: "Oracolo AI",
+  description: "Oracolo AI - il tuo assistente intelligente per le previsioni",
   themeColor: "#000000",
   appleWebApp: {
     capable: true,
@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="it">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/192.jpg" />

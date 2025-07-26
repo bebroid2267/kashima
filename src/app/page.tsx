@@ -13,76 +13,76 @@ const fakeCoeffs = [1.25, 3.88, 1.54, 1.28, 1.06];
 const predictionMessages = {
   '30-50': {
     "low": [  // 1.1–1.3x (40%)
-      "📡 AI precisely calculated weak activity — confident forecast for short flight.",
-      "📉 Chart is currently unstable — but I accurately predict minimal takeoff.",
-      "🧠 AI detected signal compression — forecast limited but precise.",
-      "🚦 Probability of flight above 1.3x is extremely low, forecast confirmed.",
-      "⚙️ Round history indicates imminent drop — entry point defined.",
-      "📊 Movement within normal range — recommend not taking risks.",
-      "🟢 Confident activity decline — recorded below-average chance.",
-      "🎯 Minimal risk — based on analysis, forecast limited but accurate."
+      "📡 L'AI ha calcolato precisamente attività debole — previsione sicura per volo breve.",
+      "📉 Il grafico è attualmente instabile — ma prevedo accuratamente decollo minimo.",
+      "🧠 L'AI ha rilevato compressione del segnale — previsione limitata ma precisa.",
+      "🚦 Probabilità di volo sopra 1.3x è estremamente bassa, previsione confermata.",
+      "⚙️ La cronologia dei round indica caduta imminente — punto di ingresso definito.",
+      "📊 Movimento entro range normale — raccomando di non rischiare.",
+      "🟢 Declino di attività sicuro — registrata possibilità sotto la media.",
+      "🎯 Rischio minimo — basato sull'analisi, previsione limitata ma accurata."
     ],
     "medium": [  // 2–5x (30%)
-      "🔍 Confident pattern detected — chance to catch up to 5x.",
-      "📈 I see growth signals — 3.2x coefficient possible.",
-      "🧩 Statistics indicate stable zone — forecast within 4x.",
-      "🚀 Wave strengthening — coefficient from 2x is real.",
-      "🛠️ AI calculated stable window — may shoot up.",
-      "📎 Synchronization with past peak — prediction justified.",
-      "🔁 Trajectory repeating — chance up to 5x justified by calculations."
+      "🔍 Pattern sicuro rilevato — possibilità di raggiungere fino a 5x.",
+      "📈 Vedo segnali di crescita — coefficiente 3.2x possibile.",
+      "🧩 Le statistiche indicano zona stabile — previsione entro 4x.",
+      "🚀 Onda che si rafforza — coefficiente da 2x è reale.",
+      "🛠️ L'AI ha calcolato finestra stabile — potrebbe salire.",
+      "📎 Sincronizzazione con picco passato — previsione giustificata.",
+      "🔁 Traiettoria che si ripete — possibilità fino a 5x giustificata dai calcoli."
     ],
     "high": [  // 5–10x (30%)
-      "🔥 Anomaly detected — powerful surge up to 7x possible.",
-      "🌊 Chart repeats model before past record — high potential.",
-      "🎲 Rare impulse — AI predicts jump above 6x.",
-      "🧠 Artificial intelligence detected critical point — moment of strength.",
-      "📡 Warning: chance for 9x, but prediction requires more precise calibration."
+      "🔥 Anomalia rilevata — potente impennata fino a 7x possibile.",
+      "🌊 Il grafico ripete modello prima del record passato — alto potenziale.",
+      "🎲 Impulso raro — l'AI prevede salto sopra 6x.",
+      "🧠 L'intelligenza artificiale ha rilevato punto critico — momento di forza.",
+      "📡 Avviso: possibilità per 9x, ma la previsione richiede calibrazione più precisa."
     ]
   },
   '50-70': {
     "low": [  // 1.1–1.6x (60%)
-      "🧠 Model predicts stable growth up to 1.6x — minimal risk.",
-      "📊 Chart shows weak but stable activity.",
-      "⚙️ Smooth wave — AI detected safe entry point.",
-      "📉 Fluctuations minimal, forecast — up to 1.5x.",
-      "🛡️ High accuracy on short segment — bet under control.",
-      "📈 Data confirms coefficient won't exceed 1.6x.",
-      "🔎 AI discovered predictable movement — excellent moment for careful bet.",
-      "🎯 Forecast stable, low impulse — ideal for calm play."
+      "🧠 Il modello prevede crescita stabile fino a 1.6x — rischio minimo.",
+      "📊 Il grafico mostra attività debole ma stabile.",
+      "⚙️ Onda liscia — l'AI ha rilevato punto di ingresso sicuro.",
+      "📉 Fluttuazioni minime, previsione — fino a 1.5x.",
+      "🛡️ Alta accuratezza su segmento breve — scommessa sotto controllo.",
+      "📈 I dati confermano che il coefficiente non supererà 1.6x.",
+      "🔎 L'AI ha scoperto movimento prevedibile — momento eccellente per scommessa attenta.",
+      "🎯 Previsione stabile, impulso basso — ideale per gioco calmo."
     ],
     "medium": [  // 1.6–2x (20%)
-      "🧬 AI caught growth pattern — coefficient may reach 2x.",
-      "📡 Confident upward signal — 1.9x boundary quite achievable.",
-      "📈 Surge probable — recommend controlling bet up to 2x.",
-      "🔍 Match with previous wave — coefficient 1.7–1.9x on horizon."
+      "🧬 L'AI ha catturato pattern di crescita — il coefficiente può raggiungere 2x.",
+      "📡 Segnale di crescita sicuro — confine 1.9x abbastanza raggiungibile.",
+      "📈 Impennata probabile — raccomando controllo scommessa fino a 2x.",
+      "🔍 Corrispondenza con onda precedente — coefficiente 1.7–1.9x all'orizzonte."
     ],
     "high": [  // 1.9–4x (20%)
-      "⚠️ AI predicted rare deviating signal — growth up to 4x possible.",
-      "🚀 Analysis indicates strong impulse — chance up to 3.5x.",
-      "💥 Probability of peak growth increasing — moment may be key."
+      "⚠️ L'AI ha previsto raro segnale deviante — crescita fino a 4x possibile.",
+      "🚀 L'analisi indica forte impulso — possibilità fino a 3.5x.",
+      "💥 Probabilità di crescita di picco in aumento — il momento può essere chiave."
     ]
   },
   '70-85': {
     "low": [  // 1.1–1.7x (85%)
-      "🧠 Highest accuracy — AI guarantees forecast within 1.7x.",
-      "🎯 Data confirms stable growth — bet under control.",
-      "📈 Confident upward movement — perfect for confident entry.",
-      "🛡️ AI in full confidence — coefficient up to 1.6x.",
-      "📊 Calculations aligned — movement won't exceed 1.7x.",
-      "📎 Historical pattern fully matched — confident entry point.",
-      "🎯 Forecast approaching ideal — minimal risk.",
-      "📡 Model worked scenario at 95% — bet without surprises.",
-      "🔐 Everything under control — forecast aimed at maximum predictability."
+      "🧠 Massima accuratezza — l'AI garantisce previsione entro 1.7x.",
+      "🎯 I dati confermano crescita stabile — scommessa sotto controllo.",
+      "📈 Movimento verso l'alto sicuro — perfetto per ingresso fiducioso.",
+      "🛡️ L'AI in piena fiducia — coefficiente fino a 1.6x.",
+      "📊 Calcoli allineati — il movimento non supererà 1.7x.",
+      "📎 Pattern storico completamente abbinato — punto di ingresso sicuro.",
+      "🎯 Previsione che si avvicina all'ideale — rischio minimo.",
+      "📡 Il modello ha lavorato scenario al 95% — scommessa senza sorprese.",
+      "🔐 Tutto sotto controllo — previsione mirata alla massima prevedibilità."
     ],
     "medium": [  // 1.8–2x (10%)
-      "🔍 AI detects surge — coefficient up to 2x possible.",
-      "📈 Forecast justified — rare window up to 1.9x open.",
-      "💡 Activity flash detected — bet reasonable within 2x."
+      "🔍 L'AI rileva impennata — coefficiente fino a 2x possibile.",
+      "📈 Previsione giustificata — rara finestra fino a 1.9x aperta.",
+      "💡 Flash di attività rilevato — scommessa ragionevole entro 2x."
     ],
     "high": [  // 2–2.5x (5%)
-      "⚡ Exceptional case — coefficient up to 2.5x confirmed by AI.",
-      "🚀 Unique pattern identified — takeoff chance increased.",
-      "💥 AI gave signal for peak point — use this chance."
+      "⚡ Caso eccezionale — coefficiente fino a 2.5x confermato dall'AI.",
+      "🚀 Pattern unico identificato — possibilità di decollo aumentata.",
+      "💥 L'AI ha dato segnale per punto di picco — usa questa possibilità."
     ]
   }
 };
@@ -91,18 +91,18 @@ const predictionMessages = {
 
 // Arabic translations removed - using only English translations
 
-// UI text in English
+// UI text in Italian
 const translations = {
   aiVisionButton: "AI Vision",
   aviatorButton: "Aviator",
-  clickForPrediction: "Click AI Vision for prediction",
-  download: "Download",
-  chanceOfWinning: "Chance of Winning",
-  howToIncreaseChance: "HOW TO INCREASE YOUR CHANCES?",
-  howToIncreaseDesc: "Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances!",
-  makeDeposit: "Make Deposit",
-  helpMe: "Help Me",
-  fullEnergy: "Full",
+  clickForPrediction: "Clicca AI Vision per previsione",
+  download: "Scarica",
+  chanceOfWinning: "Possibilità di Vincita",
+  howToIncreaseChance: "COME AUMENTARE LE TUE POSSIBILITÀ?",
+  howToIncreaseDesc: "Effettua depositi e gioca ad Aviator regolarmente per aumentare il tuo potenziale di vincita. Più sei attivo, maggiori sono le tue possibilità!",
+  makeDeposit: "Effettua Deposito",
+  helpMe: "Aiutami",
+  fullEnergy: "Pieno",
   homeFooter: "HOME",
   faqFooter: "FAQ"
 };
@@ -1442,7 +1442,7 @@ export default function Home() {
             fontFamily: "'montserrat', Arial, Helvetica, sans-serif",
           }}
         >
-          Kashif AI
+          Oracolo AI
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {showInstallButton && (

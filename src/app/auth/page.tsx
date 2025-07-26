@@ -397,7 +397,7 @@ export default function AuthPage() {
             fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
           }}
         >
-          Kashif AI
+          Oracolo AI
         </h1>
         
         {supabaseError && (
