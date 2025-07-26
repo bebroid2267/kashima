@@ -142,7 +142,7 @@ export default function AuthPage() {
         // Check if Supabase is initialized
         if (typeof window !== 'undefined' && window.supabaseInitError) {
           console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-          setSupabaseError(`Database connection error: ${window.supabaseInitError}`);
+          setSupabaseError(`Errore di connessione al database: ${window.supabaseInitError}`);
           setIsCheckingAuth(false);
           return;
         }
@@ -209,12 +209,12 @@ export default function AuthPage() {
       // Check if Supabase is properly initialized
       if (typeof window !== 'undefined' && window.supabaseInitError) {
         console.error('AUTH PAGE: Supabase initialization error:', window.supabaseInitError);
-        throw new Error(`Database connection error: ${window.supabaseInitError}`);
+        throw new Error(`Errore di connessione al database: ${window.supabaseInitError}`);
       }
       
       if (!supabaseClient) {
         console.error('AUTH PAGE: Supabase client is not available');
-        throw new Error('Database unavailable. Please check your internet connection and try again.');
+        throw new Error('Database non disponibile. Controlla la tua connessione internet e riprova.');
       }
       
       console.log('AUTH PAGE: Supabase client is available, querying users table');
@@ -231,14 +231,14 @@ export default function AuthPage() {
       if (userError) {
         console.error('AUTH PAGE: Database error:', userError);
         if (userError.message.includes('invalid input syntax for type bigint')) {
-          throw new Error('Invalid ID format. Please enter numbers only');
+          throw new Error('Formato ID non valido. Inserisci solo numeri');
         }
         throw new Error(`Database error: ${userError.message}`);
       }
       
       if (!userData) {
         console.error('AUTH PAGE: No user found with mb_id:', mbId);
-        throw new Error('User not found');
+        throw new Error('Utente non trovato');
       }
       
       console.log('AUTH PAGE: User found, checking energy/login date');
@@ -266,7 +266,7 @@ export default function AuthPage() {
           .single();
           
         if (updateError) {
-          console.error('AUTH PAGE: Error initializing energy:', updateError);
+          console.error('AUTH PAGE: Errore nell\'inizializzazione dell\'energia:', updateError);
         } else if (updatedData) {
           console.log('AUTH PAGE: Energy initialized successfully');
           updatedUserData = updatedData;
@@ -294,7 +294,7 @@ export default function AuthPage() {
             .single();
             
           if (updateError) {
-            console.error('AUTH PAGE: Error updating energy:', updateError);
+            console.error('AUTH PAGE: Errore nell\'aggiornamento dell\'energia:', updateError);
           } else if (updatedData) {
             console.log('AUTH PAGE: Energy updated successfully');
             updatedUserData = updatedData;
@@ -314,7 +314,7 @@ export default function AuthPage() {
       
     } catch (err: any) {
       console.error('AUTH PAGE: Login error:', err);
-      setError(err.message || 'An error occurred during login');
+      setError(err.message || 'Si è verificato un errore durante l\'accesso');
     } finally {
       setLoading(false);
     }
@@ -354,7 +354,7 @@ export default function AuthPage() {
             }}
           ></div>
           <div style={{ color: '#7ecbff', fontSize: 18 }}>
-            Checking authentication...
+            Controllo autenticazione...
           </div>
         </div>
       </div>
@@ -413,8 +413,8 @@ export default function AuthPage() {
               lineHeight: 1.5,
             }}
           >
-            <p><strong>Connection Error:</strong> {supabaseError}</p>
-            <p style={{ marginTop: 8 }}>Please check your internet connection and try reloading the page.</p>
+            <p><strong>Errore di Connessione:</strong> {supabaseError}</p>
+            <p style={{ marginTop: 8 }}>Controlla la tua connessione internet e prova a ricaricare la pagina.</p>
           </div>
         )}
         
@@ -432,7 +432,7 @@ export default function AuthPage() {
                 fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
               }}
             >
-              Your ID Number
+              Il Tuo Numero ID
             </label>
             <input
               id="mbId"
@@ -452,7 +452,7 @@ export default function AuthPage() {
                 fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                 boxShadow: '0 0 8px #38e0ff55',
               }}
-              placeholder="Enter your ID number"
+              placeholder="Inserisci il tuo numero ID"
               required
               autoFocus
               onFocus={e => e.currentTarget.style.borderColor = '#ffe066'}
@@ -499,7 +499,7 @@ export default function AuthPage() {
               fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
             }}
           >
-            {loading ? 'Loading...' : 'Login'}
+            {loading ? 'Caricamento...' : 'Accedi'}
           </button>
         </form>
       </div>
