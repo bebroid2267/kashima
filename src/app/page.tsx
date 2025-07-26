@@ -93,9 +93,9 @@ const predictionMessages = {
 
 // UI text in Italian
 const translations = {
-  aiVisionButton: "AI Vision",
+  aiVisionButton: "Visione AI",
   aviatorButton: "Aviator",
-  clickForPrediction: "Clicca AI Vision per previsione",
+  clickForPrediction: "Clicca Visione AI per previsione",
   download: "Scarica",
   chanceOfWinning: "Possibilità di Vincita",
   howToIncreaseChance: "COME AUMENTARE LE TUE POSSIBILITÀ?",
@@ -480,7 +480,7 @@ export default function Home() {
         .single();
       
       if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
-        console.error('Ошибка при проверке цикла:', cycleCheckError);
+        console.error('Errore durante il controllo del ciclo:', cycleCheckError);
         return;
       }
       
@@ -499,7 +499,7 @@ export default function Home() {
       // или при явном вызове updateAllUsersEnergy()
       
     } catch (error) {
-      console.error('Ошибка при проверке цикла начисления энергии:', error);
+      console.error('Errore durante il controllo del ciclo di aggiornamento dell\'energia:', error);
     }
   };
 
@@ -518,7 +518,7 @@ export default function Home() {
     // Check if Supabase is initialized
     if (typeof window !== 'undefined' && window.supabaseInitError) {
       console.error('AUTH CHECK: Supabase initialization error:', window.supabaseInitError);
-      setSupabaseError(`Ошибка подключения к базе данных: ${window.supabaseInitError}`);
+      setSupabaseError(`Errore di connessione al database: ${window.supabaseInitError}`);
       return;
     }
     
@@ -526,7 +526,7 @@ export default function Home() {
     
     if (!supabaseClient) {
       console.error('AUTH CHECK: Supabase client is not available');
-      setSupabaseError('База данных недоступна. Проверьте интернет-соединение и попробуйте перезагрузить страницу.');
+      setSupabaseError('Database non disponibile. Controlla la tua connessione internet e prova a ricaricare la pagina.');
       return;
     }
     
@@ -620,7 +620,7 @@ export default function Home() {
               .eq('mb_id', data.mb_id);
             
             if (updateError) {
-              console.error('AUTH CHECK: Error updating energy:', updateError);
+              console.error('AUTH CHECK: Errore nell\'aggiornamento dell\'energia:', updateError);
             } else {
               // Обновляем локальные данные
               data.energy = newEnergy;
@@ -719,7 +719,7 @@ export default function Home() {
               .single();
             
             if (cycleCheckError && cycleCheckError.code !== 'PGRST116') {
-              console.error('Error checking cycle:', cycleCheckError);
+              console.error('Errore durante il controllo del ciclo:', cycleCheckError);
               return;
             }
             
@@ -854,7 +854,7 @@ export default function Home() {
         }
       }
     } catch (error) {
-      console.error('Ошибка при проверке и обновлении энергии:', error);
+      console.error('Errore nel controllo e aggiornamento dell\'energia:', error);
     }
   };
 
@@ -944,7 +944,7 @@ export default function Home() {
       
       // Check if Supabase client is available
       if (!supabaseClient) {
-        throw new Error('Database unavailable. Please try reloading the page.');
+        throw new Error('Database non disponibile. Prova a ricaricare la pagina.');
       }
       
       // Уменьшаем энергию на 1
@@ -956,7 +956,7 @@ export default function Home() {
       // Обновляем только energy в базе данных
       if (!supabaseClient) {
         console.error('Supabase client is not available, cannot update energy');
-        throw new Error('Database unavailable. Please try reloading the page.');
+        throw new Error('Database non disponibile. Prova a ricaricare la pagina.');
       }
       
       const { error } = await supabaseClient
@@ -965,7 +965,7 @@ export default function Home() {
         .eq('mb_id', user.mb_id);
 
       if (error) {
-        console.error('Ошибка при обновлении энергии:', error);
+        console.error('Errore nell\'aggiornamento dell\'energia:', error);
         // В случае ошибки восстанавливаем предыдущее значение энергии
         setEnergy(energy);
       } else {
@@ -1008,7 +1008,7 @@ export default function Home() {
       }, 3000);
     } catch (err: any) {
       console.error('Error in AI Vision:', err);
-      setSupabaseError(err.message || 'An error occurred');
+      setSupabaseError(err.message || 'Si è verificato un errore');
       setIsLoading(false);
     }
   };
@@ -1105,7 +1105,7 @@ export default function Home() {
       const result = await response.json();
       
       if (response.ok) {
-        setTestDepositResult('Success! Deposit processed. New chance: ' + result.chance + '%');
+        setTestDepositResult('Successo! Deposito elaborato. Nuova possibilità: ' + result.chance + '%');
         
         // Update local user state with new values
         if (result.chance) {
@@ -1119,11 +1119,11 @@ export default function Home() {
           localStorage.setItem('user', JSON.stringify(updatedUser));
         }
       } else {
-        setTestDepositResult('Error: ' + (result.error || 'Unknown error'));
+        setTestDepositResult('Errore: ' + (result.error || 'Errore sconosciuto'));
       }
     } catch (error) {
       console.error('Error making test deposit:', error);
-      setTestDepositResult('Error making deposit request');
+              setTestDepositResult('Errore nella richiesta di deposito');
     } finally {
       setTestDepositLoading(false);
     }
@@ -1238,10 +1238,10 @@ export default function Home() {
         // Запоминаем, что энергия начислена в этом цикле
         setLastEnergyAwardCycle(currentCycleId);
       } else {
-        console.error('Ошибка при обновлении энергии всех пользователей:', result.error);
+        console.error('Errore nell\'aggiornamento dell\'energia di tutti gli utenti:', result.error);
       }
     } catch (error) {
-      console.error('Ошибка при обновлении энергии всех пользователей:', error);
+              console.error('Errore nell\'aggiornamento dell\'energia di tutti gli utenti:', error);
     } finally {
       setIsUpdatingAllUsers(false);
     }
@@ -1301,7 +1301,7 @@ export default function Home() {
             }}
           ></div>
           <div style={{ color: '#7ecbff', fontSize: 18 }}>
-            Checking authorization...
+            Controllo autorizzazione...
           </div>
           <button 
             onClick={() => router.push('/auth')}
@@ -1316,7 +1316,7 @@ export default function Home() {
               cursor: 'pointer',
             }}
           >
-            Go to Authorization
+            Vai all'Autorizzazione
           </button>
         </div>
       </div>
@@ -1354,13 +1354,13 @@ export default function Home() {
           }}
         >
           <h2 style={{ color: '#ff9999', fontSize: 22, textAlign: 'center' }}>
-            Connection Error
+            Errore di Connessione
           </h2>
           <p style={{ color: '#ff9999', fontSize: 16, textAlign: 'center', lineHeight: 1.5 }}>
             {supabaseError}
           </p>
           <p style={{ color: '#7ecbff', fontSize: 14, textAlign: 'center', marginTop: 8 }}>
-            Please check your internet connection and try reloading the page.
+            Controlla la tua connessione internet e prova a ricaricare la pagina.
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -1376,7 +1376,7 @@ export default function Home() {
               transition: 'all 0.2s',
             }}
           >
-            Reload
+            Ricarica
           </button>
         </div>
       </div>
@@ -1463,7 +1463,7 @@ export default function Home() {
                 fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
               }}
             >
-              Download
+              Scarica
             </button>
           )}
 
@@ -1607,7 +1607,7 @@ export default function Home() {
                       direction: 'ltr',
                       zIndex: 2
                     }}>
-                    Click AI Vision for prediction
+                    Clicca Visione AI per previsione
                   </div>
                 )}
               </div>
@@ -1652,7 +1652,7 @@ export default function Home() {
                     if (!(isLoading || energy <= 0)) e.currentTarget.style.boxShadow = '0 0 16px #ffe06699';
                   }}
                 >
-                  AI Vision
+                  Visione AI
                 </button>
                 <button
                   onClick={handleAviatorClick}
@@ -1754,7 +1754,7 @@ export default function Home() {
                   )}
                   {energy >= maxEnergy && (
                     <>
-                      <span>Full</span>
+                      <span>Pieno</span>
                       <span style={{ color: '#ffe066', fontSize: 18 }}>⚡</span>
                     </>
                   )}
@@ -1795,7 +1795,7 @@ export default function Home() {
                           textShadow: '0 0 8px #7ecbff99',
                           fontFamily: 'Orbitron, Segoe UI, Arial, sans-serif',
                         }}>
-                          Chance of winning
+                          Possibilità di vincita
                         </div>
                         <div style={{
                           fontSize: 27,
@@ -1842,7 +1842,7 @@ export default function Home() {
                           textAlign: 'center',
                           textShadow: '0 0 8px #ffe06644',
                         }}>
-                          HOW TO INCREASE YOUR CHANCE?
+                          COME AUMENTARE LE TUE POSSIBILITÀ?
                         </div>
                         <div style={{
                           color: '#7ecbff',
@@ -1851,7 +1851,7 @@ export default function Home() {
                           textAlign: 'center',
                           direction: 'ltr'
                         }}>
-                          Make deposits and play Aviator regularly to increase your winning potential. The more active you are, the higher your chances become!
+                          Effettua depositi e gioca ad Aviator regolarmente per aumentare il tuo potenziale di vincita. Più sei attivo, maggiori sono le tue possibilità!
                         </div>
                       </div>
                       {/* Кнопки для депозита и помощи */}
@@ -1886,7 +1886,7 @@ export default function Home() {
                           onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #ff7875cc'; }}
                           onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #ff4d4f99'; }}
                         >
-                          Make Deposit
+                          Effettua Deposito
                         </button>
                         <button
                           onClick={handleHelpClick}
@@ -1911,7 +1911,7 @@ export default function Home() {
                           onMouseOver={e => { e.currentTarget.style.boxShadow = '0 0 24px #faad14cc'; }}
                           onMouseOut={e => { e.currentTarget.style.boxShadow = '0 0 16px #faad1499'; }}
                         >
-                          Help Me
+                          Aiutami
                         </button>
                       </div>
                     </>
