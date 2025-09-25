@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     // Create update records for each user
     const updates = users.map(user => {
       const currentEnergy = user.energy || 0;
-      const newEnergy = Math.min(currentEnergy + 1, 100);
+      const newEnergy = Math.min(currentEnergy + 5, 100);
       
       return {
         mb_id: user.mb_id,
